@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "667662415150",
+    "project_id": "appfilmauthentication",
+    "storage_bucket": "appfilmauthentication.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:667662415150:android:7bbb5c5bdb1c7d26b336bf",
+        "android_client_info": {
+          "package_name": "com.example.appfilm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3QDcvK6_ojgKFc0Rf2mjsi4nxvFCNj_8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:667662415150:android:83769f9c67d0debbb336bf",
+        "android_client_info": {
+          "package_name": "com.example.noteapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3QDcvK6_ojgKFc0Rf2mjsi4nxvFCNj_8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
