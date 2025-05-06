@@ -8,7 +8,7 @@ import javax.inject.Singleton
 
 
 @Singleton
-class ReSendEmailVerificationUseCase @Inject constructor(
+class EmailVerificationUseCase @Inject constructor(
     private val authDataSource: IAuthRepository
 ) {
 

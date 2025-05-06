@@ -20,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.appfilm.R
 import com.example.appfilm.common.Constants
 import com.example.appfilm.presentation.ui.register.componets.SuccessDialog
@@ -28,7 +30,7 @@ import com.example.appfilm.presentation.ui.register.viewmodel.RegisterViewModel
 
 
 @Composable
-fun RegisterScreen(registerViewModel: RegisterViewModel){
+fun RegisterScreen(navController: NavController, registerViewModel: RegisterViewModel = hiltViewModel() ){
     Column(
         modifier = Modifier.fillMaxSize().padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,

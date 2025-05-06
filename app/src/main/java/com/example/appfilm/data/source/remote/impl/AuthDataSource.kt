@@ -24,12 +24,12 @@ class AuthDataSource @Inject constructor(
     private val firebaseAuth: FirebaseAuth
 ): IAuthDataSource {
 
-    override fun login(email: String, password: String): Flow<Resource<Unit>> = flow {
-
+    override fun login(email: String, password: String): Flow<Resource<Boolean>> = flow {
         emit(Resource.Loading())
         try{
             firebaseAuth.signInWithEmailAndPassword(email, password).await()
-            emit(Resource.Success(Unit))
+            val isVerified = firebaseAuth.currentUser?.isEmailVerified == true
+            emit(Resource.Success(isVerified))
         }catch (e: Exception){
             emit(Resource.Error(e.message ?: "Login Failed", e))
 

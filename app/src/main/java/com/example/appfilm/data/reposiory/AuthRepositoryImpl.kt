@@ -11,7 +11,7 @@ import javax.inject.Singleton
 class AuthRepositoryImpl @Inject constructor(
     private val authDataSource: IAuthDataSource
 ): IAuthRepository{
-    override fun login(email: String, password: String): Flow<Resource<Unit>> {
+    override fun login(email: String, password: String): Flow<Resource<Boolean>> {
         return authDataSource.login(email, password)
     }
 

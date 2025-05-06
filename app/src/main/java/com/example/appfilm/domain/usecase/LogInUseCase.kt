@@ -11,7 +11,7 @@ import javax.inject.Singleton
 class LogInUseCase @Inject constructor(
   private val authRepository: IAuthRepository
 ) {
-    operator fun invoke(email: String, password: String): Flow<Resource<Unit>>{
+    operator fun invoke(email: String, password: String): Flow<Resource<Boolean>>{
         return authRepository.login(email, password)
     }
 }

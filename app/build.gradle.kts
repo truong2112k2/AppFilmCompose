@@ -3,8 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 
-    alias(libs.plugins.ksp)
 
+    alias(libs.plugins.ksp)
     id ("dagger.hilt.android.plugin")
     alias(libs.plugins.google.gms.google.services)
 }
@@ -73,9 +73,13 @@ dependencies {
 
     implementation (libs.hilt.android)
     ksp(libs.androidx.room.compiler)
+    ksp(libs.hilt.compiler)
 
-     ksp(libs.hilt.compiler)
+    implementation (libs.androidx.hilt.navigation.compose)
 
     implementation (libs.firebase.auth)
     implementation (libs.androidx.lifecycle.viewmodel.compose)
+
+    implementation(libs.androidx.navigation.compose)
+
 }
