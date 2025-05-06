@@ -6,6 +6,8 @@ import javax.inject.Singleton
 @Singleton
 data class AppUseCases @Inject constructor (
     val logInUseCase: LogInUseCase,
-    val registerUseCase: RegisterUseCase
+    val registerUseCase: RegisterUseCase,
+    val validationUseCase: ValidationUseCase,
+    val reSendEmailVerification: ReSendEmailVerificationUseCase
 ) {
 }

@@ -18,4 +18,8 @@ class AuthRepositoryImpl @Inject constructor(
     override fun register(email: String, password: String): Flow<Resource<Unit>> {
         return authDataSource.register(email, password)
     }
+
+    override fun resendVerificationEmail(): Flow<Resource<Unit>> {
+        return authDataSource.resendVerificationEmail()
+    }
 }
