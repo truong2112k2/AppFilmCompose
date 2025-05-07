@@ -26,6 +26,12 @@ class AuthDataSource @Inject constructor(
 
     override fun login(email: String, password: String): Flow<Resource<Boolean>> = flow {
         emit(Resource.Loading())
+
+        val user = firebaseAuth.currentUser
+
+        if (user != null) {
+            Log.d("CheckUser", user.email.toString() +"----login----" +user.isEmailVerified.toString())
+        }
         try{
             firebaseAuth.signInWithEmailAndPassword(email, password).await()
             val isVerified = firebaseAuth.currentUser?.isEmailVerified == true
@@ -39,6 +45,12 @@ class AuthDataSource @Inject constructor(
     override fun register(email: String, password: String): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading())
         try {
+            val user = firebaseAuth.currentUser
+
+            if (user != null) {
+                Log.d("CheckUser", user.email.toString() +"register" +user.isEmailVerified.toString())
+            }
+
             firebaseAuth.createUserWithEmailAndPassword(email, password).await()
             firebaseAuth.currentUser?.sendEmailVerification()?.await()
 

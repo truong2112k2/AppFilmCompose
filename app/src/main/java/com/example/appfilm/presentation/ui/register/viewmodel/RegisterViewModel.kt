@@ -10,6 +10,7 @@ import com.example.appfilm.common.Resource
 import com.example.appfilm.domain.usecase.AppUseCases
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,77 +21,96 @@ import javax.inject.Inject
 class RegisterViewModel @Inject constructor(
     private val appUseCases: AppUseCases
 
-): ViewModel() {
+) : ViewModel() {
 
 
     var registerState by mutableStateOf(RegisterUIState())
+    var sendEmailUIState by mutableStateOf(RegisterUIState())
+
     var registerFields by mutableStateOf(RegisterFields())
 
 
-
-
-
-    fun toggleIsShowDialogSuccess(){
+    fun updateResultTextSendEmail(newResult: String){
+        registerFields = registerFields.copy(
+            resultTextSendEmail = newResult
+        )
+    }
+    fun toggleIsShowDialogSuccess() {
         registerFields = registerFields.copy(
             isShowDialogSuccess = !registerFields.isShowDialogSuccess
         )
     }
-    fun updateErrorText(error: String){
+
+    fun updateErrorTextRegister(error: String) {
         registerFields = registerFields.copy(
-            errorText = error
-        )
-    }
-    fun updateEmail(newEmail: String){
-        registerFields =   registerFields.copy(
-            inputEmail =  newEmail
+            errorTextRegister = error
         )
     }
 
-    fun updatePassword(newPassword: String){
-        registerFields =  registerFields.copy(
+    fun updateEmail(newEmail: String) {
+        registerFields = registerFields.copy(
+            inputEmail = newEmail
+        )
+    }
+
+    fun updatePassword(newPassword: String) {
+        registerFields = registerFields.copy(
             inputPassword = newPassword
         )
     }
 
-    fun updateReInputPassword(newPassword: String){
-        registerFields =  registerFields.copy(
+    fun updateReInputPassword(newPassword: String) {
+        registerFields = registerFields.copy(
             reInputPassword = newPassword
         )
     }
 
-    fun resetRegisterField(){
-        registerFields = RegisterFields()
+    fun reset(level: Int) {
+        when (level) {
+            1 -> registerFields = RegisterFields()
+            2 -> registerState = RegisterUIState()
+            3 -> {
+                registerFields = RegisterFields()
+                registerState = RegisterUIState()
+            }
+        }
     }
 
-    fun register(email: String, password: String){
+
+    fun register() {
 
         viewModelScope.launch(Dispatchers.Default) {
 
+
+            val email = registerFields.inputEmail
+            val password = registerFields.inputPassword
+            val rePassword = registerFields.reInputPassword
             val emailError = appUseCases.validationUseCase.validationEmail(email)
 
-            if( emailError != null ){
+            if (emailError != null) {
                 registerState = RegisterUIState(error = emailError)
-                updateErrorText(error = emailError)
+                updateErrorTextRegister(error = emailError)
                 return@launch
             }
 
-            val passwordError = appUseCases.validationUseCase.validationPassword(registerFields.inputPassword, registerFields.reInputPassword)
-            if( passwordError != null ){
-                registerState =   RegisterUIState(error = passwordError)
-                updateErrorText(error = passwordError)
+            val passwordError =
+                appUseCases.validationUseCase.validationPasswordRegister(password, rePassword)
+            if (passwordError != null) {
+                registerState = RegisterUIState(error = passwordError)
+                updateErrorTextRegister(error = passwordError)
 
                 return@launch
             }
 
-            appUseCases.registerUseCase(email, password).collect {result ->
+            appUseCases.registerUseCase(email, password).collect { result ->
 
-                registerState = when(result){
-                    is Resource.Loading ->  RegisterUIState(isLoading = true)
-                    is Resource.Success ->  RegisterUIState(success = true)
+                registerState = when (result) {
+                    is Resource.Loading -> RegisterUIState(isLoading = true)
+                    is Resource.Success -> RegisterUIState(success = true)
                     is Resource.Error -> {
                         val message = handleAuthException(result.exception)
 
-                        updateErrorText(error = message)
+                        updateErrorTextRegister(error = message)
 
                         RegisterUIState(error = message)
 
@@ -105,22 +125,51 @@ class RegisterViewModel @Inject constructor(
     fun resendEmail(){
         viewModelScope.launch {
             appUseCases.reSendEmailVerification.invoke().collect{ result->
-                when(result){
+                sendEmailUIState =   when(result){
                     is Resource.Loading -> {
                         Log.d( "12321","load")
+                        RegisterUIState(isLoading = true)
                     }
                     is Resource.Success -> {
                         Log.d( "12321","ok")
+                        updateResultTextSendEmail("A verification has been sent, please check your email !")
 
+                        RegisterUIState(success = true )
                     }
                     is Resource.Error -> {
                         Log.d( "12321","Not ok")
 
+                        val error = convertSendEmailException(result.exception, fallback = result.message)
+                        updateResultTextSendEmail(error)
+
+
+                        RegisterUIState(error = error)
                     }
                 }
             }
         }
     }
+//    fun resendEmail() {
+//        viewModelScope.launch {
+//            appUseCases.reSendEmailVerification.invoke().collect { result ->
+//                when (result) {
+//                    is Resource.Loading -> {
+//                        Log.d("12321", "load")
+//                    }
+//
+//                    is Resource.Success -> {
+//                        Log.d("12321", "ok")
+//
+//                    }
+//
+//                    is Resource.Error -> {
+//                        Log.d("12321", "Not ok")
+//
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 
     private fun handleAuthException(e: Exception?): String {
@@ -132,6 +181,13 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-
+    fun convertSendEmailException(e: Exception?, fallback: String? = null): String {
+        return when (e) {
+            is FirebaseAuthInvalidUserException -> "User does not exist"
+            is FirebaseNetworkException -> "Network connection error"
+            is FirebaseAuthException -> "Authentication error: ${e.message}"
+            else -> fallback ?: e?.message ?: "An unknown error occurred"
+        }
+    }
 
 }

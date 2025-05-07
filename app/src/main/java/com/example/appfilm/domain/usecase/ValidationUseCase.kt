@@ -8,7 +8,7 @@ import javax.inject.Singleton
 class ValidationUseCase @Inject constructor(
 
 ) {
-    fun validationPassword(password: String, passWordSecond: String): String? {
+    fun validationPasswordRegister(password: String, passWordSecond: String): String? {
         if (password.isEmpty()) {
             return "Password can not is empty"
         }
@@ -28,7 +28,12 @@ class ValidationUseCase @Inject constructor(
 
         return null
     }
-
+    fun validationPasswordLogin(password: String): String? {
+        if (password.isEmpty()) {
+            return "Password is empty"
+        }
+        return null
+    }
 
     fun validationEmail(email: String): String? {
         if(email.isEmpty()){

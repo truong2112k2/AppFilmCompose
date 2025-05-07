@@ -1,4 +1,4 @@
-package com.example.appfilm.presentation.ui.login
+package com.example.appfilm.presentation.ui.login.viewmodel
 
 data class LogInUIState(
     val isLoading: Boolean = false,
