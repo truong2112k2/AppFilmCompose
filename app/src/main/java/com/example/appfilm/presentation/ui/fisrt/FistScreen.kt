@@ -54,7 +54,6 @@ import com.example.appfilm.presentation.ui.login.LogInScreen
 
 @Composable
 fun FirstScreen(navController: NavController) {
-    var isHideUi by rememberSaveable { mutableStateOf(false ) }
 
     // set click
     Box(
@@ -103,8 +102,6 @@ fun FirstScreen(navController: NavController) {
 
             CreateButton(
                 onClick = {
-                    isHideUi = true
-                    Log.d(Constants.STATUS_TAG, "isHideUI button: $isHideUi")
 
                     navController.navigate(Constants.LOG_IN_ROUTE)
                           }
@@ -138,10 +135,6 @@ fun FirstScreen(navController: NavController) {
                 text = annotatedText,
                 style = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
                 onClick = { offset ->
-
-
-
-                    isHideUi = true
                     annotatedText.getStringAnnotations(tag = "SignUp", start = offset, end = offset)
                         .firstOrNull()?.let {
                             navController.navigate(Constants.REGISTER_ROUTE){
@@ -150,7 +143,6 @@ fun FirstScreen(navController: NavController) {
                             }
                         }
 
-                    Log.d(Constants.STATUS_TAG, "isHideUI: $isHideUi")
 
                 }
             )
@@ -160,10 +152,7 @@ fun FirstScreen(navController: NavController) {
         }
 
 
-        if(isHideUi){
-            CreateBoxHideUI()
 
-        }
     }
 }
 
