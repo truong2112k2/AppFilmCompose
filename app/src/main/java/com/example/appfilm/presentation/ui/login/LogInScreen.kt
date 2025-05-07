@@ -44,12 +44,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import com.example.appfilm.R
 import com.example.appfilm.common.Background
@@ -64,18 +67,29 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = hiltViewModel() ){
+fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = hiltViewModel()) {
     val logInState = loginViewModel.logInUIState
     val sendEmailState = loginViewModel.sendEmailUIState
-    var isHideUi by rememberSaveable { mutableStateOf(false ) }
+    var isHideUi by rememberSaveable { mutableStateOf(false) }
 
- DisposableEffect(Unit) {
-     onDispose {
-         isHideUi = true
-         Log.d(Constants.STATUS_TAG,"DisposableEffect In LogInScreen ")
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-     }
- }
+    DisposableEffect(lifecycleOwner) {
+
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) {
+                isHideUi = true
+                Log.d(Constants.STATUS_TAG, "ON_STOP triggered -> isHideUi = true")
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            Log.d(Constants.STATUS_TAG, "DisposableEffect cleaned up")
+
+        }
+
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -95,7 +109,9 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
         )
 
         Column(
-            modifier = Modifier.fillMaxSize().padding(8.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
@@ -108,12 +124,14 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
                 title = {},
                 navigationIcon = {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack, contentDescription = null, tint = Color.White,
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = null,
+                        tint = Color.White,
                         modifier = Modifier.clickable {
-                            Log.d("123213","Click")
+                            Log.d("123213", "Click")
                             isHideUi = true
-                            navController.navigate(Constants.FIRST_ROUTE){
-                                popUpTo(Constants.FIRST_ROUTE){
+                            navController.navigate(Constants.FIRST_ROUTE) {
+                                popUpTo(Constants.FIRST_ROUTE) {
 
                                     inclusive = true
 
@@ -129,13 +147,22 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
             )
 
             Column(
-                modifier = Modifier.weight(1f).verticalScroll(state = rememberScrollState()),
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(state = rememberScrollState()),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
 
                 ) {
                 CreateTitle("Welcome back!")
-                Text( stringResource(R.string.log_in_title), color = Color.White, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(8.dp))
+                Text(
+                    stringResource(R.string.log_in_title),
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                )
 
 
                 Spacer(Modifier.height(8.dp))
@@ -157,12 +184,12 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
                         loginViewModel.updatePassword(it)
                     },
                     true
-                    )
+                )
 
 
 
 
-                if(loginViewModel.logInFields.errorTextLogin.isNotEmpty()){
+                if (loginViewModel.logInFields.errorTextLogin.isNotEmpty()) {
 
                     Row(
                         modifier = Modifier
@@ -183,7 +210,7 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
                                 fontSize = 15.sp
                             )
                         )
-                        if(loginViewModel.logInFields.errorTextLogin == "Email not verified"){
+                        if (loginViewModel.logInFields.errorTextLogin == "Email not verified") {
                             var scale by remember { mutableFloatStateOf(1f) }
 
                             Spacer(Modifier.weight(1f))
@@ -209,7 +236,11 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("Resend Email Verify", color = Color.White, modifier = Modifier.padding(8.dp))
+                                Text(
+                                    "Resend Email Verify",
+                                    color = Color.White,
+                                    modifier = Modifier.padding(8.dp)
+                                )
                             }
 
                         }
@@ -223,7 +254,10 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
                 CreateButton(
                     onClick = {
 
-                        Log.d(Constants.STATUS_TAG,"${loginViewModel.logInFields.inputEmail} ${loginViewModel.logInFields.inputPassword}")
+                        Log.d(
+                            Constants.STATUS_TAG,
+                            "${loginViewModel.logInFields.inputEmail} ${loginViewModel.logInFields.inputPassword}"
+                        )
                         loginViewModel.login()
                     },
                     "Log In"
@@ -235,16 +269,16 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
 
                 LaunchedEffect(logInState) {
 
-                    if(logInState.isSuccess){
+                    if (logInState.isSuccess) {
 
 
                         navController.navigate(Constants.HOME_ROUTE)
-                        Log.d(Constants.STATUS_TAG,"Login Success")
+                        Log.d(Constants.STATUS_TAG, "Login Success")
 
                         loginViewModel.updateErrorTextLogin("")
-                    }else if(logInState.error?.isNotBlank() == true){
+                    } else if (logInState.error?.isNotBlank() == true) {
 
-                        Log.d(Constants.STATUS_TAG,"Login Failed ${logInState.error}")
+                        Log.d(Constants.STATUS_TAG, "Login Failed ${logInState.error}")
 
 
                     }
@@ -254,7 +288,10 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
 
                 LoadingDialog(logInState.isLoading)
                 LoadingDialog(sendEmailState.isLoading)
-                Log.d(Constants.STATUS_TAG,"Dialog ${loginViewModel.logInFields.isShowSendEmailDialog}")
+                Log.d(
+                    Constants.STATUS_TAG,
+                    "Dialog ${loginViewModel.logInFields.isShowSendEmailDialog}"
+                )
 
 
 
@@ -267,23 +304,16 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
                 )
 
 
-
             }
 
 
-
-
-
-
         }
 
-        if(isHideUi){
-             CreateBoxHideUI()
+        if (isHideUi) {
+            CreateBoxHideUI()
         }
 
     }
-
-
 
 
 }

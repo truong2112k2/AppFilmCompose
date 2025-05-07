@@ -6,11 +6,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.appfilm.common.Constants
 import com.example.appfilm.common.Resource
 import com.example.appfilm.domain.usecase.AppUseCases
+import com.example.appfilm.presentation.ui.convertSendEmailException
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -76,103 +77,85 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-
     fun register() {
-
         viewModelScope.launch(Dispatchers.Default) {
 
+            Log.d(Constants.STATUS_TAG, "Register coroutine started")
 
             val email = registerFields.inputEmail
             val password = registerFields.inputPassword
             val rePassword = registerFields.reInputPassword
-            val emailError = appUseCases.validationUseCase.validationEmail(email)
+            Log.d(Constants.STATUS_TAG, "Input email: $email")
 
+            val emailError = appUseCases.validationUseCase.validationEmail(email)
             if (emailError != null) {
+                Log.e(Constants.ERROR_TAG, "Email validation error: $emailError")
                 registerState = RegisterUIState(error = emailError)
                 updateErrorTextRegister(error = emailError)
                 return@launch
             }
 
-            val passwordError =
-                appUseCases.validationUseCase.validationPasswordRegister(password, rePassword)
+            val passwordError = appUseCases.validationUseCase.validationPasswordRegister(password, rePassword)
             if (passwordError != null) {
+                Log.e(Constants.ERROR_TAG, "Password validation error: $passwordError")
                 registerState = RegisterUIState(error = passwordError)
                 updateErrorTextRegister(error = passwordError)
-
                 return@launch
             }
 
             appUseCases.registerUseCase(email, password).collect { result ->
+                Log.d(Constants.STATUS_TAG, "Collecting register result...")
 
                 registerState = when (result) {
-                    is Resource.Loading -> RegisterUIState(isLoading = true)
-                    is Resource.Success -> RegisterUIState(success = true)
+                    is Resource.Loading -> {
+                        Log.d(Constants.STATUS_TAG, "Register Loading...")
+                        RegisterUIState(isLoading = true)
+                    }
+                    is Resource.Success -> {
+                        Log.d(Constants.STATUS_TAG, "Register Success")
+                        RegisterUIState(success = true)
+                    }
                     is Resource.Error -> {
-                        val message = handleAuthException(result.exception)
-
+                        val message = convertRegisterException(result.exception)
+                        Log.e(Constants.ERROR_TAG, "Register Error: $message")
                         updateErrorTextRegister(error = message)
-
                         RegisterUIState(error = message)
-
                     }
                 }
-
             }
         }
     }
 
-
-    fun resendEmail(){
+    fun resendEmail() {
         viewModelScope.launch {
-            appUseCases.reSendEmailVerification.invoke().collect{ result->
-                sendEmailUIState =   when(result){
+            Log.d(Constants.STATUS_TAG, "Resend email verification started")
+
+            appUseCases.reSendEmailVerification.invoke().collect { result ->
+                Log.d(Constants.STATUS_TAG, "Collecting resend email result...")
+
+                sendEmailUIState = when (result) {
                     is Resource.Loading -> {
-                        Log.d( "12321","load")
+                        Log.d(Constants.STATUS_TAG, "Resend email loading...")
                         RegisterUIState(isLoading = true)
                     }
                     is Resource.Success -> {
-                        Log.d( "12321","ok")
+                        Log.d(Constants.STATUS_TAG, "Resend email success: A verification has been sent.")
                         updateResultTextSendEmail("A verification has been sent, please check your email !")
-
-                        RegisterUIState(success = true )
+                        RegisterUIState(success = true)
                     }
                     is Resource.Error -> {
-                        Log.d( "12321","Not ok")
-
                         val error = convertSendEmailException(result.exception, fallback = result.message)
+                        Log.e(Constants.ERROR_TAG, "Resend email error: $error")
                         updateResultTextSendEmail(error)
-
-
                         RegisterUIState(error = error)
                     }
                 }
             }
         }
     }
-//    fun resendEmail() {
-//        viewModelScope.launch {
-//            appUseCases.reSendEmailVerification.invoke().collect { result ->
-//                when (result) {
-//                    is Resource.Loading -> {
-//                        Log.d("12321", "load")
-//                    }
-//
-//                    is Resource.Success -> {
-//                        Log.d("12321", "ok")
-//
-//                    }
-//
-//                    is Resource.Error -> {
-//                        Log.d("12321", "Not ok")
-//
-//                    }
-//                }
-//            }
-//        }
-//    }
 
 
-    private fun handleAuthException(e: Exception?): String {
+    private fun convertRegisterException(e: Exception?): String {
         return when (e) {
             is FirebaseAuthUserCollisionException -> "Email is already in use"
             is FirebaseNetworkException -> "Network error, please check your connection"
@@ -181,13 +164,6 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    fun convertSendEmailException(e: Exception?, fallback: String? = null): String {
-        return when (e) {
-            is FirebaseAuthInvalidUserException -> "User does not exist"
-            is FirebaseNetworkException -> "Network connection error"
-            is FirebaseAuthException -> "Authentication error: ${e.message}"
-            else -> fallback ?: e?.message ?: "An unknown error occurred"
-        }
-    }
+
 
 }
