@@ -4,6 +4,9 @@ data class RegisterFields(
     val inputEmail: String = "",
     val inputPassword: String = "",
     val reInputPassword: String = "",
-    val errorText: String = "",
+    val errorTextRegister: String = "",
     val isShowDialogSuccess: Boolean = false,
+
+    val resultTextSendEmail: String = "",
+    //val isShowErrorTextSendEmail: Boolean = false,
 )

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">AppFilm</string>
+    <string name="log_in_title">Sign in to continue exploring your favorite movies</string>
+    <string name="register_title">Create your account to explore and enjoy the world of movies.</string>
 </resources>
