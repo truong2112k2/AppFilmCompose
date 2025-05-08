@@ -1,6 +1,9 @@
 package com.example.appfilm.presentation.ui.login
 
+import android.annotation.SuppressLint
 import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,13 +23,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -35,7 +36,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,27 +44,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import com.example.appfilm.R
 import com.example.appfilm.common.Background
 import com.example.appfilm.common.Constants
-import com.example.appfilm.presentation.ui.CreateBoxHideUI
-import com.example.appfilm.presentation.ui.CreateButton
-import com.example.appfilm.presentation.ui.CreateTextField
-import com.example.appfilm.presentation.ui.CreateTitle
-import com.example.appfilm.presentation.ui.LoadingDialog
+import com.example.appfilm.presentation.ui.CustomBoxHideUI
+import com.example.appfilm.presentation.ui.CustomButton
+import com.example.appfilm.presentation.ui.CustomTextField
+import com.example.appfilm.presentation.ui.CustomTextTitle
+import com.example.appfilm.presentation.ui.CustomLoadingDialog
+import com.example.appfilm.presentation.ui.CustomRandomBackground
+import com.example.appfilm.presentation.ui.CustomResultDialog
+import com.example.appfilm.presentation.ui.login.components.CustomForgotPasswordText
 import com.example.appfilm.presentation.ui.login.viewmodel.LogInViewModel
-import kotlinx.coroutines.delay
 
+@SuppressLint("ContextCastToActivity")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = hiltViewModel()) {
@@ -72,34 +73,33 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
     val sendEmailState = loginViewModel.sendEmailUIState
     var isHideUi by rememberSaveable { mutableStateOf(false) }
 
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val activity = LocalContext.current as? ComponentActivity
 
-    DisposableEffect(lifecycleOwner) {
-
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_STOP) {
+    val backCallback = remember {
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
                 isHideUi = true
-                Log.d(Constants.STATUS_TAG, "ON_STOP triggered -> isHideUi = true")
+                Log.d(Constants.STATUS_TAG, "handleOnBackPressed")
+                remove()
+                activity?.onBackPressedDispatcher?.onBackPressed()
             }
         }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-            Log.d(Constants.STATUS_TAG, "DisposableEffect cleaned up")
-
-        }
-
     }
+
+    DisposableEffect(Unit) {
+        activity?.onBackPressedDispatcher?.addCallback(backCallback)
+        onDispose {
+            backCallback.remove()
+        }
+    }
+
+
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        Image(
-            painter = painterResource(id = Background.background),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+        CustomRandomBackground()
+
 
 
         Box(
@@ -154,7 +154,7 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
                 horizontalAlignment = Alignment.CenterHorizontally,
 
                 ) {
-                CreateTitle("Welcome back!")
+                CustomTextTitle("Welcome back!")
                 Text(
                     stringResource(R.string.log_in_title),
                     color = Color.White,
@@ -167,7 +167,7 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
 
                 Spacer(Modifier.height(8.dp))
 
-                CreateTextField(
+                CustomTextField(
                     loginViewModel.logInFields.inputEmail,
                     "Enter your email",
                     onValueChange = {
@@ -176,7 +176,7 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
 
                 Spacer(Modifier.height(8.dp))
 
-                CreateTextField(
+                CustomTextField(
                     loginViewModel.logInFields.inputPassword,
                     "Enter your password",
                     onValueChange = {
@@ -251,7 +251,7 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
                 Spacer(Modifier.height(8.dp))
 
 
-                CreateButton(
+                CustomButton(
                     onClick = {
 
                         Log.d(
@@ -266,13 +266,38 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
 
 
 
+                 CustomForgotPasswordText(
+                     onClickHere = {
+                         /*
+                           navController.navigate(Constants.FIRST_ROUTE){
+                            launchSingleTop
+                            popUpTo(Constants.FIRST_ROUTE){
+
+                                inclusive = true
+                            }
+                        }
+                          */
+                         navController.navigate(Constants.RESET_PASSWORD_ROUTE)
+
+                     },
+                     modifier = Modifier.fillMaxWidth().padding(8.dp)
+                 )
+
+
+
+
+
 
                 LaunchedEffect(logInState) {
 
                     if (logInState.isSuccess) {
+                        navController.navigate(Constants.HOME_ROUTE) {
+                            popUpTo(0) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
 
-
-                        navController.navigate(Constants.HOME_ROUTE)
                         Log.d(Constants.STATUS_TAG, "Login Success")
 
                         loginViewModel.updateErrorTextLogin("")
@@ -286,8 +311,8 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
                 }
 
 
-                LoadingDialog(logInState.isLoading)
-                LoadingDialog(sendEmailState.isLoading)
+                CustomLoadingDialog(logInState.isLoading)
+                CustomLoadingDialog(sendEmailState.isLoading)
                 Log.d(
                     Constants.STATUS_TAG,
                     "Dialog ${loginViewModel.logInFields.isShowSendEmailDialog}"
@@ -295,7 +320,7 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
 
 
 
-                ShowResultDialog(
+                CustomResultDialog(
                     showDialog = loginViewModel.logInFields.isShowSendEmailDialog,
                     message = loginViewModel.logInFields.errorTextSendEmail,
                     onDismiss = {
@@ -310,7 +335,7 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
         }
 
         if (isHideUi) {
-            CreateBoxHideUI()
+            CustomBoxHideUI()
         }
 
     }
@@ -318,25 +343,8 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
 
 }
 
-@Composable
-fun ShowResultDialog(
-    showDialog: Boolean,
-    message: String,
-    onDismiss: () -> Unit
-) {
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text("Notification") },
-            text = { Text(message) },
-            confirmButton = {
-                TextButton(onClick = onDismiss) {
-                    Text("OK")
-                }
-            }
-        )
-    }
-}
+
+
 
 
 

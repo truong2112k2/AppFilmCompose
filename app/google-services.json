@@ -12,7 +12,20 @@
           "package_name": "com.example.appfilm"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "667662415150-su3e6iqnd4vnr0aj5fooih45r6jhhqs6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.appfilm",
+            "certificate_hash": "75e8d04405e87e42dc7f7b323daac251f53fca29"
+          }
+        },
+        {
+          "client_id": "667662415150-lbf3hcbq21gj1hc1jme7vkhuoddqkdbe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB3QDcvK6_ojgKFc0Rf2mjsi4nxvFCNj_8"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "667662415150-lbf3hcbq21gj1hc1jme7vkhuoddqkdbe.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -31,7 +49,12 @@
           "package_name": "com.example.noteapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "667662415150-lbf3hcbq21gj1hc1jme7vkhuoddqkdbe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB3QDcvK6_ojgKFc0Rf2mjsi4nxvFCNj_8"
@@ -39,7 +62,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "667662415150-lbf3hcbq21gj1hc1jme7vkhuoddqkdbe.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

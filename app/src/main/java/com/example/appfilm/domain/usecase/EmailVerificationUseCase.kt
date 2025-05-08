@@ -12,7 +12,7 @@ class EmailVerificationUseCase @Inject constructor(
     private val authDataSource: IAuthRepository
 ) {
 
-    operator fun invoke() : Flow<Resource<Unit>> {
+    suspend operator fun invoke() : Flow<Resource<Unit>> {
         return authDataSource.resendVerificationEmail()
     }
 

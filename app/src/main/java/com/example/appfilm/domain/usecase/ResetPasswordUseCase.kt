@@ -6,12 +6,14 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 @Singleton
-class LogInUseCase @Inject constructor(
-  private val authRepository: IAuthRepository
+class ResetPasswordUseCase @Inject constructor(
+    private val authRepository: IAuthRepository
+
 ) {
-    suspend operator fun invoke(email: String, password: String): Flow<Resource<Boolean>>{
-        return authRepository.login(email, password)
+
+    suspend operator fun invoke(email: String): Flow<Resource<Unit>> {
+        return authRepository.resetPassword(email)
+
     }
 }

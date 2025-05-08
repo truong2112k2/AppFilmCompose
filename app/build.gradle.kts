@@ -84,4 +84,13 @@ dependencies {
 
     implementation(libs.androidx.navigation.compose)
 
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+
+    implementation (libs.play.services.auth)
+    implementation (libs.firebase.auth.ktx)
+    //noinspection GradleDependency
+    implementation (libs.androidx.credentials)
+    //noinspection GradleDependency
+
 }

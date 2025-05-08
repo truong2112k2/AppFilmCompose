@@ -8,5 +8,4 @@ data class RegisterFields(
     val isShowDialogSuccess: Boolean = false,
 
     val resultTextSendEmail: String = "",
-    //val isShowErrorTextSendEmail: Boolean = false,
 )
