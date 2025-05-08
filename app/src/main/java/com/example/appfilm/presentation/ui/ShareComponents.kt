@@ -1,6 +1,7 @@
 package com.example.appfilm.presentation.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,17 +20,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -44,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -51,11 +49,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lint.kotlin.metadata.Visibility
 import com.example.appfilm.R
+import com.example.appfilm.common.Background
 
 @Composable
-fun LoadingDialog(
+fun CustomLoadingDialog(
     showDialog: Boolean,
     ) {
     if (showDialog) {
@@ -80,7 +78,7 @@ fun LoadingDialog(
 }
 
 @Composable
-fun CreateButton(
+fun CustomButton(
     onClick :() -> Unit,
     textButton: String
 ) {
@@ -113,7 +111,7 @@ fun CreateButton(
 }
 
 @Composable
-fun CreateTitle(text: String) {
+fun CustomTextTitle(text: String) {
     Text(
         text,
         color = Color.White,
@@ -126,7 +124,7 @@ fun CreateTitle(text: String) {
 
 
 @Composable
-fun CreateButtonWithIcon(
+fun CustomButtonWithIcon(
     text: String,
     iconRes: Int,
     onClick: () -> Unit
@@ -136,7 +134,11 @@ fun CreateButtonWithIcon(
             .fillMaxWidth()
             .border(BorderStroke(1.dp, Color.White),RoundedCornerShape(8.dp))
             .clip(RoundedCornerShape(8.dp))
+            .clickable {
+                onClick()
+            }
             .padding(16.dp)
+
 
         ,
     ) {
@@ -163,7 +165,7 @@ fun CreateButtonWithIcon(
 
 
 @Composable
-fun CreateTextField(
+fun CustomTextField(
     text: String,
     label: String,
     onValueChange: (String) -> Unit,
@@ -194,16 +196,15 @@ fun CreateTextField(
         trailingIcon = {
 
             if (isPassword) {
-                val image = if (showPassword) R.drawable.ic_show_pass else R.drawable.ic_hide_password
+                val image = if (showPassword) R.drawable.ic_hide_password else R.drawable.ic_show_pass
                 val description = if (showPassword) "Hide password" else "Show password"
 
                 Box(
                     modifier = Modifier
-                        //    .background(backgroundColor, shape = CircleShape)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = ripple(
-                                color = Color.Black, // 👈 đổi màu ripple tại đây,
+                                color = Color.Black,
                             )
                         ) {
                             showPassword = !showPassword
@@ -223,36 +224,51 @@ fun CreateTextField(
 
 
 
-@Composable
-fun CreateTextError(text: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Default.Warning,
-            contentDescription = "",
-            Modifier.padding(end = 8.dp),
-            tint = Color.Red
-        )
-        Text(
-            text = text,
-            color = Color.Red,
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontSize = 15.sp
-            )
-        )
 
-    }
-}
 
 @Composable
-fun CreateBoxHideUI(){
+fun CustomBoxHideUI(){
     Box(
         modifier =Modifier.fillMaxSize().background(Color.Transparent).pointerInput(Unit){}
     ){
 
     }
+}
+
+@Composable
+fun CustomResultDialog(
+    showDialog: Boolean,
+    message: String,
+    warningMessage: String? = null ,
+    onDismiss: () -> Unit
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text("Notification") },
+            text = {
+                Column {
+                    Text(message)
+                    if(warningMessage != null ){
+                        Text(warningMessage, color = Color.Red)
+                    }
+                }
+
+                   },
+            confirmButton = {
+                TextButton(onClick = onDismiss) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+}
+@Composable
+fun CustomRandomBackground(){
+    Image(
+        painter = painterResource(id = Background.background),
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop
+    )
 }

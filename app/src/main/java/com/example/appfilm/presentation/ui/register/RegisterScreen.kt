@@ -1,6 +1,9 @@
 package com.example.appfilm.presentation.ui.register
 
+import android.annotation.SuppressLint
 import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,68 +30,67 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import com.example.appfilm.R
 import com.example.appfilm.common.Background
 import com.example.appfilm.common.Constants
-import com.example.appfilm.presentation.ui.CreateBoxHideUI
-import com.example.appfilm.presentation.ui.CreateButton
-import com.example.appfilm.presentation.ui.CreateTextError
-import com.example.appfilm.presentation.ui.CreateTextField
-import com.example.appfilm.presentation.ui.CreateTitle
-import com.example.appfilm.presentation.ui.LoadingDialog
-import com.example.appfilm.presentation.ui.register.componets.SuccessDialog
+import com.example.appfilm.presentation.ui.CustomBoxHideUI
+import com.example.appfilm.presentation.ui.CustomButton
+import com.example.appfilm.presentation.ui.CustomTextField
+import com.example.appfilm.presentation.ui.CustomTextTitle
+import com.example.appfilm.presentation.ui.CustomLoadingDialog
+import com.example.appfilm.presentation.ui.CustomRandomBackground
+import com.example.appfilm.presentation.ui.register.componets.CustomTextError
+import com.example.appfilm.presentation.ui.register.componets.CustomSuccessDialog
 import com.example.appfilm.presentation.ui.register.viewmodel.RegisterViewModel
 
 
+@SuppressLint("ContextCastToActivity")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(navController: NavController, registerViewModel: RegisterViewModel = hiltViewModel() ){
 
     var isHideUi by rememberSaveable { mutableStateOf(false) }
 
-    val lifecycleOwner = LocalLifecycleOwner.current
 
-    DisposableEffect(lifecycleOwner) {
+    val activity = LocalContext.current as? ComponentActivity
 
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_STOP) {
+    val backCallback = remember {
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
                 isHideUi = true
-                Log.d(Constants.STATUS_TAG, "ON_STOP triggered -> isHideUi = true")
+                Log.d(Constants.STATUS_TAG, "handleOnBackPressed")
+                remove()
+                activity?.onBackPressedDispatcher?.onBackPressed()
             }
         }
-        lifecycleOwner.lifecycle.addObserver(observer)
+    }
+
+    DisposableEffect(Unit) {
+        activity?.onBackPressedDispatcher?.addCallback(backCallback)
         onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-            Log.d(Constants.STATUS_TAG, "DisposableEffect cleaned up")
-
+            backCallback.remove()
         }
-
     }
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        Image(
-            painter = painterResource(id = Background.background),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+        CustomRandomBackground()
+
 
 
         Box(
@@ -144,13 +146,13 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
                 horizontalAlignment = Alignment.CenterHorizontally,
 
                 ) {
-                CreateTitle("Create An Account")
+                CustomTextTitle("Create An Account")
                 Text( stringResource(R.string.register_title), color = Color.White, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(8.dp))
 
                 Spacer(Modifier.height(5.dp))
 
 
-                CreateTextField(
+                CustomTextField(
                     text = registerViewModel.registerFields.inputEmail,
                     label = "Enter email",
                     onValueChange = {
@@ -159,7 +161,7 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
                 )
 
                 Spacer(Modifier.height(5.dp))
-                CreateTextField(
+                CustomTextField(
                     text = registerViewModel.registerFields.inputPassword,
                     label = "Enter password",
                     onValueChange = {
@@ -170,7 +172,7 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
 
                 Spacer(Modifier.height(5.dp))
 
-                CreateTextField(
+                CustomTextField(
                     text = registerViewModel.registerFields.reInputPassword,
                     label = "Re-enter password",
                     onValueChange = {
@@ -183,7 +185,7 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
                 Spacer(Modifier.height(5.dp))
 
                 if(registerFields.errorTextRegister.isNotEmpty()){
-                    CreateTextError(registerViewModel.registerFields.errorTextRegister)
+                    CustomTextError(registerViewModel.registerFields.errorTextRegister)
                 }
 
 
@@ -192,7 +194,7 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
 
 
 
-                CreateButton(
+                CustomButton(
                     onClick = {registerViewModel.register()},
                     "Register"
                 )
@@ -202,7 +204,7 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
 
                 LaunchedEffect(registerState) {
 
-                    if(registerState.success){
+                    if(registerState.isSuccess){
                         registerViewModel.updateErrorTextRegister("")
 
                         registerViewModel.toggleIsShowDialogSuccess()
@@ -216,9 +218,9 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
                     }
 
                 }
-                LoadingDialog(showDialog = registerState.isLoading)
+                CustomLoadingDialog(showDialog = registerState.isLoading)
 
-                SuccessDialog(
+                CustomSuccessDialog(
                     isShowDialogSuccess,
                     onDismiss = {
                         registerViewModel.resendEmail()
@@ -251,7 +253,7 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
 
         }
         if(isHideUi){
-            CreateBoxHideUI()
+            CustomBoxHideUI()
         }
 
 

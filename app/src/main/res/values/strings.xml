@@ -2,4 +2,6 @@
     <string name="app_name">AppFilm</string>
     <string name="log_in_title">Sign in to continue exploring your favorite movies</string>
     <string name="register_title">Create your account to explore and enjoy the world of movies.</string>
+    <string name="reset_password">Enter your email and get an email to reset your password</string>
+    <string name="warning_reset_pass">If you do not receive any email it means your email was not used to register any account.</string>
 </resources>

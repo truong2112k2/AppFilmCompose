@@ -31,7 +31,7 @@ class RegisterViewModel @Inject constructor(
     var registerFields by mutableStateOf(RegisterFields())
 
 
-    fun updateResultTextSendEmail(newResult: String){
+    private fun updateResultTextSendEmail(newResult: String){
         registerFields = registerFields.copy(
             resultTextSendEmail = newResult
         )
@@ -113,7 +113,7 @@ class RegisterViewModel @Inject constructor(
                     }
                     is Resource.Success -> {
                         Log.d(Constants.STATUS_TAG, "Register Success")
-                        RegisterUIState(success = true)
+                        RegisterUIState(isSuccess = true)
                     }
                     is Resource.Error -> {
                         val message = convertRegisterException(result.exception)
@@ -130,7 +130,7 @@ class RegisterViewModel @Inject constructor(
         viewModelScope.launch {
             Log.d(Constants.STATUS_TAG, "Resend email verification started")
 
-            appUseCases.reSendEmailVerification.invoke().collect { result ->
+            appUseCases.sendEmailVerificationUseCase.invoke().collect { result ->
                 Log.d(Constants.STATUS_TAG, "Collecting resend email result...")
 
                 sendEmailUIState = when (result) {
@@ -141,7 +141,7 @@ class RegisterViewModel @Inject constructor(
                     is Resource.Success -> {
                         Log.d(Constants.STATUS_TAG, "Resend email success: A verification has been sent.")
                         updateResultTextSendEmail("A verification has been sent, please check your email !")
-                        RegisterUIState(success = true)
+                        RegisterUIState(isSuccess = true)
                     }
                     is Resource.Error -> {
                         val error = convertSendEmailException(result.exception, fallback = result.message)

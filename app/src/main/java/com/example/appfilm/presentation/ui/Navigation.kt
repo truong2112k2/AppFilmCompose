@@ -10,6 +10,7 @@ import com.example.appfilm.presentation.ui.fisrt.FirstScreen
 import com.example.appfilm.presentation.ui.home.HomeScreen
 import com.example.appfilm.presentation.ui.login.LogInScreen
 import com.example.appfilm.presentation.ui.register.RegisterScreen
+import com.example.appfilm.presentation.ui.reset_password.ResetPasswordScreen
 
 @Composable
 fun Navigation(
@@ -32,6 +33,10 @@ fun Navigation(
 
         composable(Constants.HOME_ROUTE) {
             HomeScreen(navController)
+        }
+
+        composable(Constants.RESET_PASSWORD_ROUTE) {
+            ResetPasswordScreen(navController)
         }
     }
 }

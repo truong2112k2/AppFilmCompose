@@ -11,7 +11,7 @@ import javax.inject.Singleton
 class RegisterUseCase @Inject constructor(
     private val authRepository: IAuthRepository
 ) {
-    operator fun invoke(email: String, password: String): Flow<Resource<Unit>> {
+    suspend operator fun invoke(email: String, password: String): Flow<Resource<Unit>> {
            return authRepository.register(email, password)
     }
 }

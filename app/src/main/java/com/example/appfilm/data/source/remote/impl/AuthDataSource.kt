@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -24,7 +25,7 @@ class AuthDataSource @Inject constructor(
     private val firebaseAuth: FirebaseAuth
 ): IAuthDataSource {
 
-    override fun login(email: String, password: String): Flow<Resource<Boolean>> = flow {
+    override suspend fun login(email: String, password: String): Flow<Resource<Boolean>> = flow {
         emit(Resource.Loading())
 
         val user = firebaseAuth.currentUser
@@ -42,7 +43,7 @@ class AuthDataSource @Inject constructor(
         }
     }
 
-    override fun register(email: String, password: String): Flow<Resource<Unit>> = flow {
+    override suspend fun register(email: String, password: String): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading())
         try {
             val user = firebaseAuth.currentUser
@@ -61,7 +62,7 @@ class AuthDataSource @Inject constructor(
         }
     }
 
-    override fun resendVerificationEmail(): Flow<Resource<Unit>> = flow {
+    override suspend fun resendVerificationEmail(): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading())
         try{
             val user = firebaseAuth.currentUser
@@ -79,6 +80,29 @@ class AuthDataSource @Inject constructor(
         }catch (e: Exception){
 
             emit(Resource.Error(e.message ?: "Resend email failed", e))
+        }
+    }
+
+    override suspend fun resetPassword(email: String): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading())
+        try {
+
+            FirebaseAuth.getInstance().sendPasswordResetEmail(email).await()
+            emit(Resource.Success(Unit))
+
+        }catch (e: Exception){
+            emit(Resource.Error(e.message ?: "Send email reset password failed", e))
+        }
+    }
+
+    override suspend fun firebaseSignInWithGoogle(idToken: String): Flow<Resource<Boolean>> = flow {
+        emit(Resource.Loading())
+        try {
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            firebaseAuth.signInWithCredential(credential).await()
+            emit(Resource.Success(true))
+        } catch (e: Exception) {
+            emit(Resource.Error("Google sign-in failed: ${e.message}")) // lỗi đăng nhập
         }
     }
 }

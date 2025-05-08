@@ -8,10 +8,12 @@ import javax.inject.Singleton
 
 
 @Singleton
-class LogInUseCase @Inject constructor(
-  private val authRepository: IAuthRepository
+class LogInWithoutPassUseCase @Inject constructor(
+    private val authRepository: IAuthRepository
+
 ) {
-    suspend operator fun invoke(email: String, password: String): Flow<Resource<Boolean>>{
-        return authRepository.login(email, password)
+
+    suspend fun firebaseSignInWithGoogle(idToken: String): Flow<Resource<Boolean>>{
+        return authRepository.firebaseSignInWithGoogle(idToken)
     }
 }
