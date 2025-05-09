@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -32,6 +31,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -43,9 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -53,7 +51,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.appfilm.R
-import com.example.appfilm.common.Background
 import com.example.appfilm.common.Constants
 import com.example.appfilm.presentation.ui.CustomBoxHideUI
 import com.example.appfilm.presentation.ui.CustomButton
@@ -64,13 +61,14 @@ import com.example.appfilm.presentation.ui.CustomRandomBackground
 import com.example.appfilm.presentation.ui.CustomResultDialog
 import com.example.appfilm.presentation.ui.login.components.CustomForgotPasswordText
 import com.example.appfilm.presentation.ui.login.viewmodel.LogInViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @SuppressLint("ContextCastToActivity")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = hiltViewModel()) {
-    val logInState = loginViewModel.logInUIState
-    val sendEmailState = loginViewModel.sendEmailUIState
+    val logInState by loginViewModel.logInUIState.collectAsState()
+    val sendEmailState by loginViewModel.sendEmailUIState.collectAsState()
     var isHideUi by rememberSaveable { mutableStateOf(false) }
 
     val activity = LocalContext.current as? ComponentActivity
@@ -128,7 +126,6 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier.clickable {
-                            Log.d("123213", "Click")
                             isHideUi = true
                             navController.navigate(Constants.FIRST_ROUTE) {
                                 popUpTo(Constants.FIRST_ROUTE) {
@@ -254,11 +251,12 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
                 CustomButton(
                     onClick = {
 
+                        loginViewModel.login()
+
                         Log.d(
                             Constants.STATUS_TAG,
-                            "${loginViewModel.logInFields.inputEmail} ${loginViewModel.logInFields.inputPassword}"
+                            "Acc ${FirebaseAuth.getInstance().currentUser?.email}"
                         )
-                        loginViewModel.login()
                     },
                     "Log In"
 
@@ -313,18 +311,14 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
 
                 CustomLoadingDialog(logInState.isLoading)
                 CustomLoadingDialog(sendEmailState.isLoading)
-                Log.d(
-                    Constants.STATUS_TAG,
-                    "Dialog ${loginViewModel.logInFields.isShowSendEmailDialog}"
-                )
-
 
 
                 CustomResultDialog(
                     showDialog = loginViewModel.logInFields.isShowSendEmailDialog,
                     message = loginViewModel.logInFields.errorTextSendEmail,
-                    onDismiss = {
+                    onConfirm = {
                         loginViewModel.updateIsShowEmailDialog(false)
+                        loginViewModel.updateErrorTextLogin("")
                     }
                 )
 

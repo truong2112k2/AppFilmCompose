@@ -1,19 +1,19 @@
 package com.example.appfilm.domain.usecase
 
 import com.example.appfilm.common.Resource
-import com.example.appfilm.domain.repository.IAuthRepository
+import com.example.appfilm.domain.repository.IFirebaseRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 
 @Singleton
-class EmailVerificationUseCase @Inject constructor(
-    private val authDataSource: IAuthRepository
+class VerifyUseCase @Inject constructor(
+    private val firebaseRepository: IFirebaseRepository
 ) {
 
     suspend operator fun invoke() : Flow<Resource<Unit>> {
-        return authDataSource.resendVerificationEmail()
+        return firebaseRepository.firebaseSendVerification()
     }
 
 }

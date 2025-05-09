@@ -8,8 +8,10 @@ data class AppUseCases @Inject constructor (
     val logInUseCase: LogInUseCase,
     val registerUseCase: RegisterUseCase,
     val validationUseCase: ValidationUseCase,
-    val sendEmailVerificationUseCase: EmailVerificationUseCase,
-    val resetPassWordUseCase: ResetPasswordUseCase,
-    val logInWithoutPassUseCase: LogInWithoutPassUseCase
+    val sendEmailVerificationUseCase: VerifyUseCase,
+    val resetPassWordUseCase: ResetPassUseCase,
+    val logInWithoutPassUseCase: LogInWithoutPassUseCase,
+    val logoutUseCase: LogoutUseCase,
+    val checkLoginUseCase: CheckLoginUseCase
 ) {
 }

@@ -6,13 +6,11 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 @Singleton
-class LogInWithoutPassUseCase @Inject constructor(
+class CheckLoginUseCase @Inject constructor(
     private val firebaseRepository: IFirebaseRepository
-
 ) {
-    suspend operator fun invoke(idToken: String): Flow<Resource<Boolean>>{
-        return firebaseRepository.firebaseSignInWithGoogle(idToken)
+    suspend operator fun invoke(): Flow<Resource<Unit>> {
+        return firebaseRepository.checkUseLoginAndVerify()
     }
 }
