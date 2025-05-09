@@ -71,12 +71,11 @@ class ResetPassViewModel @Inject constructor(
                     }
 
                     is Resource.Error -> {
+
                         result.message?.let {
                             updateResultString(it)
                         }
                         updateIsShowDialogResult(true)
-
-
                         ResetPassUIState(
                             error = result.message
                         )
@@ -89,4 +88,6 @@ class ResetPassViewModel @Inject constructor(
         }
 
     }
+
+
 }

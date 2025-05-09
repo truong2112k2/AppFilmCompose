@@ -118,7 +118,8 @@ fun CustomTextTitle(text: String) {
         style = MaterialTheme.typography.headlineSmall.copy(
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold
-        )
+        ),
+
     )
 }
 
@@ -239,12 +240,12 @@ fun CustomBoxHideUI(){
 fun CustomResultDialog(
     showDialog: Boolean,
     message: String,
-    warningMessage: String? = null ,
-    onDismiss: () -> Unit
+    warningMessage: String? = null,
+    onConfirm: () -> Unit
 ) {
     if (showDialog) {
         AlertDialog(
-            onDismissRequest = onDismiss,
+            onDismissRequest = {},
             title = { Text("Notification") },
             text = {
                 Column {
@@ -256,7 +257,7 @@ fun CustomResultDialog(
 
                    },
             confirmButton = {
-                TextButton(onClick = onDismiss) {
+                TextButton(onClick = onConfirm) {
                     Text("OK")
                 }
             }

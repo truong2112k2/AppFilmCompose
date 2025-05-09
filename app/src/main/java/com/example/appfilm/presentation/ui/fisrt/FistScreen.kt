@@ -3,7 +3,6 @@ package com.example.appfilm.presentation.ui.fisrt
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,9 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
@@ -34,18 +31,16 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.appfilm.R
-import com.example.appfilm.common.Background
 import com.example.appfilm.common.Constants
 import com.example.appfilm.presentation.ui.CustomButton
 import com.example.appfilm.presentation.ui.CustomButtonWithIcon
-import com.example.appfilm.presentation.ui.CustomTextTitle
 import com.example.appfilm.presentation.ui.CustomLoadingDialog
 import com.example.appfilm.presentation.ui.CustomRandomBackground
 import com.example.appfilm.presentation.ui.CustomResultDialog
+import com.example.appfilm.presentation.ui.CustomTextTitle
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FirebaseAuth
 
 /*
 getString(R.string.default_web_client_id) -> get Id Token
@@ -56,29 +51,36 @@ getString(R.string.default_web_client_id) -> get Id Token
 fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = hiltViewModel()) {
 
 
-
+    val checkLoginState  by firstViewModel.checkLoginState.collectAsState()
+    CustomLoadingDialog(checkLoginState.isLoading)
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
 
         LaunchedEffect(Unit) {
-            val currentUser = FirebaseAuth.getInstance().currentUser
-            if (currentUser != null) {
-                navController.navigate(Constants.HOME_ROUTE) {
-                    popUpTo(0) {
-                        inclusive = true
+            firstViewModel.checkLogin(
+                onLogin = {
+                    navController.navigate(Constants.HOME_ROUTE) {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
                     }
-                    launchSingleTop = true
                 }
-            }
+            )
+
+
         }
 
-        val firstUiState by firstViewModel.firstUiState.collectAsState()
+
+
+
+
+
+        val firstUiState by firstViewModel.loginWithoutPassState.collectAsState()
         val context = LocalContext.current
         val clientId = context.getString(R.string.default_web_client_id)
 
-        val googleSignInClient = GoogleSignIn. getClient(
+        val googleSignInClient = GoogleSignIn.getClient(
             context,
             GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(clientId)
@@ -119,7 +121,7 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
 
             CustomButtonWithIcon("Continue with Google", R.drawable.ic_google, onClick = {
 
-               val signInIntent = googleSignInClient.signInIntent
+                val signInIntent = googleSignInClient.signInIntent
                 launcher.launch(signInIntent)
 
             })
@@ -137,8 +139,7 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
                 onClick = {
 
                     navController.navigate(Constants.LOG_IN_ROUTE)
-                          }
-                ,
+                },
                 "SIGN IN WITH PASSWORD"
             )
 
@@ -170,7 +171,7 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
                 onClick = { offset ->
                     annotatedText.getStringAnnotations(tag = "SignUp", start = offset, end = offset)
                         .firstOrNull()?.let {
-                            navController.navigate(Constants.REGISTER_ROUTE){
+                            navController.navigate(Constants.REGISTER_ROUTE) {
                                 launchSingleTop = true
 
                             }
@@ -181,7 +182,6 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
             )
 
 
-
         }
 
         val resultMessage = firstViewModel.resultText
@@ -190,7 +190,7 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
         CustomResultDialog(
             firstViewModel.isShowDialogResult,
             message = resultMessage,
-            onDismiss = {firstViewModel.updateIsShowDialogResult(false)}
+            onConfirm = { firstViewModel.updateIsShowDialogResult(false) }
         )
         LaunchedEffect(firstUiState) {
 

@@ -96,7 +96,7 @@ fun CustomTextError(text: String) {
             text = text,
             color = Color.Red,
             style = MaterialTheme.typography.headlineMedium.copy(
-                fontSize = 15.sp
+                fontSize = 15.sp, lineHeight = 17.sp 
             )
         )
 

@@ -1,13 +1,11 @@
 package com.example.appfilm.presentation.ui.login.viewmodel
 
-import android.provider.Settings.Global.getString
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.appfilm.R
 import com.example.appfilm.common.Constants
 import com.example.appfilm.common.Resource
 import com.example.appfilm.domain.usecase.AppUseCases
@@ -18,6 +16,8 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,8 +26,13 @@ class LogInViewModel @Inject constructor(
     private val appUseCases: AppUseCases
 ) : ViewModel()  {
 
-    var logInUIState by mutableStateOf(LogInUIState())
-    var sendEmailUIState by mutableStateOf(LogInUIState())
+   // var logInUIState by mutableStateOf(LogInUIState())
+   private val _logInUISate = MutableStateFlow<LogInUIState>(LogInUIState())
+    val logInUIState: StateFlow<LogInUIState> = _logInUISate
+
+ //   var sendEmailUIState by mutableStateOf(LogInUIState())
+ private val _sendEmailUIState = MutableStateFlow<LogInUIState>(LogInUIState())
+    val sendEmailUIState: StateFlow<LogInUIState> = _sendEmailUIState
 
     var logInFields by mutableStateOf(LogInFields())
 
@@ -72,7 +77,7 @@ class LogInViewModel @Inject constructor(
 
             if (emailError != null) {
                 Log.e(Constants.ERROR_TAG, "Email validation error: $emailError")
-                logInUIState = LogInUIState(error = emailError)
+                _logInUISate.value = LogInUIState(error = emailError)
                 updateErrorTextLogin(emailError)
                 return@launch
             }
@@ -80,13 +85,13 @@ class LogInViewModel @Inject constructor(
             val passwordError = appUseCases.validationUseCase.validationPasswordLogin(password)
             if (passwordError != null) {
                 Log.e(Constants.ERROR_TAG, "Password validation error: $passwordError")
-                logInUIState = LogInUIState(error = passwordError)
+                _logInUISate.value = LogInUIState(error = passwordError)
                 updateErrorTextLogin(passwordError)
                 return@launch
             }
 
             appUseCases.logInUseCase.invoke(email, password).collect { result ->
-                logInUIState = when (result) {
+                _logInUISate.value = when (result) {
                     is Resource.Loading -> {
                         Log.d(Constants.STATUS_TAG, "Login Loading")
                         LogInUIState(isLoading = true)
@@ -122,7 +127,7 @@ class LogInViewModel @Inject constructor(
             appUseCases.sendEmailVerificationUseCase.invoke().collect { result ->
                 Log.d(Constants.STATUS_TAG, "Collecting resend email result...")
 
-                sendEmailUIState = when (result) {
+                _sendEmailUIState.value = when (result) {
                     is Resource.Loading -> {
                         Log.d(Constants.STATUS_TAG, "Resend email loading...")
                         LogInUIState(isLoading = true)
@@ -161,7 +166,7 @@ class LogInViewModel @Inject constructor(
                 "Authentication error: ${e.message}"
             }
             is FirebaseNetworkException -> {
-                "No internet connection. Please check your network."
+                "No internet connection."
             }
             else -> {
                 e.localizedMessage ?: "An unknown error has occurred."

@@ -1,16 +1,11 @@
 package com.example.appfilm.data.source.remote.impl
 
 import android.util.Log
+import com.example.appfilm.common.Constants
 import com.example.appfilm.common.Resource
-import com.example.appfilm.data.source.remote.IAuthDataSource
-import com.google.firebase.FirebaseNetworkException
+import com.example.appfilm.data.source.remote.IFirebaseDataSource
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthException
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
-import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -19,11 +14,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 
-@Suppress("KotlinConstantConditions")
 @Singleton
-class AuthDataSource @Inject constructor(
+class FirebaseDataSource @Inject constructor(
     private val firebaseAuth: FirebaseAuth
-): IAuthDataSource {
+) : IFirebaseDataSource {
 
     override suspend fun login(email: String, password: String): Flow<Resource<Boolean>> = flow {
         emit(Resource.Loading())
@@ -31,13 +25,16 @@ class AuthDataSource @Inject constructor(
         val user = firebaseAuth.currentUser
 
         if (user != null) {
-            Log.d("CheckUser", user.email.toString() +"----login----" +user.isEmailVerified.toString())
+            Log.d(
+                Constants.STATUS_TAG,
+                "Email just logged in ${user.email} - Verify: ${user.isEmailVerified.toString()}"
+            )
         }
-        try{
+        try {
             firebaseAuth.signInWithEmailAndPassword(email, password).await()
             val isVerified = firebaseAuth.currentUser?.isEmailVerified == true
             emit(Resource.Success(isVerified))
-        }catch (e: Exception){
+        } catch (e: Exception) {
             emit(Resource.Error(e.message ?: "Login Failed", e))
 
         }
@@ -49,7 +46,10 @@ class AuthDataSource @Inject constructor(
             val user = firebaseAuth.currentUser
 
             if (user != null) {
-                Log.d("CheckUser", user.email.toString() +"register" +user.isEmailVerified.toString())
+                Log.d(
+                    Constants.STATUS_TAG,
+                    "email just registered is ${user.email} - Verify: ${user.isEmailVerified.toString()}"
+                )
             }
 
             firebaseAuth.createUserWithEmailAndPassword(email, password).await()
@@ -64,20 +64,20 @@ class AuthDataSource @Inject constructor(
 
     override suspend fun resendVerificationEmail(): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading())
-        try{
+        try {
             val user = firebaseAuth.currentUser
 
-            if(user != null  && !user.isEmailVerified){
-                Log.d("CheckUser", user.email.toString() +":" +user.isEmailVerified.toString())
+            if (user != null && !user.isEmailVerified) {
+                Log.d(Constants.STATUS_TAG, "Email just requested verify email ${user.email} ")
 
                 user.sendEmailVerification().await()
 
                 emit(Resource.Success(Unit))
-            }else{
+            } else {
                 emit(Resource.Error("User not logged in or email verified"))
 
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
 
             emit(Resource.Error(e.message ?: "Resend email failed", e))
         }
@@ -85,18 +85,28 @@ class AuthDataSource @Inject constructor(
 
     override suspend fun resetPassword(email: String): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading())
+
         try {
 
             FirebaseAuth.getInstance().sendPasswordResetEmail(email).await()
             emit(Resource.Success(Unit))
 
-        }catch (e: Exception){
+        } catch (e: Exception) {
             emit(Resource.Error(e.message ?: "Send email reset password failed", e))
         }
     }
 
     override suspend fun firebaseSignInWithGoogle(idToken: String): Flow<Resource<Boolean>> = flow {
         emit(Resource.Loading())
+
+        val user = firebaseAuth.currentUser
+        if (user != null) {
+            Log.d(
+                Constants.STATUS_TAG,
+                "Email just logged in ${user.email} - Verify: ${user.isEmailVerified.toString()}"
+            )
+        }
+
         try {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
             firebaseAuth.signInWithCredential(credential).await()
@@ -105,4 +115,40 @@ class AuthDataSource @Inject constructor(
             emit(Resource.Error("Google sign-in failed: ${e.message}")) // lỗi đăng nhập
         }
     }
+
+    override suspend fun firebaseLogOutAccount(googleSignInClient: GoogleSignInClient): Flow<Resource<Boolean>> =
+        flow {
+            emit(Resource.Loading())
+            try {
+                Log.d(
+                    Constants.STATUS_TAG,
+                    "Email just logged in ${firebaseAuth.currentUser?.email}"
+                )
+                firebaseAuth.signOut()
+                googleSignInClient.signOut().await()
+                emit(Resource.Success(true))
+            } catch (e: Exception) {
+                emit(Resource.Error("Google log-out failed: ${e.message}")) // lỗi đăng nhập
+
+            }
+        }
+
+    override suspend fun checkUseLoginAndVerify(): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading())
+        try {
+            val user = FirebaseAuth.getInstance().currentUser
+            if (user != null && user.isEmailVerified) {
+              emit( Resource.Success(Unit))
+            } else {
+                emit(    Resource.Error("Email not login"))
+
+            }
+        }catch (e: Exception){
+            emit(Resource.Error("Check log-in failed: ${e.message}")) // lỗi đăng nhập
+
+        }
+    }
+
+
+
 }
