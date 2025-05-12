@@ -4,7 +4,7 @@ import com.example.appfilm.common.Resource
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import kotlinx.coroutines.flow.Flow
 
-interface IFirebaseRepository {
+interface IFirebase {
     suspend fun firebaseLogin(email: String, password: String): Flow<Resource<Boolean>>
     suspend fun firebaseRegister(email: String, password: String): Flow<Resource<Unit>>
     suspend fun firebaseSendVerification(): Flow<Resource<Unit>>

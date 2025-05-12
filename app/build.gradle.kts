@@ -93,4 +93,10 @@ dependencies {
     implementation (libs.androidx.credentials)
     //noinspection GradleDependency
 
+
+    implementation(libs.coil.compose)
+
+    implementation (libs.shimmer)
+
+
 }

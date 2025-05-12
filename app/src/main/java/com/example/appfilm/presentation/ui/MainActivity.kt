@@ -70,9 +70,9 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 val context = LocalContext.current
-              //  Navigation(context = context, navController = navController)
+                Navigation(context = context, navController = navController)
 
-                HomeScreen(navController)
+               // HomeScreen(navController)
 
             }
         }
