@@ -94,7 +94,9 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
                 val account = task.getResult(ApiException::class.java)
-                account.idToken?.let { firstViewModel.signInWithGoogle(it) }
+                account.idToken?.let {
+                    firstViewModel.signInWithGoogle(it)
+                }
             } catch (e: ApiException) {
                 Log.e("LOGIN", "Google sign in failed", e)
             }

@@ -98,5 +98,7 @@ dependencies {
 
     implementation (libs.shimmer)
 
+    implementation (libs.play.services.auth.v2070)
+    implementation (libs.jetpack.loading)
 
 }

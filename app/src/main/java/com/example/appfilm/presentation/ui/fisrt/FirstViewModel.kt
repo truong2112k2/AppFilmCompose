@@ -37,6 +37,8 @@ class FirstViewModel @Inject constructor(
         isShowDialogResult = newValue
     }
     fun signInWithGoogle(idToken: String) {
+        Log.d("LoginWithoutMail", "Goi ham")
+
         viewModelScope.launch {
 
 
