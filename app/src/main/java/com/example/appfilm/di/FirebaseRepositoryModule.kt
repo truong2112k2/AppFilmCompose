@@ -3,7 +3,7 @@ package com.example.appfilm.di
 import com.example.appfilm.data.reposiory.FirebaseRepositoryImpl
 import com.example.appfilm.data.source.remote.IFirebaseDataSource
 import com.example.appfilm.data.source.remote.impl.FirebaseDataSource
-import com.example.appfilm.domain.repository.IFirebaseRepository
+import com.example.appfilm.domain.repository.IFirebase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -21,5 +21,5 @@ abstract class FirebaseRepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindIAuthRepository( authRepositoryImpl: FirebaseRepositoryImpl): IFirebaseRepository
+    abstract fun bindIFirebase(authRepositoryImpl: FirebaseRepositoryImpl): IFirebase
 }

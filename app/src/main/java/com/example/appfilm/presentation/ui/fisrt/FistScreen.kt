@@ -102,11 +102,6 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
 
         CustomRandomBackground()
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.6f))
-        )
 
         Column(
             modifier = Modifier

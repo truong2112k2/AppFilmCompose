@@ -1,52 +1,56 @@
 package com.example.appfilm.presentation.ui.home
 
+import android.util.Log
+import androidx.compose.foundation.MarqueeAnimationMode
+import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.appfilm.presentation.ui.home.DrawerScreen.Favorite.DrawerScreenSaver
+import coil.compose.AsyncImage
+import com.example.appfilm.domain.model.Movie
+import com.example.appfilm.presentation.ui.CustomLoadingDialog
+import com.example.appfilm.presentation.ui.home.components.CustomModalNavigationDrawer
 import com.example.appfilm.presentation.ui.home.viewmodel.HomeViewModel
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import kotlinx.coroutines.launch
+import com.example.appfilm.presentation.ui.register.componets.CustomSuccessDialog
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,131 +61,105 @@ fun HomeScreen(
 
 ) {
 
-    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-        .requestEmail()  // Yêu cầu quyền truy cập email
-        .build()
-    val googleSignInClient = GoogleSignIn.getClient(LocalContext.current, gso)
+  LaunchedEffect(Unit) {
+      homeViewModel.getNewMovie(3)
+  }
 
 
-    //------------------------------
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val coroutineScope = rememberCoroutineScope()
 
-    var selectedScreen by rememberSaveable(stateSaver = DrawerScreenSaver) {
-        mutableStateOf<DrawerScreen>(DrawerScreen.Home)
-    }
+    CustomModalNavigationDrawer(homeViewModel)
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            DrawerContent(
-                selectedScreen = selectedScreen,
-                onItemSelected = {
-                    selectedScreen = it
-                    coroutineScope.launch { drawerState.close() }
+
+
+
+
+}
+
+
+
+
+
+@Composable
+fun HomeMovieScreen(homeViewModel: HomeViewModel) {
+
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        val getNewMovieState by homeViewModel.getNewMovieState.collectAsState()
+        val movies by homeViewModel.movies.collectAsState()
+
+       CustomLoadingDialog(getNewMovieState.isLoading)
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+        ){
+            items(movies){ movie ->
+
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .padding(4.dp)
+                        .shadow(8.dp, RoundedCornerShape(12.dp)) // 👈 Bóng đổ
+                        .clip(RoundedCornerShape(8.dp))
+                    ,
+                ) {
+
+                    AsyncImage(
+                        model = movie.poster_url,
+                        contentDescription = movie.name,
+                        modifier = Modifier
+                            .fillMaxSize()
+
+
+
+                        ,
+                        contentScale = ContentScale.Crop
+                    )
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(Color.Transparent, Color.Black.copy( 0.8f))
+                                )
+                            )
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = movie.name.toString(), modifier = Modifier.align(Alignment.BottomCenter).
+                    basicMarquee(
+                        animationMode = MarqueeAnimationMode.Immediately, // hoặc  WhileFocused
+                        repeatDelayMillis = 1800, //độ trễ trước vong lap tiep // theo
+                        spacing = MarqueeSpacing(48.dp), // khoảng cách giữa 2 lần lặp
+                        velocity = 30.dp // tốc độ: dp per second
+                    ), color = Color.White.copy(0.8f))
                 }
-            )
-        }
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(selectedScreen.title) },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            coroutineScope.launch { drawerState.open() }
-                        }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menu")
-                        }
-                    }
-                )
-            }
-        ) { innerPadding ->
-            Box(modifier = Modifier.padding(innerPadding)) {
-                when (selectedScreen) {
-                    is DrawerScreen.Home -> Test0()
-                    is DrawerScreen.Favorite -> Test1()
-                    is DrawerScreen.Settings -> Test2()
-                }
-            }
-        }
-    }
 
+
+        }
+        }
+
+
+
+
+    }
 
 }
 
 
-@Composable
-fun DrawerContent(
-    selectedScreen: DrawerScreen,
-    onItemSelected: (DrawerScreen) -> Unit
-) {
-    val items = listOf(
-        DrawerScreen.Home,
-        DrawerScreen.Favorite,
-        DrawerScreen.Settings
-    )
 
-    Column(
-        modifier = Modifier
-            .fillMaxHeight()
-            .width(250.dp)
-            .background(Color.White)
-            .padding(vertical = 24.dp, horizontal = 16.dp)
-    ) {
-        items.forEach { screen ->
-            val isSelected = selectedScreen.title == screen.title
-            val backgroundColor = if (isSelected) Color(0xFFE0E0E0) else Color.Transparent
-            val textColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Black
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(backgroundColor)
-                    .clickable { onItemSelected(screen) }
-                    .padding(vertical = 12.dp, horizontal = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(screen.icon, contentDescription = screen.title, tint = textColor)
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(text = screen.title, color = textColor)
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-    }
-}
 
 
 
 @Composable
-fun DrawerItem(
-    screen: DrawerScreen,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    val backgroundColor = if (isSelected) Color(0xFFE0E0E0) else Color.Transparent
-    val contentColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Black
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(backgroundColor, RoundedCornerShape(8.dp))
-            .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(imageVector = screen.icon, contentDescription = null, tint = contentColor)
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(screen.title, color = contentColor)
-    }
-}
-
-
-
-@Composable
-fun Test1() {
+fun FavouriteMovieScreen(homeViewModel: HomeViewModel) {
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -190,14 +168,14 @@ fun Test1() {
     ) {
 
 
-        Text("this is test 1")
+        Text("FavouriteMovieScreen")
 
     }
 
 }
 
 @Composable
-fun Test2() {
+fun SearchMovieScreen(homeViewModel: HomeViewModel) {
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -206,66 +184,27 @@ fun Test2() {
     ) {
 
 
-        Text("this is test 2")
+        Text("SearchMovieScreen")
 
     }
 
 }
 
-@Composable
-fun Test0() {
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-
-
-        Text("this is test 0")
-
-    }
-
-}
-
-@Composable
-fun DrawerItem(
-    screen: DrawerScreen,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    message: String
-) {
-    val backgroundColor = if (isSelected) Color(0xFFE0E0E0) else Color.Transparent
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                backgroundColor
-//                Brush.verticalGradient(listOf(Color.Transparent, Color.LightGray.copy(
-//                    alpha = 0.5f
-//                )))
-            )
-            .clickable {  }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Default.Notifications,
-            contentDescription = null,
-            tint = Color.White
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontSize = 19.sp
-            ),
-            color = Color.White
-        )
-    }
-}
-
+//
+//
+//
+//
+//
+//
+//
+//
+//   val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//        .requestEmail()  // Yêu cầu quyền truy cập email
+//        .build()
+//    val googleSignInClient = GoogleSignIn.getClient(LocalContext.current, gso)
+//
+// logout funtion
 //    Column(
 //        modifier = Modifier.fillMaxSize(),
 //        horizontalAlignment = Alignment.CenterHorizontally,

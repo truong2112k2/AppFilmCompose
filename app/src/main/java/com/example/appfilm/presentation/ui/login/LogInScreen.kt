@@ -100,11 +100,6 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
 
 
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.6f))
-        )
 
         Column(
             modifier = Modifier
