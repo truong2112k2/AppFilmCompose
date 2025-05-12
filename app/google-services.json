@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "667662415150",
+    "firebase_url": "https://appfilmauthentication-default-rtdb.firebaseio.com",
     "project_id": "appfilmauthentication",
     "storage_bucket": "appfilmauthentication.firebasestorage.app"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "667662415150-r12gpgt0270eq3f1fkus9mki2s7onoon.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.appfilm",
+            "certificate_hash": "c9b53253d50fb9d7e7c96f6c64591d6c7ab60030"
+          }
+        },
         {
           "client_id": "667662415150-su3e6iqnd4vnr0aj5fooih45r6jhhqs6.apps.googleusercontent.com",
           "client_type": 1,
