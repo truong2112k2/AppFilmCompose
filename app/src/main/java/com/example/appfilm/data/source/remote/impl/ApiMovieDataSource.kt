@@ -20,7 +20,7 @@ class ApiMovieDataSource @Inject  constructor(
 )  :  IApiMovieDataSource {
 
 
-    override suspend fun getNewMovies(page: Int): Resource<MovieDto>  {
+    override suspend fun fetchDataMovieAndSaveFromDb(page: Int): Resource<MovieDto>  {
       return try{
             val movie = apiService.getNewMovies(page)
             Log.d(Constants.STATUS_TAG,"get new movies success")

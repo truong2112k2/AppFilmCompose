@@ -3,15 +3,23 @@ package com.example.appfilm.presentation.ui.fisrt
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,8 +28,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
@@ -33,7 +43,6 @@ import androidx.navigation.NavController
 import com.example.appfilm.R
 import com.example.appfilm.common.Constants
 import com.example.appfilm.presentation.ui.CustomButton
-import com.example.appfilm.presentation.ui.CustomButtonWithIcon
 import com.example.appfilm.presentation.ui.CustomLoadingDialog
 import com.example.appfilm.presentation.ui.CustomRandomBackground
 import com.example.appfilm.presentation.ui.CustomResultDialog
@@ -51,7 +60,7 @@ getString(R.string.default_web_client_id) -> get Id Token
 fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = hiltViewModel()) {
 
 
-    val checkLoginState  by firstViewModel.checkLoginState.collectAsState()
+    val checkLoginState by firstViewModel.checkLoginState.collectAsState()
     CustomLoadingDialog(checkLoginState.isLoading)
     Box(
         modifier = Modifier
@@ -70,10 +79,6 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
 
 
         }
-
-
-
-
 
 
         val firstUiState by firstViewModel.loginWithoutPassState.collectAsState()
@@ -116,13 +121,37 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
             Spacer(modifier = Modifier.height(32.dp))
 
 
-            CustomButtonWithIcon("Continue with Google", R.drawable.ic_google, onClick = {
 
-                val signInIntent = googleSignInClient.signInIntent
-                launcher.launch(signInIntent)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(BorderStroke(1.dp, Color.White), RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable {
+                        val signInIntent = googleSignInClient.signInIntent
+                        launcher.launch(signInIntent)
+                    }
+                    .padding(16.dp),
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
 
-            })
-
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_google),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.Unspecified
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "Continue with Google", color = Color.White,
+                        modifier = Modifier.padding(5.dp)
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(16.dp))
 
             Text("or", color = Color.White)

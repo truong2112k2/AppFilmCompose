@@ -1,6 +1,7 @@
 package com.example.appfilm.domain.usecase
 
-import com.example.appfilm.domain.usecase.api_movie.GetNewMoviesUseCase
+import com.example.appfilm.domain.usecase.api_movie.FetchMovieAndSave
+import com.example.appfilm.domain.usecase.database.GetMoviesUseCase
 import com.example.appfilm.domain.usecase.firebase.CheckLoginUseCase
 import com.example.appfilm.domain.usecase.firebase.LogInUseCase
 import com.example.appfilm.domain.usecase.firebase.LogInWithoutPassUseCase
@@ -21,6 +22,30 @@ data class AppUseCases @Inject constructor (
     val logInWithoutPassUseCase: LogInWithoutPassUseCase,
     val logoutUseCase: LogoutUseCase,
     val checkLoginUseCase: CheckLoginUseCase,
-    val getNewMoviesUseCase: GetNewMoviesUseCase
+    val fetchDataAndSaveFromDbUseCase: FetchMovieAndSave,
+    val getMoviesUseCase: GetMoviesUseCase
 ) {
+
+    /*
+        init {
+        viewModelScope.launch {
+            searchQuery
+                .debounce(400)
+                .distinctUntilChanged()
+                .collect { query ->
+                    if (query.isBlank()) {
+                        getAllNote()
+                    } else {
+                        searchNoteByTitle(query)
+                    }
+                }
+        }
+        viewModelScope.launch {
+            noteUseCases.dataStorageUseCase.getTheme().collect {
+                uiState.isDarkTheme.value = it
+            }
+        }
+
+    }
+     */
 }
