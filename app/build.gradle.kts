@@ -99,6 +99,12 @@ dependencies {
     implementation (libs.shimmer)
 
     implementation (libs.play.services.auth.v2070)
-    implementation (libs.jetpack.loading)
+
+
+    implementation (libs.simpleloading)
+    implementation (libs.androidx.room.runtime.v250) // Replace with the latest version
+    implementation (libs.androidx.room.ktx.v250) // KTX support for Room
+
+   // ksp (libs.androidx.room.compiler.v250)
 
 }

@@ -1,6 +1,4 @@
-package com.example.appfilm.data.source.remote.dto
-
-import com.example.appfilm.domain.model.Movie
+package com.example.appfilm.data.source.remote.dto.movie_dto
 
 data class MovieDto(
     val items: List<Item>,

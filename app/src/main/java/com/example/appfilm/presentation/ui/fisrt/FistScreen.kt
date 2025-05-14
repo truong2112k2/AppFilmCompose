@@ -3,25 +3,38 @@ package com.example.appfilm.presentation.ui.fisrt
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
@@ -33,11 +46,11 @@ import androidx.navigation.NavController
 import com.example.appfilm.R
 import com.example.appfilm.common.Constants
 import com.example.appfilm.presentation.ui.CustomButton
-import com.example.appfilm.presentation.ui.CustomButtonWithIcon
 import com.example.appfilm.presentation.ui.CustomLoadingDialog
 import com.example.appfilm.presentation.ui.CustomRandomBackground
 import com.example.appfilm.presentation.ui.CustomResultDialog
 import com.example.appfilm.presentation.ui.CustomTextTitle
+import com.example.appfilm.presentation.ui.isNetworkAvailable
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -50,8 +63,13 @@ getString(R.string.default_web_client_id) -> get Id Token
 @Composable
 fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = hiltViewModel()) {
 
-
-    val checkLoginState  by firstViewModel.checkLoginState.collectAsState()
+    var showDialogError by rememberSaveable { mutableStateOf(false) }
+    var errorText by rememberSaveable { mutableStateOf("") }
+    val checkLoginState by firstViewModel.checkLoginState.collectAsState()
+    var checkInternet by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
+    val logInWithoutPass by firstViewModel.loginWithoutPassState.collectAsState()
+    val clientId = context.getString(R.string.default_web_client_id)
     CustomLoadingDialog(checkLoginState.isLoading)
     Box(
         modifier = Modifier
@@ -69,16 +87,12 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
             )
 
 
+
+
         }
 
 
 
-
-
-
-        val firstUiState by firstViewModel.loginWithoutPassState.collectAsState()
-        val context = LocalContext.current
-        val clientId = context.getString(R.string.default_web_client_id)
 
         val googleSignInClient = GoogleSignIn.getClient(
             context,
@@ -116,13 +130,43 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
             Spacer(modifier = Modifier.height(32.dp))
 
 
-            CustomButtonWithIcon("Continue with Google", R.drawable.ic_google, onClick = {
 
-                val signInIntent = googleSignInClient.signInIntent
-                launcher.launch(signInIntent)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(BorderStroke(1.dp, Color.White), RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable {
+                        if( isNetworkAvailable(context)){
+                            val signInIntent = googleSignInClient.signInIntent
+                            launcher.launch(signInIntent)
+                        }else{
+                            errorText = "No internet"
+                            showDialogError = true
+                        }
 
-            })
+                    }
+                    .padding(16.dp),
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
 
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_google),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.Unspecified
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "Continue with Google", color = Color.White,
+                        modifier = Modifier.padding(5.dp)
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(16.dp))
 
             Text("or", color = Color.White)
@@ -181,17 +225,13 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
 
         }
 
-        val resultMessage = firstViewModel.resultText
-        CustomLoadingDialog(firstUiState.isLoading)
 
-        CustomResultDialog(
-            firstViewModel.isShowDialogResult,
-            message = resultMessage,
-            onConfirm = { firstViewModel.updateIsShowDialogResult(false) }
-        )
-        LaunchedEffect(firstUiState) {
 
-            if (firstUiState.isSuccess) {
+
+
+        LaunchedEffect(logInWithoutPass) {
+
+            if (logInWithoutPass.isSuccess) {
                 navController.navigate(Constants.HOME_ROUTE) {
                     popUpTo(0) {
                         inclusive = true
@@ -202,14 +242,23 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
                 Log.d(Constants.STATUS_TAG, "Login Success")
 
 
-            } else if (firstUiState.error?.isNotBlank() == true) {
+            } else if (logInWithoutPass.error?.isNotBlank() == true) {
 
-                Log.d(Constants.STATUS_TAG, "Login Failed ${firstUiState.error}")
+                showDialogError = true
+                errorText = logInWithoutPass.error.toString()
+                Log.d(Constants.STATUS_TAG, "Login Failed ${logInWithoutPass.error}")
 
 
             }
 
         }
+        CustomResultDialog(
+            showDialogError,
+            errorText,
+            onConfirm = {
+                showDialogError = false
+            }
+        )
 
     }
 }

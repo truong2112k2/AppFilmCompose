@@ -66,7 +66,8 @@ fun CustomLoadingDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
                     CircularProgressIndicator()
                     Spacer(modifier = Modifier.height(16.dp))
@@ -124,44 +125,44 @@ fun CustomTextTitle(text: String) {
 }
 
 
-@Composable
-fun CustomButtonWithIcon(
-    text: String,
-    iconRes: Int,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(BorderStroke(1.dp, Color.White),RoundedCornerShape(8.dp))
-            .clip(RoundedCornerShape(8.dp))
-            .clickable {
-                onClick()
-            }
-            .padding(16.dp)
-
-
-        ,
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-
-            Icon(
-                painter = painterResource(id = iconRes),
-                contentDescription = null,
-                modifier = Modifier.size(24.dp),
-                tint = Color.Unspecified
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text, color = Color.White,
-                modifier = Modifier.padding(5.dp))
-        }
-    }
-
-}
+//@Composable
+//fun CustomButtonWithIcon(
+//    text: String,
+//    iconRes: Int,
+//    onClick: () -> Unit
+//) {
+//    Box(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .border(BorderStroke(1.dp, Color.White),RoundedCornerShape(8.dp))
+//            .clip(RoundedCornerShape(8.dp))
+//            .clickable {
+//                onClick()
+//            }
+//            .padding(16.dp)
+//
+//
+//        ,
+//    ) {
+//        Row(
+//            verticalAlignment = Alignment.CenterVertically,
+//            horizontalArrangement = Arrangement.Center,
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//
+//            Icon(
+//                painter = painterResource(id = iconRes),
+//                contentDescription = null,
+//                modifier = Modifier.size(24.dp),
+//                tint = Color.Unspecified
+//            )
+//            Spacer(modifier = Modifier.width(8.dp))
+//            Text(text, color = Color.White,
+//                modifier = Modifier.padding(5.dp))
+//        }
+//    }
+//
+//}
 
 
 

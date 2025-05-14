@@ -1,5 +1,6 @@
 package com.example.appfilm.presentation.ui.home.components
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,20 +41,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.appfilm.presentation.ui.CustomRandomBackground
 import com.example.appfilm.presentation.ui.home.NavigationDrawerItem
 import com.example.appfilm.presentation.ui.home.NavigationDrawerItem.Favorite.drawerScreenSaver
-import com.example.appfilm.presentation.ui.home.SearchMovieScreen
-import com.example.appfilm.presentation.ui.home.HomeMovieScreen
-import com.example.appfilm.presentation.ui.home.FavouriteMovieScreen
+
+import com.example.appfilm.presentation.ui.home.screen.favourite_movie_screen.FavouriteMovieScreen
+import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.HomeMovieScreen
+import com.example.appfilm.presentation.ui.home.screen.search_movie_screen.SearchMovieScreen
 import com.example.appfilm.presentation.ui.home.viewmodel.HomeViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
-fun CustomModalNavigationDrawer(homeViewModel: HomeViewModel){
+fun CustomModalNavigationDrawer( navController: NavController, context: Context, homeViewModel: HomeViewModel){
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
@@ -114,7 +120,7 @@ fun CustomModalNavigationDrawer(homeViewModel: HomeViewModel){
 
             ) {
                 when (selectedScreen) {
-                    is NavigationDrawerItem.Home -> HomeMovieScreen(homeViewModel)
+                    is NavigationDrawerItem.Home -> HomeMovieScreen(navController, context)
                     is NavigationDrawerItem.Favorite -> FavouriteMovieScreen(homeViewModel)
                     is NavigationDrawerItem.Search -> SearchMovieScreen(homeViewModel)
                 }
@@ -218,3 +224,4 @@ fun CustomDrawerContent(
 
 
 }
+

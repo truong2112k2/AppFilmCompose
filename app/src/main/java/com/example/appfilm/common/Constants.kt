@@ -1,5 +1,9 @@
 package com.example.appfilm.common
 
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import com.example.appfilm.R
+
 object Constants {
     const val STATUS_TAG = "STATUS_TAG"
     const val ERROR_TAG = "ERROR_TAG"
@@ -10,6 +14,13 @@ object Constants {
     const val REGISTER_ROUTE = "REGISTER_SCREEN"
     const val HOME_ROUTE = "HOME_SCREEN"
     const val RESET_PASSWORD_ROUTE = "RESET_PASSWORD_ROUTE"
+    const val CATEGORY_ROUTE = "CATEGORY_ROUTE"
 
 
+    val FontTagessChrift = FontFamily(
+        Font(R.font.tagesschrift)  // tên file không chứa đuôi .ttf
+    )
+    val FontNotoSans = FontFamily(
+        Font(R.font.noto_sans)  // tên file không chứa đuôi .ttf
+    )
 }
