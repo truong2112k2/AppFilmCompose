@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appfilm.common.Constants
 import com.example.appfilm.domain.model.Category
+import com.example.appfilm.domain.model.MovieByCategory
 import com.example.appfilm.domain.usecase.AppUseCases
-import com.example.appfilm.presentation.ui.home.viewmodel.HomeUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,12 +20,17 @@ class CategoryViewModel @Inject constructor(
     private val appUseCases: AppUseCases
 ): ViewModel(){
 
-    private val _categoryUIState = MutableStateFlow(CategoryUIState())
-    val categoryUIState : StateFlow<CategoryUIState> = _categoryUIState
+    private val _getCategoryState = MutableStateFlow(CategoryUIState())
+    val getCategoryState : StateFlow<CategoryUIState> = _getCategoryState
 
-    private val _listCategory = MutableStateFlow(emptyList<Category>())
-    val listCategory : StateFlow<List<Category>> = _listCategory
+    private val _categories = MutableStateFlow(emptyList<Category>())
+    val categories : StateFlow<List<Category>> = _categories
 
+    private val _getMoviesByCategoryState = MutableStateFlow(CategoryUIState())
+    val getMoviesByCategoryState : StateFlow<CategoryUIState> = _getMoviesByCategoryState
+
+    private val _moviesByCategory = MutableStateFlow(emptyList<MovieByCategory>())
+    val moviesByCategory : StateFlow<List<MovieByCategory>> = _moviesByCategory
 
     fun getCategory(){
 
@@ -34,15 +39,38 @@ class CategoryViewModel @Inject constructor(
 
             if(result.data?.isNotEmpty() == true){
 
-                _listCategory.value = result.data
-                _categoryUIState.value = CategoryUIState(isSuccess = true)
+                _categories.value = result.data
+                _getCategoryState.value = CategoryUIState(isSuccess = true)
                 Log.d(Constants.STATUS_TAG,"getCategory UseCase success")
 
 
             }else{
                 Log.d(Constants.STATUS_TAG,"getCategory UseCase Failed")
 
-                _categoryUIState.value = CategoryUIState(error = "Failed")
+                _getCategoryState.value = CategoryUIState(error = "Failed")
+
+
+            }
+        }
+    }
+
+    fun getMoviesByCategory(category: String){
+        _getMoviesByCategoryState.value = CategoryUIState(isLoading = true)
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = appUseCases.getMoviesByCategoryUseCase.invoke(category)
+
+            if(result.data?.isNotEmpty() == true){
+
+                _moviesByCategory.value = result.data
+
+                _getMoviesByCategoryState.value = CategoryUIState(isSuccess = true)
+                Log.d(Constants.STATUS_TAG,"get movies Category UseCase success")
+
+
+            }else{
+                Log.d(Constants.STATUS_TAG,"get movies Category UseCase Failed ${result.message} slug = ${category}")
+                _getMoviesByCategoryState.value = CategoryUIState(error = result.message)
+
 
 
             }

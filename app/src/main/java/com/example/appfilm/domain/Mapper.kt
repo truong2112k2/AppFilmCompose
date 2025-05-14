@@ -6,6 +6,7 @@ import com.example.appfilm.data.source.remote.dto.category_dto.CategoryDtoItem
 import com.example.appfilm.data.source.remote.dto.movie_dto.Item
 import com.example.appfilm.domain.model.Category
 import com.example.appfilm.domain.model.Movie
+import com.example.appfilm.domain.model.MovieByCategory
 
 fun Item.toMovie(): Movie {
     return Movie(
@@ -67,3 +68,48 @@ fun CategoryDtoItem.toCategory(): Category{
         slug = this.slug
     )
 }
+
+
+
+fun com.example.appfilm.data.source.remote.dto.movie_catgory_dto.Item.toMovieByCategory(): MovieByCategory {
+    return MovieByCategory(
+        _id = this._id,
+        name = this.name,
+        origin_name = this.origin_name,
+        poster_url = this.poster_url,
+        slug = this.slug
+    )
+}
+
+/*
+data class Item(
+    val _id: String, // lay
+    val category: List<Category>,
+    val chieurap: Boolean,
+    val country: List<Country>,
+    val episode_current: String,
+    val lang: String,
+    val modified: Modified,
+    val name: String, // lay
+    val origin_name: String, // lay
+    val poster_url: String, // lay
+    val quality: String,
+    val slug: String,// lay
+    val sub_docquyen: Boolean,
+    val thumb_url: String,// lay
+    val time: String, // lay
+    val type: String,// lay
+    val year: Int // lay
+)
+
+/*
+    val _id: String, // lay
+    val name: String, // lay
+    val origin_name: String, // lay
+    val poster_url: String, // lay
+    val slug: String,// lay
+
+
+
+ */
+ */
