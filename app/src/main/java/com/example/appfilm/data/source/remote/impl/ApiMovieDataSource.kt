@@ -6,6 +6,7 @@ import com.example.appfilm.common.Resource
 import com.example.appfilm.data.source.remote.IApiMovieDataSource
 import com.example.appfilm.data.source.remote.dto.MovieApiService
 import com.example.appfilm.data.source.remote.dto.category_dto.CategoryDto
+import com.example.appfilm.data.source.remote.dto.movie_catgory_dto.MovieByCategoryDto
 import com.example.appfilm.data.source.remote.dto.movie_dto.MovieDto
 import retrofit2.HttpException
 import java.io.IOException
@@ -21,9 +22,9 @@ class ApiMovieDataSource @Inject constructor(
 
     override suspend fun fetchDataMovieAndSaveFromDb(page: Int): Resource<MovieDto> {
         return try {
-            val movie = apiService.getNewMovies(page)
+            val movies = apiService.getNewMovies(page)
             Log.d(Constants.STATUS_TAG, "get new movies success")
-            Resource.Success(movie)
+            Resource.Success(movies)
         } catch (e: IOException) {
             Log.e(Constants.ERROR_TAG, "Network error: ${e.message}")
             Resource.Error(e.message ?: "get new movies failed", e)
@@ -41,9 +42,9 @@ class ApiMovieDataSource @Inject constructor(
 
     override suspend fun fetchCategory(): Resource<CategoryDto> {
         return try {
-            val category = apiService.getCategory()
+            val categories = apiService.getCategory()
             Log.d(Constants.STATUS_TAG, "get category movies success")
-            Resource.Success(category)
+            Resource.Success(categories)
         } catch (e: IOException) {
             Log.e(Constants.ERROR_TAG, "Network error: ${e.message}")
             Resource.Error(e.message ?: "get category failed", e)
@@ -55,6 +56,26 @@ class ApiMovieDataSource @Inject constructor(
         } catch (e: Exception) {
             Log.e(Constants.ERROR_TAG, "Unexpected error: ${e.message}")
             Resource.Error(e.message ?: "get category failed", e)
+
+        }
+    }
+
+    override suspend fun fetchMoviesByCategory(category: String): Resource<MovieByCategoryDto> {
+        return try {
+            val moviesByCategory = apiService.getMoviesByCategory(category)
+            Log.d(Constants.STATUS_TAG, "get movies by category movies success")
+            Resource.Success(moviesByCategory)
+        } catch (e: IOException) {
+            Log.e(Constants.ERROR_TAG, "Network error: ${e.message}")
+            Resource.Error(e.message ?: "get movies by category failed", e)
+
+        } catch (e: HttpException) {
+            Log.e(Constants.ERROR_TAG, "HTTP error: ${e.code()} ${e.message()}")
+            Resource.Error(e.message ?: "get movies by category failed", e)
+
+        } catch (e: Exception) {
+            Log.e(Constants.ERROR_TAG, "Unexpected error: ${e.message}")
+            Resource.Error(e.message ?: "get movies by category failed", e)
 
         }
     }

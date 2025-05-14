@@ -6,9 +6,11 @@ import com.example.appfilm.data.source.local.IDatabaseDataSource
 import com.example.appfilm.data.source.remote.impl.ApiMovieDataSource
 import com.example.appfilm.domain.model.Category
 import com.example.appfilm.domain.model.Movie
+import com.example.appfilm.domain.model.MovieByCategory
 import com.example.appfilm.domain.repository.IApiMovie
 import com.example.appfilm.domain.toCategory
 import com.example.appfilm.domain.toMovie
+import com.example.appfilm.domain.toMovieByCategory
 import com.example.appfilm.domain.toMovieDb
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -49,6 +51,7 @@ class ApiMovieRepositoryImpl @Inject constructor (
     }
 
     override suspend fun fetchCategory(): Resource<List<Category>> {
+
         var categoryList = emptyList<Category>()
         return when(val getCategory = apiMovieDataSource.fetchCategory()){
             is Resource.Success -> {
@@ -59,6 +62,26 @@ class ApiMovieRepositoryImpl @Inject constructor (
                 }
 
                 Resource.Success(categoryList)
+
+            }
+            is Resource.Error -> {
+                Resource.Error(message =  getCategory.message ?: "Unknown error", getCategory.exception)
+            }
+            is Resource.Loading ->{   Resource.Loading(emptyList())}
+        }
+    }
+
+    override suspend fun fetchMoviesByCategory(category: String): Resource<List<MovieByCategory>> {
+        var movieByCategoryList = emptyList<MovieByCategory>()
+        return when(val getCategory = apiMovieDataSource.fetchMoviesByCategory(category)){
+            is Resource.Success -> {
+
+                val dto = getCategory.data
+                if(dto != null){
+                    movieByCategoryList = dto.data.items.map { it.toMovieByCategory() }
+                }
+
+                Resource.Success(movieByCategoryList)
 
             }
             is Resource.Error -> {
