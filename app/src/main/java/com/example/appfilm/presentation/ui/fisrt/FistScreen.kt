@@ -26,6 +26,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,6 +50,7 @@ import com.example.appfilm.presentation.ui.CustomLoadingDialog
 import com.example.appfilm.presentation.ui.CustomRandomBackground
 import com.example.appfilm.presentation.ui.CustomResultDialog
 import com.example.appfilm.presentation.ui.CustomTextTitle
+import com.example.appfilm.presentation.ui.isNetworkAvailable
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -59,8 +63,13 @@ getString(R.string.default_web_client_id) -> get Id Token
 @Composable
 fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = hiltViewModel()) {
 
-
+    var showDialogError by rememberSaveable { mutableStateOf(false) }
+    var errorText by rememberSaveable { mutableStateOf("") }
     val checkLoginState by firstViewModel.checkLoginState.collectAsState()
+    var checkInternet by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
+    val logInWithoutPass by firstViewModel.loginWithoutPassState.collectAsState()
+    val clientId = context.getString(R.string.default_web_client_id)
     CustomLoadingDialog(checkLoginState.isLoading)
     Box(
         modifier = Modifier
@@ -78,12 +87,12 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
             )
 
 
+
+
         }
 
 
-        val firstUiState by firstViewModel.loginWithoutPassState.collectAsState()
-        val context = LocalContext.current
-        val clientId = context.getString(R.string.default_web_client_id)
+
 
         val googleSignInClient = GoogleSignIn.getClient(
             context,
@@ -128,8 +137,14 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
                     .border(BorderStroke(1.dp, Color.White), RoundedCornerShape(8.dp))
                     .clip(RoundedCornerShape(8.dp))
                     .clickable {
-                        val signInIntent = googleSignInClient.signInIntent
-                        launcher.launch(signInIntent)
+                        if( isNetworkAvailable(context)){
+                            val signInIntent = googleSignInClient.signInIntent
+                            launcher.launch(signInIntent)
+                        }else{
+                            errorText = "No internet"
+                            showDialogError = true
+                        }
+
                     }
                     .padding(16.dp),
             ) {
@@ -210,17 +225,13 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
 
         }
 
-        val resultMessage = firstViewModel.resultText
-        CustomLoadingDialog(firstUiState.isLoading)
 
-        CustomResultDialog(
-            firstViewModel.isShowDialogResult,
-            message = resultMessage,
-            onConfirm = { firstViewModel.updateIsShowDialogResult(false) }
-        )
-        LaunchedEffect(firstUiState) {
 
-            if (firstUiState.isSuccess) {
+
+
+        LaunchedEffect(logInWithoutPass) {
+
+            if (logInWithoutPass.isSuccess) {
                 navController.navigate(Constants.HOME_ROUTE) {
                     popUpTo(0) {
                         inclusive = true
@@ -231,14 +242,23 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
                 Log.d(Constants.STATUS_TAG, "Login Success")
 
 
-            } else if (firstUiState.error?.isNotBlank() == true) {
+            } else if (logInWithoutPass.error?.isNotBlank() == true) {
 
-                Log.d(Constants.STATUS_TAG, "Login Failed ${firstUiState.error}")
+                showDialogError = true
+                errorText = logInWithoutPass.error.toString()
+                Log.d(Constants.STATUS_TAG, "Login Failed ${logInWithoutPass.error}")
 
 
             }
 
         }
+        CustomResultDialog(
+            showDialogError,
+            errorText,
+            onConfirm = {
+                showDialogError = false
+            }
+        )
 
     }
 }

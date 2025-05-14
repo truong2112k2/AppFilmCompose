@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.appfilm.common.Constants
+import com.example.appfilm.presentation.ui.category.CategoryScreen
 import com.example.appfilm.presentation.ui.fisrt.FirstScreen
 import com.example.appfilm.presentation.ui.home.HomeScreen
 import com.example.appfilm.presentation.ui.login.LogInScreen
@@ -37,6 +38,11 @@ fun Navigation(
 
         composable(Constants.RESET_PASSWORD_ROUTE) {
             ResetPasswordScreen(navController)
+        }
+
+
+        composable(Constants.CATEGORY_ROUTE) {
+           CategoryScreen()
         }
     }
 }

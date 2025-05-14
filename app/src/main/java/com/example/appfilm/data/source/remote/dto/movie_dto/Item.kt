@@ -1,4 +1,4 @@
-package com.example.appfilm.data.source.remote.dto
+package com.example.appfilm.data.source.remote.dto.movie_dto
 
 data class Item(
     val _id: String,

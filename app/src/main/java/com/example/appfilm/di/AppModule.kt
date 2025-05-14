@@ -15,7 +15,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 private const val URL_BASE = "https://phimapi.com/"
-
+/// https://phimapi.com/the-loai
 @Module
 @InstallIn(SingletonComponent ::class)
 object AppModule {

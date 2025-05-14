@@ -1,7 +1,10 @@
 package com.example.appfilm.domain
 
 import com.example.appfilm.data.source.local.model.MovieDb
-import com.example.appfilm.data.source.remote.dto.Item
+import com.example.appfilm.data.source.remote.dto.category_dto.CategoryDto
+import com.example.appfilm.data.source.remote.dto.category_dto.CategoryDtoItem
+import com.example.appfilm.data.source.remote.dto.movie_dto.Item
+import com.example.appfilm.domain.model.Category
 import com.example.appfilm.domain.model.Movie
 
 fun Item.toMovie(): Movie {
@@ -53,5 +56,14 @@ fun MovieDb.toMovie(): Movie{
         vote_count = this.vote_count.toString(),
         time = this.time,
         localPosterPath = this.localPosterPath
+    )
+}
+
+
+fun CategoryDtoItem.toCategory(): Category{
+    return Category(
+        _id = this._id,
+        name =  this.name,
+        slug = this.slug
     )
 }

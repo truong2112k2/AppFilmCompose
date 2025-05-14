@@ -1,5 +1,6 @@
 package com.example.appfilm.domain.usecase
 
+import com.example.appfilm.domain.usecase.api_movie.FetchCategory
 import com.example.appfilm.domain.usecase.api_movie.FetchMovieAndSave
 import com.example.appfilm.domain.usecase.database.GetMoviesUseCase
 import com.example.appfilm.domain.usecase.firebase.CheckLoginUseCase
@@ -23,7 +24,9 @@ data class AppUseCases @Inject constructor (
     val logoutUseCase: LogoutUseCase,
     val checkLoginUseCase: CheckLoginUseCase,
     val fetchDataAndSaveFromDbUseCase: FetchMovieAndSave,
-    val getMoviesUseCase: GetMoviesUseCase
+    val getMoviesUseCase: GetMoviesUseCase,
+    val getCategoryUseCase: FetchCategory
+
 ) {
 
     /*

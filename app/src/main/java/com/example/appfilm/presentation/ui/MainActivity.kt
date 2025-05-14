@@ -51,6 +51,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.appfilm.R
 import com.example.appfilm.common.Constants
+import com.example.appfilm.presentation.ui.category.CategoryScreen
 import com.example.appfilm.presentation.ui.home.HomeScreen
 import com.example.appfilm.presentation.ui.login.viewmodel.LogInViewModel
 import com.example.appfilm.presentation.ui.theme.AppFilmTheme
@@ -70,9 +71,9 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 val context = LocalContext.current
-                Navigation(context = context, navController = navController)
+            Navigation(context = context, navController = navController)
 
-               // HomeScreen(navController)
+            //    CategoryScreen()
 
             }
         }

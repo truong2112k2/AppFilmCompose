@@ -4,8 +4,10 @@ import android.content.Context
 import com.example.appfilm.common.Resource
 import com.example.appfilm.data.source.local.IDatabaseDataSource
 import com.example.appfilm.data.source.remote.impl.ApiMovieDataSource
+import com.example.appfilm.domain.model.Category
 import com.example.appfilm.domain.model.Movie
 import com.example.appfilm.domain.repository.IApiMovie
+import com.example.appfilm.domain.toCategory
 import com.example.appfilm.domain.toMovie
 import com.example.appfilm.domain.toMovieDb
 import javax.inject.Inject
@@ -46,6 +48,23 @@ class ApiMovieRepositoryImpl @Inject constructor (
 
     }
 
+    override suspend fun fetchCategory(): Resource<List<Category>> {
+        var categoryList = emptyList<Category>()
+        return when(val getCategory = apiMovieDataSource.fetchCategory()){
+            is Resource.Success -> {
 
+                val dto = getCategory.data
+                if(dto != null){
+                    categoryList = dto.map { it.toCategory() }
+                }
 
+                Resource.Success(categoryList)
+
+            }
+            is Resource.Error -> {
+                Resource.Error(message =  getCategory.message ?: "Unknown error", getCategory.exception)
+            }
+            is Resource.Loading ->{   Resource.Loading(emptyList())}
+        }
+    }
 }

@@ -1,9 +1,5 @@
 package com.example.appfilm.domain.model
 
-import com.example.appfilm.data.source.remote.dto.Imdb
-import com.example.appfilm.data.source.remote.dto.Modified
-import com.example.appfilm.data.source.remote.dto.Tmdb
-
 data class Movie(
 
 val _id: String?,

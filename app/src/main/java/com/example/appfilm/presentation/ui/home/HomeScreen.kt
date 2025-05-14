@@ -2,6 +2,7 @@ package com.example.appfilm.presentation.ui.home
 
 import android.annotation.SuppressLint
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -29,9 +30,7 @@ fun HomeScreen(
     @SuppressLint("StaticFieldLeak")
     val googleSignInClient = GoogleSignIn.getClient(context, gso)
 
-    CustomModalNavigationDrawer(navController, context, homeViewModel)
-
-
+CustomModalNavigationDrawer(navController, context, homeViewModel)
 }
 
 

@@ -8,12 +8,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appfilm.common.Resource
 import com.example.appfilm.domain.usecase.AppUseCases
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import javax.inject.Inject
 
 
@@ -30,12 +36,7 @@ class FirstViewModel @Inject constructor(
     val checkLoginState : StateFlow<FirstUiState> = _checkLoginState
 
 
-    var isShowDialogResult by mutableStateOf(false )
-    var resultText by mutableStateOf("")
 
-    fun updateIsShowDialogResult(newValue: Boolean){
-        isShowDialogResult = newValue
-    }
     fun signInWithGoogle(idToken: String) {
         Log.d("LoginWithoutMail", "Goi ham")
 
@@ -57,8 +58,9 @@ class FirstViewModel @Inject constructor(
                      }
                      is Resource.Error -> {
                          Log.d("LoginWithoutMail", result.message.toString())
-                         resultText = result.message.toString()
-                         FirstUiState(error = "fail")
+
+
+                         FirstUiState(error = convertLoginGoogleException(result.exception ?: Exception()))
                      }
                  }
              }
@@ -105,6 +107,23 @@ class FirstViewModel @Inject constructor(
         }
 
     }
+
+    private fun convertLoginGoogleException(e: Exception): String {
+        return when (e) {
+            is FirebaseAuthInvalidUserException -> "Account does not exist."
+            is FirebaseAuthInvalidCredentialsException -> "Incorrect email or password."
+            is FirebaseNetworkException -> "No internet connection."
+            is FirebaseAuthException -> "Authentication error: ${e.message}"
+            is ApiException -> when (e.statusCode) {
+                7 -> "Network error. Please check your internet connection."
+                10 -> "App is not configured properly for Google Sign-In."
+                12501 -> "Sign-in was cancelled."
+                else -> "Google Sign-In failed with error code: ${e.statusCode}"
+            }
+            else -> e.localizedMessage ?: "An unknown error has occurred."
+        }
+    }
+
 
 
 
