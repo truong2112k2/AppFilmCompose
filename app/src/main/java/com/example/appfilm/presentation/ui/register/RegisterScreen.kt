@@ -96,6 +96,7 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
 
 
 
+
         Column(
             modifier = Modifier.fillMaxSize().padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

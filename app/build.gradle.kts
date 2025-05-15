@@ -108,4 +108,17 @@ dependencies {
 
    // ksp (libs.androidx.room.compiler.v250)
 
+    //noinspection UseTomlInstead
+    implementation ("com.github.commandiron:ComposeLoading:1.0.4")
+
+    //noinspection UseTomlInstead
+    implementation ("androidx.paging:paging-runtime-ktx:3.3.6")
+    //noinspection UseTomlInstead
+    implementation ("androidx.paging:paging-compose:3.3.6")
+
+    //noinspection UseTomlInstead
+    implementation ("com.google.accompanist:accompanist-navigation-animation:0.32.0")
+
+
+
 }

@@ -1,6 +1,7 @@
 package com.example.appfilm.data.source.remote.dto
 
 import com.example.appfilm.data.source.remote.dto.category_dto.CategoryDto
+import com.example.appfilm.data.source.remote.dto.detail_dto.MovieDetailDto
 import com.example.appfilm.data.source.remote.dto.movie_catgory_dto.MovieByCategoryDto
 import com.example.appfilm.data.source.remote.dto.movie_dto.MovieDto
 import retrofit2.http.GET
@@ -17,9 +18,19 @@ interface MovieApiService {
     suspend fun getCategory(): CategoryDto
 
 ///private const val URL_BASE = "https://phimapi.com/"
-    //https://phimapi.com/v1/api/the-loai/gia-dinh
     @GET("v1/api/the-loai/{type_list}")
-   suspend  fun getMoviesByCategory(@Path("type_list") category: String): MovieByCategoryDto
+   suspend  fun getMoviesByCategory(
+    @Path("type_list") category: String,
+    @Query("page") page: Int,
+    @Query("limit") limit: Int
+
+   ): MovieByCategoryDto
+
+   ///https://phimapi.com/phim/${slug}
+   @GET("phim/{slug}")
+   suspend  fun getDetailMovie(
+       @Path("slug") slug: String,
+   ): MovieDetailDto
 
 
 }

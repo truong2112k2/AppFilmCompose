@@ -3,12 +3,17 @@ package com.example.appfilm.presentation.ui.category
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.appfilm.common.Constants
 import com.example.appfilm.domain.model.Category
 import com.example.appfilm.domain.model.MovieByCategory
 import com.example.appfilm.domain.usecase.AppUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -54,10 +59,23 @@ class CategoryViewModel @Inject constructor(
         }
     }
 
-    fun getMoviesByCategory(category: String){
+    fun getMoviesByCategory2(typeList: String): Flow<PagingData<MovieByCategory>> {
+
+        return Pager(
+            config = PagingConfig(pageSize = 30),
+            pagingSourceFactory = { MoviePagingSource( appUseCases,  typeList) }
+
+
+        ).flow.cachedIn(viewModelScope)
+
+
+
+    }
+
+    fun getMoviesByCategory(category: String, page: Int, limit: Int ){
         _getMoviesByCategoryState.value = CategoryUIState(isLoading = true)
         viewModelScope.launch(Dispatchers.IO) {
-            val result = appUseCases.getMoviesByCategoryUseCase.invoke(category)
+            val result = appUseCases.getMoviesByCategoryUseCase.invoke(category, page, limit)
 
             if(result.data?.isNotEmpty() == true){
 

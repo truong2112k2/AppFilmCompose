@@ -71,9 +71,13 @@ class ApiMovieRepositoryImpl @Inject constructor (
         }
     }
 
-    override suspend fun fetchMoviesByCategory(category: String): Resource<List<MovieByCategory>> {
+    override suspend fun fetchMoviesByCategory(
+        category: String,
+        page: Int,
+        limit: Int
+    ): Resource<List<MovieByCategory>> {
         var movieByCategoryList = emptyList<MovieByCategory>()
-        return when(val getCategory = apiMovieDataSource.fetchMoviesByCategory(category)){
+        return when(val getCategory = apiMovieDataSource.fetchMoviesByCategory(category,page, limit)){
             is Resource.Success -> {
 
                 val dto = getCategory.data

@@ -6,6 +6,7 @@ import com.example.appfilm.common.Resource
 import com.example.appfilm.data.source.remote.IApiMovieDataSource
 import com.example.appfilm.data.source.remote.dto.MovieApiService
 import com.example.appfilm.data.source.remote.dto.category_dto.CategoryDto
+import com.example.appfilm.data.source.remote.dto.detail_dto.MovieDetailDto
 import com.example.appfilm.data.source.remote.dto.movie_catgory_dto.MovieByCategoryDto
 import com.example.appfilm.data.source.remote.dto.movie_dto.MovieDto
 import retrofit2.HttpException
@@ -60,9 +61,9 @@ class ApiMovieDataSource @Inject constructor(
         }
     }
 
-    override suspend fun fetchMoviesByCategory(category: String): Resource<MovieByCategoryDto> {
+    override suspend fun fetchMoviesByCategory(category: String, page: Int, limit: Int): Resource<MovieByCategoryDto> {
         return try {
-            val moviesByCategory = apiService.getMoviesByCategory(category)
+            val moviesByCategory = apiService.getMoviesByCategory(category,page, limit)
             Log.d(Constants.STATUS_TAG, "get movies by category movies success")
             Resource.Success(moviesByCategory)
         } catch (e: IOException) {
@@ -78,5 +79,26 @@ class ApiMovieDataSource @Inject constructor(
             Resource.Error(e.message ?: "get movies by category failed", e)
 
         }
+    }
+
+    override suspend fun getDetailMovie(slug: String): Resource<MovieDetailDto> {
+        return try {
+            val moviesByCategory = apiService.getDetailMovie(slug)
+            Log.d(Constants.STATUS_TAG, "get movies detail by category movies success")
+            Resource.Success(moviesByCategory)
+        } catch (e: IOException) {
+            Log.e(Constants.ERROR_TAG, "Network error: ${e.message}")
+            Resource.Error(e.message ?: "get movies detail by category failed", e)
+
+        } catch (e: HttpException) {
+            Log.e(Constants.ERROR_TAG, "HTTP error: ${e.code()} ${e.message()}")
+            Resource.Error(e.message ?: "get movies detail by category failed", e)
+
+        } catch (e: Exception) {
+            Log.e(Constants.ERROR_TAG, "Unexpected error: ${e.message}")
+            Resource.Error(e.message ?: "get movies detail by category failed", e)
+
+        }
+
     }
 }

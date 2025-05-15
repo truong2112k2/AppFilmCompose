@@ -6,6 +6,7 @@ import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,6 +46,7 @@ import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import com.example.appfilm.common.Constants
 import com.example.appfilm.domain.model.Movie
+import com.example.appfilm.presentation.ui.shimmerBrush
 
 @Composable
 fun CustomButtonWithIcon(
@@ -81,13 +83,14 @@ fun CustomButtonWithIcon(
 @Composable
  fun NewMovieItem(
     newMovie: Movie,
-    brush: Brush
+    onClickPlay: () -> Unit,
+    onClickAddFavourite: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(540.dp)
-            .padding(4.dp)
+            .padding(8.dp)
             .clip(RoundedCornerShape(16.dp))
             .border(1.dp, Color.White, RoundedCornerShape(16.dp)),
         contentAlignment = Alignment.Center
@@ -106,7 +109,7 @@ fun CustomButtonWithIcon(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(brush)
+                        .background(shimmerBrush())
                 )
             },
             success = {
@@ -159,9 +162,14 @@ fun CustomButtonWithIcon(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    CustomButtonWithIcon(onClick = {}, Icons.Default.PlayArrow, "Play")
+                    CustomButtonWithIcon(onClick = {
+                        onClickPlay()
+                    }, Icons.Default.PlayArrow, "Play")
                     Spacer(Modifier.width(8.dp))
-                    CustomButtonWithIcon(onClick = {}, Icons.Default.Favorite, "Save to favourite")
+                    CustomButtonWithIcon(onClick = {
+                        onClickAddFavourite()
+
+                    }, Icons.Default.Favorite, "Save to favourite")
                 }
                 Spacer(Modifier.height(30.dp))
             }
@@ -172,12 +180,16 @@ fun CustomButtonWithIcon(
 @Composable
  fun MovieItem(
     movie: Movie,
-    brush: Brush
+    onClick: () -> Unit
+
 ) {
     Box(
         modifier = Modifier
             .width(180.dp)
             .height(240.dp)
+            .clickable {
+                onClick()
+            }
             .padding(8.dp)
             .shadow(8.dp, RoundedCornerShape(12.dp))
     ) {
@@ -195,7 +207,7 @@ fun CustomButtonWithIcon(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(brush)
+                        .background(shimmerBrush())
                 )
             },
             success = {

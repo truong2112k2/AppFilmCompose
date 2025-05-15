@@ -3,6 +3,17 @@ package com.example.appfilm.presentation.ui
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
@@ -22,4 +33,7 @@ fun isNetworkAvailable(context: Context): Boolean {
     val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
 
     return activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+
+
 }
+

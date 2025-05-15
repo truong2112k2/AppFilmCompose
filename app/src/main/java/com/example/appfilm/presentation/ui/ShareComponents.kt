@@ -1,5 +1,11 @@
 package com.example.appfilm.presentation.ui
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,6 +29,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -38,6 +45,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -125,45 +134,16 @@ fun CustomTextTitle(text: String) {
 }
 
 
-//@Composable
-//fun CustomButtonWithIcon(
-//    text: String,
-//    iconRes: Int,
-//    onClick: () -> Unit
-//) {
-//    Box(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .border(BorderStroke(1.dp, Color.White),RoundedCornerShape(8.dp))
-//            .clip(RoundedCornerShape(8.dp))
-//            .clickable {
-//                onClick()
-//            }
-//            .padding(16.dp)
-//
-//
-//        ,
-//    ) {
-//        Row(
-//            verticalAlignment = Alignment.CenterVertically,
-//            horizontalArrangement = Arrangement.Center,
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//
-//            Icon(
-//                painter = painterResource(id = iconRes),
-//                contentDescription = null,
-//                modifier = Modifier.size(24.dp),
-//                tint = Color.Unspecified
-//            )
-//            Spacer(modifier = Modifier.width(8.dp))
-//            Text(text, color = Color.White,
-//                modifier = Modifier.padding(5.dp))
-//        }
-//    }
-//
-//}
-
+@Composable
+fun CustomLineProgressbar(color: Color){
+    LinearProgressIndicator(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(3.dp),
+        color = color,
+        trackColor = Color.Gray
+    )
+}
 
 
 @Composable
@@ -279,4 +259,61 @@ fun CustomRandomBackground(){
             .fillMaxSize()
             .background(Color.Black.copy(alpha = 0.6f))
     )
+}
+
+@Composable
+fun shimmerBrush(): Brush {
+    val shimmerColors = listOf(
+        Color.LightGray.copy(alpha = 0.6f),
+        Color.LightGray.copy(alpha = 0.2f),
+        Color.LightGray.copy(alpha = 0.6f)
+    )
+
+    val transition = rememberInfiniteTransition(label = "")
+    val translateAnim by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1200, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = ""
+    )
+
+    return Brush.linearGradient(
+        colors = shimmerColors,
+        start = Offset(translateAnim, translateAnim),
+        end = Offset(translateAnim + 200f, translateAnim + 200f)
+    )
+}
+
+@Composable
+fun CustomConfirmDialog(
+    title: String ,
+    message: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    showDialog: Boolean
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = {
+                Text(text = title)
+            },
+            text = {
+                Text(text = message)
+            },
+            confirmButton = {
+                TextButton(onClick = onConfirm) {
+                    Text("Ok")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
