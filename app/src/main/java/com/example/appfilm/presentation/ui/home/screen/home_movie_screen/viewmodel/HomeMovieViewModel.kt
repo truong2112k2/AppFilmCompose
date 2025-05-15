@@ -8,7 +8,9 @@ import com.example.appfilm.common.Constants
 import com.example.appfilm.domain.model.Movie
 import com.example.appfilm.domain.usecase.AppUseCases
 import com.example.appfilm.presentation.ui.home.viewmodel.HomeUIState
+import com.example.appfilm.presentation.ui.isNetworkAvailable
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,8 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeMovieViewModel @Inject constructor(
-    private val appUseCases: AppUseCases
-
+    private val appUseCases: AppUseCases,
+    @ApplicationContext val context: Context
 ): ViewModel() {
     private val _getNewMovieState = MutableStateFlow(HomeUIState())
     val getNewMovieState : StateFlow<HomeUIState> = _getNewMovieState
@@ -30,7 +32,22 @@ class HomeMovieViewModel @Inject constructor(
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
     val movies : StateFlow<List<Movie>> = _movies
 
-    fun getMoviesNoNetwork() {
+
+    init {
+        fetchMoviesIfNeeded()
+    }
+
+    private fun fetchMoviesIfNeeded() {
+        if (_movies.value.isEmpty()) {
+            if (isNetworkAvailable(context)) {
+                getMoviesOnNetwork(context, 1)
+            } else {
+                getMoviesNoNetwork()
+            }
+        }
+    }
+
+    private fun getMoviesNoNetwork() {
 
         viewModelScope.launch(Dispatchers.IO) {
             appUseCases.getMoviesUseCase.getMovie().collect{movies ->

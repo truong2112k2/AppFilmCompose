@@ -1,26 +1,30 @@
 package com.example.appfilm.presentation.ui.category
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,101 +43,153 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
-import com.example.appfilm.domain.model.Movie
 import com.example.appfilm.domain.model.MovieByCategory
-
+import com.example.appfilm.presentation.ui.CustomLineProgressbar
+import com.example.appfilm.presentation.ui.shimmerBrush
 @SuppressLint("AutoboxingStateCreation")
 @Composable
-fun CategoryScreen(categoryViewModel: CategoryViewModel = hiltViewModel()){
+fun CategoryScreen( navController: NavController, categoryViewModel: CategoryViewModel = hiltViewModel()) {
 
+    // Gọi lấy danh mục khi vào màn hình
     LaunchedEffect(Unit) {
         categoryViewModel.getCategory()
     }
 
+    val listCategory by categoryViewModel.categories.collectAsState()
+    var selectedTabIndex by rememberSaveable { mutableStateOf(0) }
+    var selectedCategory by rememberSaveable { mutableStateOf<String?>(null) }
+
+
+    var view by rememberSaveable { mutableStateOf(false) }
+
+    // Cập nhật selectedCategory mặc định sau khi load danh mục
+    LaunchedEffect(listCategory) {
+        if (listCategory.isNotEmpty() && selectedCategory == null) {
+            selectedCategory = listCategory[0].slug
+        }
+    }
+
+    // Gọi lại Paging Flow mỗi khi selectedCategory thay đổi
+    val moviesPagingItems = remember(selectedCategory) {
+        selectedCategory?.let { categoryViewModel.getMoviesByCategory2(it) }
+    }?.collectAsLazyPagingItems()
+
+    val loadState = moviesPagingItems?.loadState
+
+    if (loadState != null) {
+        when {
+            loadState.refresh is LoadState.Loading -> {
+               view = true
+            }
+
+            loadState.refresh is LoadState.Error -> {
+                val e = (loadState.refresh as LoadState.Error).error
+                // show error message UI với e.message
+            }
+
+            else -> {
+                view = false
+
+
+            }
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(Color.Black, Color.White)
-                )
-            )
+            .background(Brush.verticalGradient(colors = listOf(Color.Black, Color.White)))
+            .statusBarsPadding()
     ) {
 
-        var selectedTabIndex by rememberSaveable  { mutableStateOf(0) }
 
-
-        var selectedCategory by rememberSaveable { mutableStateOf<String?>(null ) }
-
-        val listCategory by categoryViewModel.categories.collectAsState()
-
-        val moviesByCategory by categoryViewModel.moviesByCategory.collectAsState()
-
-        val getMoviesByCategoryState by categoryViewModel.getMoviesByCategoryState.collectAsState()
         if (listCategory.isNotEmpty()) {
             ScrollableTabRow(
                 selectedTabIndex = selectedTabIndex,
                 edgePadding = 0.dp,
-                 containerColor = Color.Transparent,
-                divider = {}
-
+                containerColor = Color.Transparent,
+                divider = {},
+                indicator = {}
             ) {
                 listCategory.forEachIndexed { index, category ->
-                    Tab(
-                        selected = selectedTabIndex == index,
-                        onClick = {
-                            selectedTabIndex = index
-                           categoryViewModel.getMoviesByCategory(category.slug)
-                                  },
-                        text = { Text(category.name) },
-                    )
+                    val isSelected = selectedTabIndex == index
+                    val backgroundColor = if (isSelected) Color.White else Color.Transparent
+                    val textColor = if (isSelected) Color.Black else Color.White
+
+                    Box(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .border(1.dp, Color.White, RoundedCornerShape(16.dp))
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(backgroundColor)
+                            .clickable {
+                                selectedTabIndex = index
+                                selectedCategory = category.slug
+                            }
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Text(text = category.name, color = textColor)
+                    }
                 }
+            }
+            if(view){
+                CustomLineProgressbar(Color.White)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if(getMoviesByCategoryState.isLoading){
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-            }else{
-                LazyColumn {
-                    items(moviesByCategory) {
-                        MovieByCategoryItem(movie = it )
+
+            moviesPagingItems?.let { movies ->
+                LazyVerticalGrid(columns = GridCells.Fixed(3)) {
+                    items(movies.itemCount) { index ->
+                        val movie = movies[index]
+                        if (movie != null) {
+                            MovieByCategoryItem(movie = movie,
+                                onClick = {
+                                    navController.navigate("DETAIL_ROUTE/${movie.slug}")
+                                })
+                        }
                     }
 
+                    item {
+                        if (movies.loadState.append is LoadState.Loading) {
+                            CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                        }
+                    }
                 }
-            }
-
-
+            } ?: CustomLineProgressbar(Color.White)
         } else {
-            // Hiển thị loading hoặc thông báo không có dữ liệu
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+            CustomLineProgressbar(Color.White)
         }
-
-
-
-
-
     }
+
 }
+
+
+
 
 @Composable
 fun MovieByCategoryItem(
     movie: MovieByCategory,
-
-) {
+    onClick: () -> Unit ) {
     Box(
         modifier = Modifier
             .width(100.dp)
             .height(180.dp)
             .padding(8.dp)
+            .clickable {
+                onClick()
+            }
             .shadow(8.dp, RoundedCornerShape(12.dp))
     ) {
         var isImageLoaded by remember { mutableStateOf(false) }
 
         SubcomposeAsyncImage(
-            model = movie.poster_url,
+            model = "https://phimimg.com/" + movie.poster_url,
             contentDescription = movie.name,
             modifier = Modifier
                 .fillMaxSize()
@@ -144,7 +200,7 @@ fun MovieByCategoryItem(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-
+                        .background(shimmerBrush())
                 )
             },
             success = {

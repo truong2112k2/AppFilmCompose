@@ -11,8 +11,8 @@ class FetchMoviesByCategory @Inject constructor(
     private val movieRepository: IApiMovie
 
 ) {
-    suspend operator fun invoke(category: String): Resource<List<MovieByCategory>> {
-        return movieRepository.fetchMoviesByCategory(category)
+    suspend operator fun invoke(category: String, page: Int, limit: Int ): Resource<List<MovieByCategory>> {
+        return movieRepository.fetchMoviesByCategory(category, page, limit)
     }
 
 

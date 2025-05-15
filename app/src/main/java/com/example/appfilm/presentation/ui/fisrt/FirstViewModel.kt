@@ -38,7 +38,6 @@ class FirstViewModel @Inject constructor(
 
 
     fun signInWithGoogle(idToken: String) {
-        Log.d("LoginWithoutMail", "Goi ham")
 
         viewModelScope.launch {
 
@@ -46,20 +45,21 @@ class FirstViewModel @Inject constructor(
             appUseCases.logInWithoutPassUseCase.invoke(idToken).collect{ result->
 
                  _loginWithoutPassState.value = when(result){
+
                      is Resource.Loading -> {
                          Log.d("LoginWithoutMail", "loading")
 
                          FirstUiState(isLoading = true)
                      }
+
                      is Resource.Success -> {
                          Log.d("LoginWithoutMail", "success LoginWithoutMail ")
 
                          FirstUiState(isSuccess = true)
                      }
+
                      is Resource.Error -> {
                          Log.d("LoginWithoutMail", result.message.toString())
-
-
                          FirstUiState(error = convertLoginGoogleException(result.exception ?: Exception()))
                      }
                  }
@@ -67,9 +67,7 @@ class FirstViewModel @Inject constructor(
         }
     }
 
-    fun checkLogin(
-        onLogin : () -> Unit
-    ){
+    fun checkLogin(){
         viewModelScope.launch(Dispatchers.IO) {
             appUseCases.checkLoginUseCase.invoke().collect{ result ->
 
@@ -81,9 +79,7 @@ class FirstViewModel @Inject constructor(
 
                     }
                     is Resource.Success -> {
-                        withContext(Dispatchers.Main){
-                            onLogin()
-                        }
+
 
                         Log.d("CheckLogin","Success")
 

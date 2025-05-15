@@ -66,31 +66,21 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
     var showDialogError by rememberSaveable { mutableStateOf(false) }
     var errorText by rememberSaveable { mutableStateOf("") }
     val checkLoginState by firstViewModel.checkLoginState.collectAsState()
-    var checkInternet by rememberSaveable { mutableStateOf(false) }
+
+
     val context = LocalContext.current
     val logInWithoutPass by firstViewModel.loginWithoutPassState.collectAsState()
     val clientId = context.getString(R.string.default_web_client_id)
-    CustomLoadingDialog(checkLoginState.isLoading)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
 
         LaunchedEffect(Unit) {
-            firstViewModel.checkLogin(
-                onLogin = {
-                    navController.navigate(Constants.HOME_ROUTE) {
-                        popUpTo(0) { inclusive = true }
-                        launchSingleTop = true
-                    }
-                }
-            )
-
-
-
+            firstViewModel.checkLogin()
 
         }
-
 
 
 
@@ -137,10 +127,10 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
                     .border(BorderStroke(1.dp, Color.White), RoundedCornerShape(8.dp))
                     .clip(RoundedCornerShape(8.dp))
                     .clickable {
-                        if( isNetworkAvailable(context)){
+                        if (isNetworkAvailable(context)) {
                             val signInIntent = googleSignInClient.signInIntent
                             launcher.launch(signInIntent)
-                        }else{
+                        } else {
                             errorText = "No internet"
                             showDialogError = true
                         }
@@ -260,6 +250,20 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
             }
         )
 
+    }
+
+
+    when (checkLoginState) {
+        FirstUiState(isLoading = true) -> {
+            CustomLoadingDialog(checkLoginState.isLoading)
+        }
+
+        FirstUiState(isSuccess = true) -> {
+            navController.navigate(Constants.HOME_ROUTE) {
+                popUpTo(0) { inclusive = true }
+                launchSingleTop = true
+            }
+        }
     }
 }
 

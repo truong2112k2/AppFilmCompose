@@ -3,6 +3,7 @@ agp = "8.7.3"
 androidxRoomCompiler = "2.5.0"
 androidxRoomRuntime = "2.5.0"
 coilCompose = "2.2.2"
+composeNavTransitions = "3.3.6"
 converterGson = "2.9.0"
 hiltAndroid = "2.55"
 hiltNavigationCompose = "1.2.0"
@@ -53,6 +54,7 @@ androidx-room-ktx-v250 = { module = "androidx.room:room-ktx", version.ref = "roo
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 androidx-room-runtime-v250 = { module = "androidx.room:room-runtime", version.ref = "androidxRoomRuntime" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+compose-nav-transitions = { module = "com.github.jianastrero:compose-nav-transitions", version.ref = "composeNavTransitions" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref ="firebaseAuth" }
 google-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
