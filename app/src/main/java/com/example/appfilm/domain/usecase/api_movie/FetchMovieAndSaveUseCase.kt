@@ -9,7 +9,7 @@ import javax.inject.Singleton
 
 
 @Singleton
-class FetchMovieAndSave @Inject constructor(
+class FetchMovieAndSaveUseCase @Inject constructor(
     private val movieRepository : IApiMovie
 ) {
     suspend fun fetchDataMovieAndSaveFromDb(context: Context, page: Int): Resource<List<Movie>> {

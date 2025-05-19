@@ -84,19 +84,19 @@ class ApiMovieDataSource @Inject constructor(
     override suspend fun getDetailMovie(slug: String): Resource<MovieDetailDto> {
         return try {
             val moviesByCategory = apiService.getDetailMovie(slug)
-            Log.d(Constants.STATUS_TAG, "get movies detail by category movies success")
+            Log.d(Constants.STATUS_TAG, "get movies detail by getDetailMovie success")
             Resource.Success(moviesByCategory)
         } catch (e: IOException) {
             Log.e(Constants.ERROR_TAG, "Network error: ${e.message}")
-            Resource.Error(e.message ?: "get movies detail by category failed", e)
+            Resource.Error(e.message ?: "get movies detail by getDetailMovie failed", e)
 
         } catch (e: HttpException) {
             Log.e(Constants.ERROR_TAG, "HTTP error: ${e.code()} ${e.message()}")
-            Resource.Error(e.message ?: "get movies detail by category failed", e)
+            Resource.Error(e.message ?: "get movies detail by getDetailMovie failed", e)
 
         } catch (e: Exception) {
             Log.e(Constants.ERROR_TAG, "Unexpected error: ${e.message}")
-            Resource.Error(e.message ?: "get movies detail by category failed", e)
+            Resource.Error(e.message ?: "get movies detail by getDetailMovie failed", e)
 
         }
 

@@ -1,8 +1,9 @@
 package com.example.appfilm.domain.usecase
 
-import com.example.appfilm.domain.usecase.api_movie.FetchCategory
-import com.example.appfilm.domain.usecase.api_movie.FetchMovieAndSave
-import com.example.appfilm.domain.usecase.api_movie.FetchMoviesByCategory
+import com.example.appfilm.domain.usecase.api_movie.FetchCategoryUseCase
+import com.example.appfilm.domain.usecase.api_movie.FetchDetailMovieUseCase
+import com.example.appfilm.domain.usecase.api_movie.FetchMovieAndSaveUseCase
+import com.example.appfilm.domain.usecase.api_movie.FetchMoviesByCategoryUseCase
 import com.example.appfilm.domain.usecase.database.GetMoviesUseCase
 import com.example.appfilm.domain.usecase.firebase.CheckLoginUseCase
 import com.example.appfilm.domain.usecase.firebase.LogInUseCase
@@ -24,32 +25,14 @@ data class AppUseCases @Inject constructor (
     val logInWithoutPassUseCase: LogInWithoutPassUseCase,
     val logoutUseCase: LogoutUseCase,
     val checkLoginUseCase: CheckLoginUseCase,
-    val fetchDataAndSaveFromDbUseCase: FetchMovieAndSave,
     val getMoviesUseCase: GetMoviesUseCase,
-    val getCategoryUseCase: FetchCategory,
-    val getMoviesByCategoryUseCase: FetchMoviesByCategory
+
+    val fetchDataAndSaveFromDbUseCase: FetchMovieAndSaveUseCase,
+    val fetchCategoryUseCase: FetchCategoryUseCase,
+    val fetchMoviesByCategoryUseCase: FetchMoviesByCategoryUseCase,
+
+    val fetchDetailMovie : FetchDetailMovieUseCase
 ) {
 
-    /*
-        init {
-        viewModelScope.launch {
-            searchQuery
-                .debounce(400)
-                .distinctUntilChanged()
-                .collect { query ->
-                    if (query.isBlank()) {
-                        getAllNote()
-                    } else {
-                        searchNoteByTitle(query)
-                    }
-                }
-        }
-        viewModelScope.launch {
-            noteUseCases.dataStorageUseCase.getTheme().collect {
-                uiState.isDarkTheme.value = it
-            }
-        }
 
-    }
-     */
 }

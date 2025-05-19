@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,6 +63,8 @@ import com.commandiron.compose_loading.CubeGrid
 import com.example.appfilm.R
 import com.example.appfilm.common.Constants
 import com.example.appfilm.presentation.ui.category.CategoryScreen
+import com.example.appfilm.presentation.ui.detail.DetailMovieScreen
+import com.example.appfilm.presentation.ui.detail.DetailViewModel
 import com.example.appfilm.presentation.ui.home.HomeScreen
 import com.example.appfilm.presentation.ui.login.viewmodel.LogInViewModel
 import com.example.appfilm.presentation.ui.theme.AppFilmTheme
@@ -81,11 +84,18 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 val context = LocalContext.current
-          Navigation(context = context, navController = navController)
+          //Navigation(context = context, navController = navController)
 
 
-           //     CategoryScreen()
 
+                val vm = hiltViewModel<DetailViewModel>()
+                val getDetailUIState by vm.getDetailMovieState.collectAsState()
+                val detailMovie by vm.detailMovie.collectAsState()
+                DetailMovieScreen(navController, "", getDetailUIState, detailMovie,
+                    onEvent = {
+                        vm.onEvent(it)
+                    }
+                )
 
 
             }

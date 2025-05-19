@@ -1,5 +1,6 @@
 package com.example.appfilm.presentation.ui.home.components
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -60,6 +61,7 @@ import com.example.appfilm.presentation.ui.home.viewmodel.HomeViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import kotlinx.coroutines.launch
 
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 

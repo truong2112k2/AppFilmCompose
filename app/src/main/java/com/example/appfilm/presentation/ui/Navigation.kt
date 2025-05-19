@@ -6,13 +6,18 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.appfilm.common.Constants
 import com.example.appfilm.presentation.ui.category.CategoryScreen
+import com.example.appfilm.presentation.ui.detail.DetailAction
 import com.example.appfilm.presentation.ui.detail.DetailMovieScreen
+import com.example.appfilm.presentation.ui.detail.DetailViewModel
 import com.example.appfilm.presentation.ui.fisrt.FirstScreen
 import com.example.appfilm.presentation.ui.home.HomeScreen
 import com.example.appfilm.presentation.ui.login.LogInScreen
@@ -68,7 +73,15 @@ fun Navigation(
         ) {backStackEntry ->
             val movieSlug = backStackEntry.arguments?.getString("MovieSlug") ?: "null"
 
-            DetailMovieScreen(navController, movieSlug)
+            val vm = hiltViewModel<DetailViewModel>()
+            val getDetailUIState by vm.getDetailMovieState.collectAsState()
+            val detailMovie by vm.detailMovie.collectAsState()
+            DetailMovieScreen(navController, movieSlug, getDetailUIState, detailMovie,
+                onEvent = {
+                    vm.onEvent(it)
+                }
+                )
+
         }
     }
 }

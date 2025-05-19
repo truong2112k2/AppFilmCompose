@@ -7,11 +7,13 @@ import com.example.appfilm.data.source.remote.impl.ApiMovieDataSource
 import com.example.appfilm.domain.model.Category
 import com.example.appfilm.domain.model.Movie
 import com.example.appfilm.domain.model.MovieByCategory
+import com.example.appfilm.domain.model.detail_movie.MovieDetail
 import com.example.appfilm.domain.repository.IApiMovie
 import com.example.appfilm.domain.toCategory
 import com.example.appfilm.domain.toMovie
 import com.example.appfilm.domain.toMovieByCategory
 import com.example.appfilm.domain.toMovieDb
+import com.example.appfilm.domain.toMovieDetail
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -92,6 +94,24 @@ class ApiMovieRepositoryImpl @Inject constructor (
                 Resource.Error(message =  getCategory.message ?: "Unknown error", getCategory.exception)
             }
             is Resource.Loading ->{   Resource.Loading(emptyList())}
+        }
+    }
+
+    override suspend fun getDetailMovie(slug: String): Resource<MovieDetail> {
+
+        var detailMovie: MovieDetail = MovieDetail()
+        return when(val getDetailMovie = apiMovieDataSource.getDetailMovie(slug)){
+            is Resource.Success -> {
+
+                  detailMovie = (getDetailMovie.data?.toMovieDetail() ?: emptyList<MovieDetail>()) as MovieDetail
+
+                Resource.Success(detailMovie)
+
+            }
+            is Resource.Error -> {
+                Resource.Error(message =  getDetailMovie.message ?: "Unknown error", getDetailMovie.exception)
+            }
+            is Resource.Loading ->{   Resource.Loading(detailMovie)}
         }
     }
 }
