@@ -49,17 +49,27 @@ import com.example.appfilm.presentation.ui.CustomLoadingDialog
 import com.example.appfilm.presentation.ui.CustomRandomBackground
 import com.example.appfilm.presentation.ui.CustomResultDialog
 import com.example.appfilm.presentation.ui.register.componets.CustomTextError
+import com.example.appfilm.presentation.ui.register.viewmodel.RegisterUIState
+import com.example.appfilm.presentation.ui.reset_password.viewmodel.RegisterEvent
+import com.example.appfilm.presentation.ui.reset_password.viewmodel.ResetPassFields
+import com.example.appfilm.presentation.ui.reset_password.viewmodel.ResetPassUIState
 import com.example.appfilm.presentation.ui.reset_password.viewmodel.ResetPassViewModel
 
 @SuppressLint("ContextCastToActivity")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ResetPasswordScreen(navController: NavController, resetPassViewModel: ResetPassViewModel = hiltViewModel()) {
+fun ResetPasswordScreen(
+    navController: NavController,
+    resetPassFields : ResetPassFields,
+    resetPassUIState: ResetPassUIState,
+    eventClick : (RegisterEvent) -> Unit
+                      //  resetPassViewModel: ResetPassViewModel = hiltViewModel()
+) {
 
 
     var isHideUi by rememberSaveable { mutableStateOf(false) }
-    val resetPassFields = resetPassViewModel.resetPassFields
-    val resetPassUIState = resetPassViewModel.resetPassState
+   // val resetPassFields = resetPassViewModel.resetPassFields
+   // val resetPassUIState = resetPassViewModel.resetPassState
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -158,7 +168,8 @@ fun ResetPasswordScreen(navController: NavController, resetPassViewModel: ResetP
                         resetPassFields.email,
                         "Enter your email",
                         onValueChange = {
-                            resetPassViewModel.updateEmail(it)
+                        //    resetPassViewModel.updateEmail(it) // funtion
+                            eventClick(RegisterEvent.updateEmail(it))
                         })
 
                     Spacer(Modifier.height(8.dp))
@@ -174,7 +185,8 @@ fun ResetPasswordScreen(navController: NavController, resetPassViewModel: ResetP
                     CustomButton(
                         onClick = {
 
-                            resetPassViewModel.resetPassword()
+                            eventClick(RegisterEvent.resetPassword)
+                          //  resetPassViewModel.resetPassword() // funtion
 
                         },
                         "Reset password"
@@ -188,7 +200,8 @@ fun ResetPasswordScreen(navController: NavController, resetPassViewModel: ResetP
                         message = resetPassFields.resultString,
                         warningMessage = stringResource(R.string.warning_reset_pass),
                         onConfirm = {
-                            resetPassViewModel.updateIsShowDialogResult(false)
+                            //resetPassViewModel.updateIsShowDialogResult(false) // funtion
+                            eventClick(RegisterEvent.updateIsShowDialogResult(false))
 
                             isHideUi = true
                             navController.navigate(Constants.LOG_IN_ROUTE) {
