@@ -50,7 +50,6 @@ class ResetPassViewModel @Inject constructor(
             if (errorEmail?.isNotEmpty() == true) {
                 resetPassState = ResetPassUIState(error = errorEmail)
                 updateResultString(errorEmail)
-            //    updateIsShowDialogResult(true)
 
                 return@launch
             }
@@ -88,6 +87,16 @@ class ResetPassViewModel @Inject constructor(
         }
 
     }
+
+    fun handleEvent(registerEvent: RegisterEvent){
+        when(registerEvent){
+            is RegisterEvent.updateEmail -> { updateEmail(registerEvent.email)}
+            is RegisterEvent.resetPassword -> { resetPassword() }
+            is RegisterEvent.updateIsShowDialogResult -> { updateIsShowDialogResult(registerEvent.value)}
+        }
+    }
+
+
 
 
 }

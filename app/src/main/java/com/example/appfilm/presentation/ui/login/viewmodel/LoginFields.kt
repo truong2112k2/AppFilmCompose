@@ -1,6 +1,6 @@
 package com.example.appfilm.presentation.ui.login.viewmodel
 
-data class LogInFields(
+data class LoginFields(
     val inputEmail: String = "",
     val inputPassword: String = "",
     val errorTextLogin: String = "",

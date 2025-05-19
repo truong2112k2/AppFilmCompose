@@ -22,48 +22,46 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LogInViewModel @Inject constructor(
+class LoginViewModel @Inject constructor(
     private val appUseCases: AppUseCases
-) : ViewModel()  {
+) : ViewModel() {
 
-   // var logInUIState by mutableStateOf(LogInUIState())
-   private val _logInUISate = MutableStateFlow<LogInUIState>(LogInUIState())
-    val logInUIState: StateFlow<LogInUIState> = _logInUISate
+    private val _logInUISate = MutableStateFlow<LoginUIState>(LoginUIState())
+    val logInUIState: StateFlow<LoginUIState> = _logInUISate
 
- //   var sendEmailUIState by mutableStateOf(LogInUIState())
- private val _sendEmailUIState = MutableStateFlow<LogInUIState>(LogInUIState())
-    val sendEmailUIState: StateFlow<LogInUIState> = _sendEmailUIState
+    private val _sendEmailUIState = MutableStateFlow<LoginUIState>(LoginUIState())
+    val sendEmailUIState: StateFlow<LoginUIState> = _sendEmailUIState
 
-    var logInFields by mutableStateOf(LogInFields())
+    var logInFields by mutableStateOf(LoginFields())
 
 
-
-
-
-    fun updateIsShowEmailDialog(newValue: Boolean){
+    fun updateIsShowEmailDialog(newValue: Boolean) {
         logInFields = logInFields.copy(
             isShowSendEmailDialog = newValue
         )
     }
-    fun updateErrorTextLogin(newError: String){
-        logInFields = logInFields .copy(
+
+    fun updateErrorTextLogin(newError: String) {
+        logInFields = logInFields.copy(
             errorTextLogin = newError
         )
     }
-    fun updateErrorTextSendEmail(newError: String){
-        logInFields = logInFields .copy(
+
+    fun updateErrorTextSendEmail(newError: String) {
+        logInFields = logInFields.copy(
             errorTextSendEmail = newError
         )
     }
 
 
-    fun updateEmail(newEmail: String){
+    fun updateEmail(newEmail: String) {
         logInFields = logInFields.copy(inputEmail = newEmail)
     }
 
-    fun updatePassword(newPassword: String){
+    fun updatePassword(newPassword: String) {
         logInFields = logInFields.copy(inputPassword = newPassword)
     }
+
     fun login() {
         val email = logInFields.inputEmail
         val password = logInFields.inputPassword
@@ -77,7 +75,7 @@ class LogInViewModel @Inject constructor(
 
             if (emailError != null) {
                 Log.e(Constants.ERROR_TAG, "Email validation error: $emailError")
-                _logInUISate.value = LogInUIState(error = emailError)
+                _logInUISate.value = LoginUIState(error = emailError)
                 updateErrorTextLogin(emailError)
                 return@launch
             }
@@ -85,7 +83,7 @@ class LogInViewModel @Inject constructor(
             val passwordError = appUseCases.validationUseCase.validationPasswordLogin(password)
             if (passwordError != null) {
                 Log.e(Constants.ERROR_TAG, "Password validation error: $passwordError")
-                _logInUISate.value = LogInUIState(error = passwordError)
+                _logInUISate.value = LoginUIState(error = passwordError)
                 updateErrorTextLogin(passwordError)
                 return@launch
             }
@@ -94,17 +92,17 @@ class LogInViewModel @Inject constructor(
                 _logInUISate.value = when (result) {
                     is Resource.Loading -> {
                         Log.d(Constants.STATUS_TAG, "Login Loading")
-                        LogInUIState(isLoading = true)
+                        LoginUIState(isLoading = true)
                     }
 
                     is Resource.Success -> {
                         if (result.data == true) {
                             Log.d(Constants.STATUS_TAG, "Login Success")
-                            LogInUIState(isSuccess = true)
+                            LoginUIState(isSuccess = true)
                         } else {
                             Log.e(Constants.ERROR_TAG, "Email not verified")
                             updateErrorTextLogin("Email not verified")
-                            LogInUIState(error = "Email not verified")
+                            LoginUIState(error = "Email not verified")
                         }
                     }
 
@@ -112,7 +110,7 @@ class LogInViewModel @Inject constructor(
                         val error = convertLoginException(result.exception ?: Exception())
                         Log.e(Constants.ERROR_TAG, "Login Error: $error")
                         updateErrorTextLogin(error)
-                        LogInUIState(error = error)
+                        LoginUIState(error = error)
                     }
                 }
             }
@@ -130,21 +128,26 @@ class LogInViewModel @Inject constructor(
                 _sendEmailUIState.value = when (result) {
                     is Resource.Loading -> {
                         Log.d(Constants.STATUS_TAG, "Resend email loading...")
-                        LogInUIState(isLoading = true)
-                    }
-                    is Resource.Success -> {
-                        Log.d(Constants.STATUS_TAG, "Resend email success: A verification has been sent.")
-                        updateErrorTextSendEmail("A verification has been sent, please check your email !")
-                        updateIsShowEmailDialog(true)
-                        LogInUIState(isSuccess = true)
+                        LoginUIState(isLoading = true)
                     }
 
-                            is Resource.Error -> {
-                        val error = convertSendEmailException(result.exception, fallback = result.message)
+                    is Resource.Success -> {
+                        Log.d(
+                            Constants.STATUS_TAG,
+                            "Resend email success: A verification has been sent."
+                        )
+                        updateErrorTextSendEmail("A verification has been sent, please check your email !")
+                        updateIsShowEmailDialog(true)
+                        LoginUIState(isSuccess = true)
+                    }
+
+                    is Resource.Error -> {
+                        val error =
+                            convertSendEmailException(result.exception, fallback = result.message)
                         Log.e(Constants.ERROR_TAG, "Resend email error: $error")
                         updateErrorTextSendEmail(error)
                         updateIsShowEmailDialog(true)
-                        LogInUIState(error = error)
+                        LoginUIState(error = error)
                     }
                 }
             }
@@ -152,6 +155,37 @@ class LogInViewModel @Inject constructor(
     }
 
 
+    fun handleEventLogin(loginEvent: LoginEvent) {
+        when (loginEvent) {
+            is LoginEvent.updateIsShowEmailDialog -> {
+                updateIsShowEmailDialog(loginEvent.email)
+            }
+
+            is LoginEvent.updateErrorTextLogin -> {
+                updateErrorTextLogin(loginEvent.text)
+            }
+
+            is LoginEvent.updateErrorTextSendEmail -> {
+                updateErrorTextSendEmail(loginEvent.text)
+            }
+
+            is LoginEvent.updateEmail -> {
+                updateEmail(loginEvent.newEmail)
+            }
+
+            is LoginEvent.updatePassword -> {
+                updatePassword(loginEvent.newPassword)
+            }
+
+            is LoginEvent.login -> {
+                login()
+            }
+
+            is LoginEvent.resendEmail -> {
+                resendEmail()
+            }
+        }
+    }
 
 
     private fun convertLoginException(e: Exception): String {
@@ -159,23 +193,24 @@ class LogInViewModel @Inject constructor(
             is FirebaseAuthInvalidUserException -> {
                 "Account does not exist."
             }
+
             is FirebaseAuthInvalidCredentialsException -> {
                 "Incorrect email or password."
             }
+
             is FirebaseAuthException -> {
                 "Authentication error: ${e.message}"
             }
+
             is FirebaseNetworkException -> {
                 "No internet connection."
             }
+
             else -> {
                 e.localizedMessage ?: "An unknown error has occurred."
             }
         }
     }
-
-
-
 
 
 }
