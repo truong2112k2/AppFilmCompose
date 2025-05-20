@@ -15,12 +15,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.appfilm.common.Constants
 import com.example.appfilm.presentation.ui.category.CategoryScreen
-import com.example.appfilm.presentation.ui.category.CategoryViewModel
+import com.example.appfilm.presentation.ui.category.viewmodel.CategoryViewModel
 import com.example.appfilm.presentation.ui.detail.DetailMovieScreen
-import com.example.appfilm.presentation.ui.detail.DetailViewModel
+import com.example.appfilm.presentation.ui.detail.viewmodel.DetailViewModel
 import com.example.appfilm.presentation.ui.fisrt.FirstScreen
-import com.example.appfilm.presentation.ui.fisrt.FirstUiState
-import com.example.appfilm.presentation.ui.fisrt.FirstViewModel
+import com.example.appfilm.presentation.ui.fisrt.viewmodel.FirstUiState
+import com.example.appfilm.presentation.ui.fisrt.viewmodel.FirstViewModel
 import com.example.appfilm.presentation.ui.home.HomeScreen
 import com.example.appfilm.presentation.ui.home.viewmodel.HomeViewModel
 import com.example.appfilm.presentation.ui.login.LogInScreen
@@ -106,10 +106,14 @@ fun Navigation(
 
             val categoryViewModel = hiltViewModel<CategoryViewModel>()
             val listCategory by categoryViewModel.categories.collectAsState()
+
             CategoryScreen(navController,
                 listCategory,
                 onEvenClick = { categoryViewModel.handleEvent(it) },
-                getList = { categoryViewModel.getMoviesByCategory(it) })
+                getList = {
+
+                    categoryViewModel.getMoviesByCategory(it)
+                })
         }
 
 

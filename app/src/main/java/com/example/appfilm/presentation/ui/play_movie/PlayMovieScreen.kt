@@ -39,15 +39,13 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
-
 @Composable
 fun PlayMovieScreen(videoUrl: String, context: Context, navController: NavController) {
-    var showVideo by rememberSaveable { mutableStateOf(false) }
+    var showVideo by rememberSaveable { mutableStateOf(true) }
 
     val activity = context as? Activity
 
     LaunchedEffect(showVideo) {
-
         if (showVideo) {
             activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
             WindowCompat.setDecorFitsSystemWindows(activity?.window ?: return@LaunchedEffect, false)
@@ -63,6 +61,11 @@ fun PlayMovieScreen(videoUrl: String, context: Context, navController: NavContro
         }
     }
 
+    // Xử lý nút back vật lý
+    androidx.activity.compose.BackHandler(enabled = showVideo) {
+        showVideo = false
+    }
+
     if (showVideo) {
         FullScreenVideoPlayer(
             url = videoUrl,
@@ -70,17 +73,55 @@ fun PlayMovieScreen(videoUrl: String, context: Context, navController: NavContro
             onExit = { showVideo = false }
         )
     } else {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Button(onClick = { showVideo = true }) {
-                Text("Xem video full screen")
-            }
+        // Khi đã thoát video => quay lại màn hình trước
+        LaunchedEffect(Unit) {
+            navController.popBackStack()
         }
     }
 }
+
+//
+//@Composable
+//fun PlayMovieScreen(videoUrl: String, context: Context, navController: NavController) {
+//    var showVideo by rememberSaveable { mutableStateOf(false) }
+//
+//    val activity = context as? Activity
+//
+//    LaunchedEffect(showVideo) {
+//
+//        if (showVideo) {
+//            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+//            WindowCompat.setDecorFitsSystemWindows(activity?.window ?: return@LaunchedEffect, false)
+//            activity?.window?.decorView?.systemUiVisibility = (
+//                    View.SYSTEM_UI_FLAG_FULLSCREEN
+//                            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+//                            or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+//                    )
+//        } else {
+//            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+//            WindowCompat.setDecorFitsSystemWindows(activity?.window ?: return@LaunchedEffect, true)
+//            activity?.window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+//        }
+//    }
+//
+//    if (showVideo) {
+//        FullScreenVideoPlayer(
+//            url = videoUrl,
+//            context = context,
+//            onExit = { showVideo = false }
+//        )
+//    } else {
+//        Column(
+//            modifier = Modifier.fillMaxSize(),
+//            verticalArrangement = Arrangement.Center,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            Button(onClick = { showVideo = true }) {
+//                Text("Xem video full screen")
+//            }
+//        }
+//    }
+//}
 
 
 @OptIn(UnstableApi::class)

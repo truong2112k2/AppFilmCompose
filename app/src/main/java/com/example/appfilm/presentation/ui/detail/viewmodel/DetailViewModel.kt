@@ -1,4 +1,4 @@
-package com.example.appfilm.presentation.ui.detail
+package com.example.appfilm.presentation.ui.detail.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -27,38 +27,47 @@ class DetailViewModel @Inject constructor(
     private val _detailMovie = MutableStateFlow<MovieDetail>(MovieDetail())
     val detailMovie: StateFlow<MovieDetail> = _detailMovie.asStateFlow()
 
-    fun getDetailMovie(slug: String) {
+    private fun getDetailMovie(slug: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            _getDetailMovieState.value = DetailUiState(isLoading = true)
-
-            Log.d("check", _getDetailMovieState.value.isLoading.toString())
-
-            val getDetailMove = appUseCases.fetchDetailMovie.invoke(slug)
 
 
 
-            _getDetailMovieState.value = when (getDetailMove) {
-                is Resource.Loading -> {
-                    DetailUiState(isLoading = true)
+
+
+            if(detailMovie.value.listEpisodeMovie?.isEmpty() == true){
+
+                _getDetailMovieState.value = DetailUiState(isLoading = true)
+                Log.d("check", _getDetailMovieState.value.isLoading.toString())
+                val getDetailMove = appUseCases.fetchDetailMovie.invoke(slug)
+                _getDetailMovieState.value = when (getDetailMove) {
+                    is Resource.Loading -> {
+                        DetailUiState(isLoading = true)
+                    }
+
+                    is Resource.Success -> {
+                        Log.d(Constants.STATUS_TAG, "Success from getDetailMovie ")
+
+                        _detailMovie.value = getDetailMove.data!!
+
+
+
+                        DetailUiState(isSuccess = true)
+                    }
+
+                    is Resource.Error -> {
+                        Log.d(Constants.STATUS_TAG, "Error from getDetailMovie ")
+                        _detailMovie.value = MovieDetail()
+
+                        DetailUiState(error = getDetailMove.message)
+                    }
                 }
-
-                is Resource.Success -> {
-                    Log.d(Constants.STATUS_TAG, "Success from getDetailMovie ")
-
-                    _detailMovie.value = getDetailMove.data!!
-
-
-
-                    DetailUiState(isSuccess = true)
-                }
-
-                is Resource.Error -> {
-                    Log.d(Constants.STATUS_TAG, "Error from getDetailMovie ")
-                    _detailMovie.value = MovieDetail()
-
-                    DetailUiState(error = getDetailMove.message)
-                }
+            }else{
+                Log.d(Constants.STATUS_TAG,"detail movie is not null")
             }
+
+
+
+
 
         }
 

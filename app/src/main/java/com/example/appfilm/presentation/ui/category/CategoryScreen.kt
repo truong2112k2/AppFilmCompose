@@ -48,6 +48,7 @@ import coil.compose.SubcomposeAsyncImageContent
 import com.example.appfilm.domain.model.Category
 import com.example.appfilm.domain.model.MovieByCategory
 import com.example.appfilm.presentation.ui.CustomLineProgressbar
+import com.example.appfilm.presentation.ui.category.viewmodel.CategoryEvent
 import com.example.appfilm.presentation.ui.shimmerBrush
 import kotlinx.coroutines.flow.Flow
 
@@ -60,8 +61,6 @@ fun CategoryScreen(
     getList: (category: String) -> Flow<PagingData<MovieByCategory>>
 
 ) {
-
-    // Gọi lấy danh mục khi vào màn hình
     LaunchedEffect(Unit) {
         onEvenClick(CategoryEvent.GetCategory)
     }
