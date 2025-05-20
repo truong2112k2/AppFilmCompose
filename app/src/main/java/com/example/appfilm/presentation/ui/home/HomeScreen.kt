@@ -1,24 +1,69 @@
 package com.example.appfilm.presentation.ui.home
 
 import android.annotation.SuppressLint
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.appfilm.presentation.ui.home.components.CustomModalNavigationDrawer
-import com.example.appfilm.presentation.ui.home.viewmodel.HomeViewModel
+import com.example.appfilm.common.Constants
+import com.example.appfilm.presentation.ui.CustomConfirmDialog
+import com.example.appfilm.presentation.ui.home.NavigationDrawerItem.Favorite.drawerScreenSaver
+import com.example.appfilm.presentation.ui.home.components.CustomDrawerContent
+import com.example.appfilm.presentation.ui.home.screen.favourite_movie_screen.FavouriteMovieScreen
+import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.HomeMovieScreen
+import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.viewmodel.HomeMovieViewModel
+import com.example.appfilm.presentation.ui.home.screen.search_movie_screen.SearchMovieScreen
+import com.example.appfilm.presentation.ui.home.viewmodel.HomeEvent
+import com.example.appfilm.presentation.ui.home.viewmodel.HomeUIState
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import kotlinx.coroutines.launch
 
 
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-
-    homeViewModel: HomeViewModel = hiltViewModel()
+    logoutState: HomeUIState,
+    onEvenClick: (HomeEvent) -> Unit
 
 ) {
 
@@ -30,8 +75,182 @@ fun HomeScreen(
     @SuppressLint("StaticFieldLeak")
     val googleSignInClient = GoogleSignIn.getClient(context, gso)
 
-    CustomModalNavigationDrawer(navController, context, homeViewModel , googleSignInClient)
+    var isHideUi by rememberSaveable { mutableStateOf(false) }
 
+    val activity = context as? ComponentActivity
+
+    val backCallback = remember {
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                isHideUi = true
+                Log.d(Constants.STATUS_TAG, "handleOnBackPressed")
+                remove()
+                activity?.onBackPressedDispatcher?.onBackPressed()
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        activity?.onBackPressedDispatcher?.addCallback(backCallback)
+        onDispose {
+            backCallback.remove()
+        }
+    }
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val coroutineScope = rememberCoroutineScope()
+
+    var selectedScreen by rememberSaveable(stateSaver = drawerScreenSaver) {
+        mutableStateOf<NavigationDrawerItem>(NavigationDrawerItem.Home)
+    }
+
+    var isShowDiaLogConfirm by rememberSaveable { mutableStateOf(false) }
+
+
+    val homeMovieViewModel = hiltViewModel<HomeMovieViewModel>()
+    val getNewMovieState by homeMovieViewModel.getNewMovieState.collectAsState()
+    val movies by homeMovieViewModel.movies.collectAsState()
+
+
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+
+
+            CustomDrawerContent(
+                selectedScreen = selectedScreen,
+                onItemSelected = {
+                    selectedScreen = it
+                    coroutineScope.launch { drawerState.close() }
+                }
+            )
+
+
+        }
+    ) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(Color.Black, Color.White)
+                    )
+                )
+        ) {
+
+
+            TopAppBar(
+                title = {
+                    if (!getNewMovieState.isLoading) {
+                        Text(selectedScreen.title)
+                    }
+
+                },
+                navigationIcon = {
+                    if (getNewMovieState.isLoading) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Loading",
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            CircularProgressIndicator(
+                                color = Color.White
+                            )
+                        }
+
+                    } else {
+                        IconButton(onClick = {
+                            coroutineScope.launch { drawerState.open() }
+                        }) {
+                            Icon(Icons.Default.Menu, contentDescription = "Menu")
+                        }
+                    }
+
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                ),
+                actions = {
+                    if (!getNewMovieState.isLoading) {
+                        IconButton(onClick = {
+                            isShowDiaLogConfirm = true
+                        }) {
+                            Icon(
+                                Icons.Default.ExitToApp,
+                                contentDescription = "Menu",
+                                tint = Color.White
+                            )
+                        }
+                    }
+
+                }
+            )
+
+
+
+
+            Box(
+
+            ) {
+                when (selectedScreen) {
+                    is NavigationDrawerItem.Home -> HomeMovieScreen(
+                        navController,
+                        context,
+                        getNewMovieState,
+                        movies,
+                        onEventClick = { homeMovieViewModel.handleEvent(it) })
+
+                    is NavigationDrawerItem.Favorite -> FavouriteMovieScreen()
+                    is NavigationDrawerItem.Search -> SearchMovieScreen()
+                }
+            }
+
+
+        }
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+    CustomConfirmDialog(
+        "Log out your account",
+        "Are you sure to log out",
+        showDialog = isShowDiaLogConfirm,
+        onConfirm = {
+            isShowDiaLogConfirm = false
+
+            onEvenClick(HomeEvent.Logout(googleSignInClient))
+        },
+        onDismiss = {
+            isShowDiaLogConfirm = false
+        }
+    )
+
+
+
+    if (logoutState.isSuccess) {
+        isHideUi = true
+        navController.navigate(Constants.FIRST_ROUTE) {
+            launchSingleTop
+            popUpTo(Constants.HOME_ROUTE) {
+
+                inclusive = true
+            }
+        }
+    }
 
 }
 

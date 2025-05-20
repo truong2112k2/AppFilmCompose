@@ -59,7 +59,7 @@ class CategoryViewModel @Inject constructor(
         }
     }
 
-    fun getMoviesByCategory2(typeList: String): Flow<PagingData<MovieByCategory>> {
+    fun getMoviesByCategory(typeList: String): Flow<PagingData<MovieByCategory>> {
 
         return Pager(
             config = PagingConfig(pageSize = 30),
@@ -72,27 +72,34 @@ class CategoryViewModel @Inject constructor(
 
     }
 
-    fun getMoviesByCategory(category: String, page: Int, limit: Int ){
-        _getMoviesByCategoryState.value = CategoryUIState(isLoading = true)
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = appUseCases.fetchMoviesByCategoryUseCase.invoke(category, page, limit)
-
-            if(result.data?.isNotEmpty() == true){
-
-                _moviesByCategory.value = result.data
-
-                _getMoviesByCategoryState.value = CategoryUIState(isSuccess = true)
-                Log.d(Constants.STATUS_TAG,"get movies Category UseCase success")
-
-
-            }else{
-                Log.d(Constants.STATUS_TAG,"get movies Category UseCase Failed ${result.message} slug = ${category}")
-                _getMoviesByCategoryState.value = CategoryUIState(error = result.message)
-
-
-
-            }
+    fun handleEvent(categoryEvent: CategoryEvent){
+        when(categoryEvent){
+            is CategoryEvent.GetCategory -> {getCategory()}
+            is CategoryEvent.GetMoviesByCategory ->{getMoviesByCategory(categoryEvent.typeList)}
         }
     }
+
+//    fun getMoviesByCategory(category: String, page: Int, limit: Int ){
+//        _getMoviesByCategoryState.value = CategoryUIState(isLoading = true)
+//        viewModelScope.launch(Dispatchers.IO) {
+//            val result = appUseCases.fetchMoviesByCategoryUseCase.invoke(category, page, limit)
+//
+//            if(result.data?.isNotEmpty() == true){
+//
+//                _moviesByCategory.value = result.data
+//
+//                _getMoviesByCategoryState.value = CategoryUIState(isSuccess = true)
+//                Log.d(Constants.STATUS_TAG,"get movies Category UseCase success")
+//
+//
+//            }else{
+//                Log.d(Constants.STATUS_TAG,"get movies Category UseCase Failed ${result.message} slug = ${category}")
+//                _getMoviesByCategoryState.value = CategoryUIState(error = result.message)
+//
+//
+//
+//            }
+//        }
+//    }
 
 }

@@ -157,31 +157,31 @@ class LoginViewModel @Inject constructor(
 
     fun handleEventLogin(loginEvent: LoginEvent) {
         when (loginEvent) {
-            is LoginEvent.updateIsShowEmailDialog -> {
+            is LoginEvent.UpdateIsShowEmailDialog -> {
                 updateIsShowEmailDialog(loginEvent.email)
             }
 
-            is LoginEvent.updateErrorTextLogin -> {
+            is LoginEvent.UpdateErrorTextLogin -> {
                 updateErrorTextLogin(loginEvent.text)
             }
 
-            is LoginEvent.updateErrorTextSendEmail -> {
+            is LoginEvent.UpdateErrorTextSendEmail -> {
                 updateErrorTextSendEmail(loginEvent.text)
             }
 
-            is LoginEvent.updateEmail -> {
+            is LoginEvent.UpdateEmail -> {
                 updateEmail(loginEvent.newEmail)
             }
 
-            is LoginEvent.updatePassword -> {
+            is LoginEvent.UpdatePassword -> {
                 updatePassword(loginEvent.newPassword)
             }
 
-            is LoginEvent.login -> {
+            is LoginEvent.Login -> {
                 login()
             }
 
-            is LoginEvent.resendEmail -> {
+            is LoginEvent.ResendEmail -> {
                 resendEmail()
             }
         }

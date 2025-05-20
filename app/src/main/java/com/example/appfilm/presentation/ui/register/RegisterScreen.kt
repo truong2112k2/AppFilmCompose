@@ -55,17 +55,36 @@ import com.example.appfilm.presentation.ui.CustomLoadingDialog
 import com.example.appfilm.presentation.ui.CustomRandomBackground
 import com.example.appfilm.presentation.ui.register.componets.CustomTextError
 import com.example.appfilm.presentation.ui.register.componets.CustomSuccessDialog
+import com.example.appfilm.presentation.ui.register.viewmodel.RegisterEvent
+import com.example.appfilm.presentation.ui.register.viewmodel.RegisterFields
+import com.example.appfilm.presentation.ui.register.viewmodel.RegisterUIState
 import com.example.appfilm.presentation.ui.register.viewmodel.RegisterViewModel
 
 
 @SuppressLint("ContextCastToActivity")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(navController: NavController, registerViewModel: RegisterViewModel = hiltViewModel() ){
+fun RegisterScreen(navController: NavController,
+    registerFields : RegisterFields ,
+    registerState : RegisterUIState ,
+    sendEmailState : RegisterUIState,
+    evenClick : (RegisterEvent) -> Unit
+
+
+                   //registerViewModel: RegisterViewModel = hiltViewModel()
+
+){
+
+//    val registerFields = registerViewModel.registerFields
+//    val registerState = registerViewModel.registerState
+//    val sendEmailState = registerViewModel.sendEmailUIState
+
+    val isShowDialogSuccess = registerFields.isShowDialogSuccess
+
+
+
 
     var isHideUi by rememberSaveable { mutableStateOf(false) }
-
-
     val activity = LocalContext.current as? ComponentActivity
 
     val backCallback = remember {
@@ -104,11 +123,7 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
         ) {
 
 
-            val registerFields = registerViewModel.registerFields
-            val registerState = registerViewModel.registerState
-            val sendEmailState = registerViewModel.sendEmailUIState
 
-            val isShowDialogSuccess = registerFields.isShowDialogSuccess
 
 
             CenterAlignedTopAppBar(
@@ -150,19 +165,22 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
 
 
                 CustomTextField(
-                    text = registerViewModel.registerFields.inputEmail,
+                    text = registerFields.inputEmail,
                     label = "Enter email",
                     onValueChange = {
-                        registerViewModel.updateEmail(it)
+                     //   registerViewModel.updateEmail(it)
+                        evenClick(RegisterEvent.UpdateEmail(it))
                     }
                 )
 
                 Spacer(Modifier.height(5.dp))
                 CustomTextField(
-                    text = registerViewModel.registerFields.inputPassword,
+                    text = registerFields.inputPassword,
                     label = "Enter password",
                     onValueChange = {
-                        registerViewModel.updatePassword(it)
+                     //   registerViewModel.updatePassword(it)
+                        evenClick(RegisterEvent.UpdatePassword(it))
+
                     },
                     true
                 )
@@ -170,10 +188,12 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
                 Spacer(Modifier.height(5.dp))
 
                 CustomTextField(
-                    text = registerViewModel.registerFields.reInputPassword,
+                    text = registerFields.reInputPassword,
                     label = "Re-enter password",
                     onValueChange = {
-                        registerViewModel.updateReInputPassword(it)
+                       // registerViewModel.updateReInputPassword(it)
+                        evenClick(RegisterEvent.UpdateReInputPassword(it))
+
                     },
                     true
                 )
@@ -182,7 +202,7 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
                 Spacer(Modifier.height(5.dp))
 
                 if(registerFields.errorTextRegister.isNotEmpty()){
-                    CustomTextError(registerViewModel.registerFields.errorTextRegister)
+                    CustomTextError(registerFields.errorTextRegister)
                 }
 
 
@@ -192,7 +212,11 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
 
 
                 CustomButton(
-                    onClick = {registerViewModel.register()},
+                    onClick = {
+                        //registerViewModel.register()
+                        evenClick(RegisterEvent.Register)
+
+                    },
                     "Register"
                 )
 
@@ -202,9 +226,12 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
                 LaunchedEffect(registerState) {
 
                     if(registerState.isSuccess){
-                        registerViewModel.updateErrorTextRegister("")
+                     //   registerViewModel.updateErrorTextRegister("")
 
-                        registerViewModel.toggleIsShowDialogSuccess()
+                     //   registerViewModel.toggleIsShowDialogSuccess()
+                        evenClick(RegisterEvent.UpdateErrorTextRegister(""))
+                        evenClick(RegisterEvent.ToggleIsShowDialogSuccess)
+
                         Log.d(Constants.STATUS_TAG,"Register Success")
 
                     }else if(registerState.error?.isNotBlank() == true){
@@ -220,11 +247,16 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
                 CustomSuccessDialog(
                     isShowDialogSuccess,
                     onDismiss = {
-                        registerViewModel.resendEmail()
+                       // registerViewModel.resendEmail()
+                        evenClick(RegisterEvent.ResendEmail)
+
                     },
                     onConfirm = {
-                        registerViewModel.toggleIsShowDialogSuccess()
-                        registerViewModel.reset(3)
+                        //registerViewModel.toggleIsShowDialogSuccess()
+                       // registerViewModel.reset(3)
+                        evenClick(RegisterEvent.ToggleIsShowDialogSuccess)
+                        evenClick(RegisterEvent.Reset(3))
+
                         isHideUi = true
                         navController.navigate(Constants.FIRST_ROUTE){
                             launchSingleTop

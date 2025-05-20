@@ -1,10 +1,12 @@
 [versions]
+accompanistPlaceholderMaterial = "0.32.0"
 agp = "8.7.3"
 androidxRoomCompiler = "2.5.0"
 androidxRoomRuntime = "2.5.0"
 coilCompose = "2.2.2"
 composeNavTransitions = "3.3.6"
 converterGson = "2.9.0"
+core = "12.1.0"
 hiltAndroid = "2.55"
 hiltNavigationCompose = "1.2.0"
 jetpackLoading = "1.1.0"
@@ -39,8 +41,10 @@ roomCompilerVersion = "2.5.1"
 shimmer = "0.5.0"
 simpleloading = "0.0.6"
 roomRuntimeAndroid = "2.7.1"
+composeMaterial = "1.4.1"
 
 [libraries]
+accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanistPlaceholderMaterial" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-lifecycle-runtime-ktx-v261 = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
@@ -56,6 +60,7 @@ androidx-room-runtime-v250 = { module = "androidx.room:room-runtime", version.re
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 compose-nav-transitions = { module = "com.github.jianastrero:compose-nav-transitions", version.ref = "composeNavTransitions" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+core = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "core" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref ="firebaseAuth" }
 google-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
@@ -92,6 +97,7 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
 simpleloading = { module = "com.github.younhwan97:SimpleLoading", version.ref = "simpleloading" }
 androidx-room-runtime-android = { group = "androidx.room", name = "room-runtime-android", version.ref = "roomRuntimeAndroid" }
+androidx-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "composeMaterial" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

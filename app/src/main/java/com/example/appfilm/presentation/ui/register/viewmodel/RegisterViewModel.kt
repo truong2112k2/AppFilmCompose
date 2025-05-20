@@ -165,5 +165,45 @@ class RegisterViewModel @Inject constructor(
     }
 
 
+    fun handleEvent(registerEvent: RegisterEvent){
+        when(registerEvent){
+            is RegisterEvent.Register ->{
+                register()
+            }
+            is RegisterEvent.UpdateResultTextSendEmail ->{
+                updateResultTextSendEmail(registerEvent.newResult)
+            }
+
+            is RegisterEvent.ToggleIsShowDialogSuccess ->{
+
+                toggleIsShowDialogSuccess()
+
+            }
+
+            is RegisterEvent.UpdateErrorTextRegister->{
+                updateErrorTextRegister(registerEvent.error)
+            }
+
+            is RegisterEvent.UpdateEmail->{
+                updateEmail(registerEvent.newEmail)
+            }
+
+            is RegisterEvent. UpdatePassword->{
+                updatePassword(registerEvent.newPassword)
+            }
+
+            is RegisterEvent.UpdateReInputPassword->{
+                updateReInputPassword(registerEvent.newPassword)
+            }
+
+            is RegisterEvent.Reset->{
+                reset(registerEvent.level)
+            }
+
+            is RegisterEvent.ResendEmail ->{
+                resendEmail()
+            }
+        }
+    }
 
 }

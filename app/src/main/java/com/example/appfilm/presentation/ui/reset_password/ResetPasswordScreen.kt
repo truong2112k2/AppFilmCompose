@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,7 +37,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.appfilm.R
 import com.example.appfilm.common.Constants
@@ -49,11 +47,9 @@ import com.example.appfilm.presentation.ui.CustomLoadingDialog
 import com.example.appfilm.presentation.ui.CustomRandomBackground
 import com.example.appfilm.presentation.ui.CustomResultDialog
 import com.example.appfilm.presentation.ui.register.componets.CustomTextError
-import com.example.appfilm.presentation.ui.register.viewmodel.RegisterUIState
 import com.example.appfilm.presentation.ui.reset_password.viewmodel.RegisterEvent
 import com.example.appfilm.presentation.ui.reset_password.viewmodel.ResetPassFields
 import com.example.appfilm.presentation.ui.reset_password.viewmodel.ResetPassUIState
-import com.example.appfilm.presentation.ui.reset_password.viewmodel.ResetPassViewModel
 
 @SuppressLint("ContextCastToActivity")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -169,7 +165,7 @@ fun ResetPasswordScreen(
                         "Enter your email",
                         onValueChange = {
                         //    resetPassViewModel.updateEmail(it) // funtion
-                            eventClick(RegisterEvent.updateEmail(it))
+                            eventClick(RegisterEvent.UpdateEmail(it))
                         })
 
                     Spacer(Modifier.height(8.dp))
@@ -185,7 +181,7 @@ fun ResetPasswordScreen(
                     CustomButton(
                         onClick = {
 
-                            eventClick(RegisterEvent.resetPassword)
+                            eventClick(RegisterEvent.ResetPassword)
                           //  resetPassViewModel.resetPassword() // funtion
 
                         },
@@ -201,7 +197,7 @@ fun ResetPasswordScreen(
                         warningMessage = stringResource(R.string.warning_reset_pass),
                         onConfirm = {
                             //resetPassViewModel.updateIsShowDialogResult(false) // funtion
-                            eventClick(RegisterEvent.updateIsShowDialogResult(false))
+                            eventClick(RegisterEvent.UpdateIsShowDialogResult(false))
 
                             isHideUi = true
                             navController.navigate(Constants.LOG_IN_ROUTE) {

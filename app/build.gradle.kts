@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.appfilm"
-        minSdk = 24
+        minSdk = 25
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.androidx.espresso.core)
     implementation(libs.androidx.animation.core.lint)
     implementation(libs.androidx.room.runtime.android)
+    implementation(libs.androidx.compose.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -119,6 +120,16 @@ dependencies {
     //noinspection UseTomlInstead
     implementation ("com.google.accompanist:accompanist-navigation-animation:0.32.0")
 
+    implementation ("com.google.accompanist:accompanist-placeholder:0.32.0")
+
+
+    implementation(libs.core)
+    //noinspection UseTomlInstead
+    implementation ("androidx.media3:media3-exoplayer:1.2.1")
+    //noinspection UseTomlInstead
+    implementation ("androidx.media3:media3-ui:1.2.1")
+
+    implementation ( "androidx.media3:media3-exoplayer-hls:1.7.1" )
 
 
 }

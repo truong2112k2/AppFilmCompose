@@ -121,6 +121,12 @@ class FirstViewModel @Inject constructor(
     }
 
 
+    fun handleEvent(firstEvent: FirstEvent){
+        when(firstEvent){
+            is FirstEvent.CheckLogin ->{ checkLogin()}
+            is FirstEvent.SignInWithGoogle -> {signInWithGoogle(firstEvent.idToken)}
+        }
+    }
 
 
 

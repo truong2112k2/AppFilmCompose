@@ -61,7 +61,6 @@ import com.example.appfilm.presentation.ui.login.components.CustomForgotPassword
 import com.example.appfilm.presentation.ui.login.viewmodel.LoginEvent
 import com.example.appfilm.presentation.ui.login.viewmodel.LoginFields
 import com.example.appfilm.presentation.ui.login.viewmodel.LoginUIState
-import com.example.appfilm.presentation.ui.reset_password.viewmodel.RegisterEvent
 import com.google.firebase.auth.FirebaseAuth
 
 @SuppressLint("ContextCastToActivity")
@@ -171,7 +170,7 @@ fun LogInScreen(
                     "Enter your email",
                     onValueChange = {
                         //  loginViewModel.updateEmail(it)
-                        evenClick(LoginEvent.updateEmail(it))
+                        evenClick(LoginEvent.UpdateEmail(it))
                     })
 
                 Spacer(Modifier.height(8.dp))
@@ -182,7 +181,7 @@ fun LogInScreen(
                     onValueChange = {
 
                         //     loginViewModel.updatePassword(it)
-                        evenClick(LoginEvent.updatePassword(it))
+                        evenClick(LoginEvent.UpdatePassword(it))
 
                     },
                     true
@@ -233,7 +232,7 @@ fun LogInScreen(
                                                 scale = 1f
 
                                                 //   loginViewModel.resendEmail()
-                                                evenClick(LoginEvent.resendEmail)
+                                                evenClick(LoginEvent.ResendEmail)
 
                                             }
                                         )
@@ -259,7 +258,7 @@ fun LogInScreen(
                     onClick = {
 
                         // loginViewModel.login()
-                        evenClick(LoginEvent.login)
+                        evenClick(LoginEvent.Login)
 
                         Log.d(
                             Constants.STATUS_TAG,
@@ -309,7 +308,7 @@ fun LogInScreen(
                         Log.d(Constants.STATUS_TAG, "Login Success")
 
                         //  loginViewModel.updateErrorTextLogin("")
-                        evenClick(LoginEvent.updateErrorTextLogin(""))
+                        evenClick(LoginEvent.UpdateErrorTextLogin(""))
 
                     } else if (logInState.error?.isNotBlank() == true) {
 
@@ -332,8 +331,8 @@ fun LogInScreen(
                         //  loginViewModel.updateIsShowEmailDialog(false)
                         // loginViewModel.updateErrorTextLogin("")
 
-                        evenClick(LoginEvent.updateIsShowEmailDialog(false))
-                        evenClick(LoginEvent.updateErrorTextLogin(""))
+                        evenClick(LoginEvent.UpdateIsShowEmailDialog(false))
+                        evenClick(LoginEvent.UpdateErrorTextLogin(""))
 
                     }
                 )
