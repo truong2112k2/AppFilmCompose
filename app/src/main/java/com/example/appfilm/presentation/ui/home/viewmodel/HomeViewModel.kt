@@ -55,6 +55,12 @@ class HomeViewModel @Inject constructor(
 
     }
 
+    fun handleEvent(homeEvent: HomeEvent){
+        when(homeEvent){
+            is HomeEvent.Logout ->{ logout(homeEvent.googleSignInClient)}
+        }
+    }
+
 
 
 

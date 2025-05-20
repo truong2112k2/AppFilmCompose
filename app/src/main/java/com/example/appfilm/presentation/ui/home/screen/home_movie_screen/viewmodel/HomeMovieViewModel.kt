@@ -110,4 +110,10 @@ class HomeMovieViewModel @Inject constructor(
         }
     }
 
+    fun handleEvent(homeMovieEvent: HomeMovieEvent){
+        when(homeMovieEvent){
+            is HomeMovieEvent.GetMoviesOnNetwork -> {getMoviesOnNetwork(homeMovieEvent.context, homeMovieEvent.page)}
+        }
+    }
+
 }

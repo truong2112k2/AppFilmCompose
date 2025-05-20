@@ -90,9 +90,9 @@ class ResetPassViewModel @Inject constructor(
 
     fun handleEvent(registerEvent: RegisterEvent){
         when(registerEvent){
-            is RegisterEvent.updateEmail -> { updateEmail(registerEvent.email)}
-            is RegisterEvent.resetPassword -> { resetPassword() }
-            is RegisterEvent.updateIsShowDialogResult -> { updateIsShowDialogResult(registerEvent.value)}
+            is RegisterEvent.UpdateEmail -> { updateEmail(registerEvent.email)}
+            is RegisterEvent.ResetPassword -> { resetPassword() }
+            is RegisterEvent.UpdateIsShowDialogResult -> { updateIsShowDialogResult(registerEvent.value)}
         }
     }
 

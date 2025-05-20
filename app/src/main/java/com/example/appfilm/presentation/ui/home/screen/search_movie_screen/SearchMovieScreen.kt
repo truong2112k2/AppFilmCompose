@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import com.example.appfilm.presentation.ui.home.viewmodel.HomeViewModel
 
 @Composable
-fun SearchMovieScreen(homeViewModel: HomeViewModel) {
+fun SearchMovieScreen() {
 
     Column(
         modifier = Modifier.fillMaxSize(),

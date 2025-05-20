@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
+
+
     <application
         android:name=".presentation.ui.MyApplication"
         android:allowBackup="true"
@@ -16,8 +20,11 @@
         <activity
             android:name=".presentation.ui.MainActivity"
             android:exported="true"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"
-            android:theme="@style/Theme.AppFilm">
+            android:theme="@style/Theme.AppFilm"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

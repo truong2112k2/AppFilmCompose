@@ -24,7 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -41,7 +40,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.appfilm.R
 import com.example.appfilm.common.Constants
@@ -61,15 +59,21 @@ getString(R.string.default_web_client_id) -> get Id Token
 
 
 @Composable
-fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = hiltViewModel()) {
+fun FirstScreen(
+    navController: NavController,
+    checkLoginState: FirstUiState,
+    logInWithoutPassState: FirstUiState,
+    onEventClick: (FirstEvent) -> Unit
+
+
+) {
+
 
     var showDialogError by rememberSaveable { mutableStateOf(false) }
     var errorText by rememberSaveable { mutableStateOf("") }
-    val checkLoginState by firstViewModel.checkLoginState.collectAsState()
 
 
     val context = LocalContext.current
-    val logInWithoutPass by firstViewModel.loginWithoutPassState.collectAsState()
     val clientId = context.getString(R.string.default_web_client_id)
 
     Box(
@@ -78,10 +82,10 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
     ) {
 
         LaunchedEffect(Unit) {
-            firstViewModel.checkLogin()
+            //     firstViewModel.checkLogin()
 
+            onEventClick(FirstEvent.CheckLogin)
         }
-
 
 
         val googleSignInClient = GoogleSignIn.getClient(
@@ -99,7 +103,9 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
             try {
                 val account = task.getResult(ApiException::class.java)
                 account.idToken?.let {
-                    firstViewModel.signInWithGoogle(it)
+                    //   firstViewModel.signInWithGoogle(it)
+                    onEventClick(FirstEvent.SignInWithGoogle(it))
+
                 }
             } catch (e: ApiException) {
                 Log.e("LOGIN", "Google sign in failed", e)
@@ -219,9 +225,9 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
 
 
 
-        LaunchedEffect(logInWithoutPass) {
+        LaunchedEffect(logInWithoutPassState) {
 
-            if (logInWithoutPass.isSuccess) {
+            if (logInWithoutPassState.isSuccess) {
                 navController.navigate(Constants.HOME_ROUTE) {
                     popUpTo(0) {
                         inclusive = true
@@ -232,11 +238,11 @@ fun FirstScreen(navController: NavController, firstViewModel: FirstViewModel = h
                 Log.d(Constants.STATUS_TAG, "Login Success")
 
 
-            } else if (logInWithoutPass.error?.isNotBlank() == true) {
+            } else if (logInWithoutPassState.error?.isNotBlank() == true) {
 
                 showDialogError = true
-                errorText = logInWithoutPass.error.toString()
-                Log.d(Constants.STATUS_TAG, "Login Failed ${logInWithoutPass.error}")
+                errorText = logInWithoutPassState.error.toString()
+                Log.d(Constants.STATUS_TAG, "Login Failed ${logInWithoutPassState.error}")
 
 
             }

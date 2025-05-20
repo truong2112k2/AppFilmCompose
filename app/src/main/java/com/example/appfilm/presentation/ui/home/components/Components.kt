@@ -61,150 +61,150 @@ import com.example.appfilm.presentation.ui.home.viewmodel.HomeViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import kotlinx.coroutines.launch
 
-@SuppressLint("SuspiciousIndentation")
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
+//@SuppressLint("SuspiciousIndentation")
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
 
-fun CustomModalNavigationDrawer(
-    navController: NavController,
-    context: Context,
-    homeViewModel: HomeViewModel,
-    googleSignInClient: GoogleSignInClient
-) {
-
-    var isHideUi by rememberSaveable { mutableStateOf(false) }
-
-    val activity = context as? ComponentActivity
-
-    val backCallback = remember {
-        object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                isHideUi = true
-                Log.d(Constants.STATUS_TAG, "handleOnBackPressed")
-                remove()
-                activity?.onBackPressedDispatcher?.onBackPressed()
-            }
-        }
-    }
-
-    DisposableEffect(Unit) {
-        activity?.onBackPressedDispatcher?.addCallback(backCallback)
-        onDispose {
-            backCallback.remove()
-        }
-    }
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val coroutineScope = rememberCoroutineScope()
-
-    var selectedScreen by rememberSaveable(stateSaver = drawerScreenSaver) {
-        mutableStateOf<NavigationDrawerItem>(NavigationDrawerItem.Home)
-    }
-
-    var isShowDiaLogConfirm by rememberSaveable { mutableStateOf(false) }
-
-    val logoutState by homeViewModel.logoutState.collectAsState()
-
-
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = {
-
-
-                CustomDrawerContent(
-                    selectedScreen = selectedScreen,
-                    onItemSelected = {
-                        selectedScreen = it
-                        coroutineScope.launch { drawerState.close() }
-                    }
-                )
-
-
-            }
-        ) {
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(Color.Black, Color.White)
-                        )
-                    )
-            ) {
-                TopAppBar(
-                    title = { Text(selectedScreen.title) },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            coroutineScope.launch { drawerState.open() }
-                        }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menu")
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent,       // Nền đỏ
-                        titleContentColor = Color.White,  // Màu chữ (tuỳ chọn)
-                        navigationIconContentColor = Color.White // Màu icon (tuỳ chọn)
-                    ),
-                    actions = {
-                        IconButton(onClick = {
-                            isShowDiaLogConfirm = true
-                        }) {
-                            Icon(
-                                Icons.Default.ExitToApp,
-                                contentDescription = "Menu",
-                                tint = Color.White
-                            )
-                        }
-                    }
-                )
-
-                Box(
-
-                ) {
-                    when (selectedScreen) {
-                        is NavigationDrawerItem.Home -> HomeMovieScreen(navController, context)
-                        is NavigationDrawerItem.Favorite -> FavouriteMovieScreen(homeViewModel)
-                        is NavigationDrawerItem.Search -> SearchMovieScreen(homeViewModel)
-                    }
-                }
-
-            }
-
-
-        }
-
-
-
-
-
-
-    CustomConfirmDialog(
-        "Log out your account",
-        "Are you sure to log out",
-        showDialog = isShowDiaLogConfirm,
-        onConfirm = {
-            isShowDiaLogConfirm = false
-            homeViewModel.logout(googleSignInClient)
-        },
-        onDismiss = {
-            isShowDiaLogConfirm = false
-        }
-    )
-
-
-
-    if (logoutState.isSuccess) {
-        isHideUi = true
-        navController.navigate(Constants.FIRST_ROUTE) {
-            launchSingleTop
-            popUpTo(Constants.HOME_ROUTE) {
-
-                inclusive = true
-            }
-        }
-    }
-
-}
+//fun CustomModalNavigationDrawer(
+//    navController: NavController,
+//    context: Context,
+//    homeViewModel: HomeViewModel,
+//    googleSignInClient: GoogleSignInClient
+//) {
+//
+//    var isHideUi by rememberSaveable { mutableStateOf(false) }
+//
+//    val activity = context as? ComponentActivity
+//
+//    val backCallback = remember {
+//        object : OnBackPressedCallback(true) {
+//            override fun handleOnBackPressed() {
+//                isHideUi = true
+//                Log.d(Constants.STATUS_TAG, "handleOnBackPressed")
+//                remove()
+//                activity?.onBackPressedDispatcher?.onBackPressed()
+//            }
+//        }
+//    }
+//
+//    DisposableEffect(Unit) {
+//        activity?.onBackPressedDispatcher?.addCallback(backCallback)
+//        onDispose {
+//            backCallback.remove()
+//        }
+//    }
+//    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+//    val coroutineScope = rememberCoroutineScope()
+//
+//    var selectedScreen by rememberSaveable(stateSaver = drawerScreenSaver) {
+//        mutableStateOf<NavigationDrawerItem>(NavigationDrawerItem.Home)
+//    }
+//
+//    var isShowDiaLogConfirm by rememberSaveable { mutableStateOf(false) }
+//
+//    val logoutState by homeViewModel.logoutState.collectAsState()
+//
+//
+//        ModalNavigationDrawer(
+//            drawerState = drawerState,
+//            drawerContent = {
+//
+//
+//                CustomDrawerContent(
+//                    selectedScreen = selectedScreen,
+//                    onItemSelected = {
+//                        selectedScreen = it
+//                        coroutineScope.launch { drawerState.close() }
+//                    }
+//                )
+//
+//
+//            }
+//        ) {
+//
+//            Column(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .background(
+//                        brush = Brush.verticalGradient(
+//                            colors = listOf(Color.Black, Color.White)
+//                        )
+//                    )
+//            ) {
+//                TopAppBar(
+//                    title = { Text(selectedScreen.title) },
+//                    navigationIcon = {
+//                        IconButton(onClick = {
+//                            coroutineScope.launch { drawerState.open() }
+//                        }) {
+//                            Icon(Icons.Default.Menu, contentDescription = "Menu")
+//                        }
+//                    },
+//                    colors = TopAppBarDefaults.topAppBarColors(
+//                        containerColor = Color.Transparent,       // Nền đỏ
+//                        titleContentColor = Color.White,  // Màu chữ (tuỳ chọn)
+//                        navigationIconContentColor = Color.White // Màu icon (tuỳ chọn)
+//                    ),
+//                    actions = {
+//                        IconButton(onClick = {
+//                            isShowDiaLogConfirm = true
+//                        }) {
+//                            Icon(
+//                                Icons.Default.ExitToApp,
+//                                contentDescription = "Menu",
+//                                tint = Color.White
+//                            )
+//                        }
+//                    }
+//                )
+//
+//                Box(
+//
+//                ) {
+//                    when (selectedScreen) {
+//                        is NavigationDrawerItem.Home -> HomeMovieScreen(navController, context)
+//                        is NavigationDrawerItem.Favorite -> FavouriteMovieScreen(homeViewModel)
+//                        is NavigationDrawerItem.Search -> SearchMovieScreen(homeViewModel)
+//                    }
+//                }
+//
+//            }
+//
+//
+//        }
+//
+//
+//
+//
+//
+//
+//    CustomConfirmDialog(
+//        "Log out your account",
+//        "Are you sure to log out",
+//        showDialog = isShowDiaLogConfirm,
+//        onConfirm = {
+//            isShowDiaLogConfirm = false
+//            homeViewModel.logout(googleSignInClient)
+//        },
+//        onDismiss = {
+//            isShowDiaLogConfirm = false
+//        }
+//    )
+//
+//
+//
+//    if (logoutState.isSuccess) {
+//        isHideUi = true
+//        navController.navigate(Constants.FIRST_ROUTE) {
+//            launchSingleTop
+//            popUpTo(Constants.HOME_ROUTE) {
+//
+//                inclusive = true
+//            }
+//        }
+//    }
+//
+//}
 
 @Composable
 fun CustomDrawerContent(

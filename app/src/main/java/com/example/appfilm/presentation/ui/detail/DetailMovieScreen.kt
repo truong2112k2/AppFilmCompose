@@ -1,11 +1,21 @@
 package com.example.appfilm.presentation.ui.detail
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
+import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,10 +33,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -53,6 +66,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
@@ -63,8 +78,12 @@ import com.example.appfilm.R
 import com.example.appfilm.common.Constants
 import com.example.appfilm.domain.model.detail_movie.EpisodeMovie
 import com.example.appfilm.domain.model.detail_movie.MovieDetail
-import com.example.appfilm.presentation.ui.CustomLineProgressbar
+import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.components.CustomButtonWithIcon
 import com.example.appfilm.presentation.ui.isNetworkAvailable
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import java.net.URLEncoder
 
 @SuppressLint("ContextCastToActivity")
 @Composable
@@ -74,9 +93,10 @@ fun DetailMovieScreen(
     getDetailUIState: DetailUiState,
     detailMovie: MovieDetail,
 
-    onEvent: (DetailAction) -> Unit
+    onEvent: (DetailEvent) -> Unit
 
 ) {
+
 
     var isHideUi by rememberSaveable { mutableStateOf(false) }
 
@@ -105,8 +125,8 @@ fun DetailMovieScreen(
 
     LaunchedEffect(Unit) {
 
-        //onEvent(DetailAction.GetDetail(movieSlug))
-          onEvent(DetailAction.GetDetail("ngoi-truong-xac-song"))
+        onEvent(DetailEvent.GetDetail(movieSlug))
+        //  onEvent(DetailEvent.GetDetail("ngoi-truong-xac-song"))
         isNetworkConnected = isNetworkAvailable(context)
     }
 
@@ -140,8 +160,8 @@ fun DetailMovieScreen(
                 )
 
                 Button(onClick = {
-                    //  onEvent(DetailAction.GetDetail(movieSlug))
-                    onEvent(DetailAction.GetDetail("ngoi-truong-xac-song"))
+                    onEvent(DetailEvent.GetDetail(movieSlug))
+                    //  onEvent(DetailEvent.GetDetail("ngoi-truong-xac-song"))
 
                 }) {
                     Text("Re Try")
@@ -149,7 +169,9 @@ fun DetailMovieScreen(
             }
         } else {
             if (getDetailUIState.isLoading) {
-                CustomLineProgressbar(Color.White)
+
+                DetailMovieShimmer()
+
             } else {
                 Column(
                     modifier = Modifier
@@ -208,17 +230,72 @@ fun DetailMovieScreen(
                                     )
                                 )
                         )
+
+                        detailMovie.type?.let {
+                            Box(
+                                modifier = Modifier
+                                    .padding(12.dp)
+                                    .align(Alignment.TopEnd),
+                            ) {
+                                Text(
+                                    it,
+                                    modifier = Modifier
+                                        .border(1.dp, Color.White, RoundedCornerShape(8.dp))
+                                        .padding(12.dp),
+                                    style = TextStyle(
+                                        color = Color.White,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                )
+                            }
+
+
+                        }
+
+
+                        var isShowTrailer by rememberSaveable { mutableStateOf(false) }
+
+                        Log.d("23213", "Film : ${detailMovie.name} ${detailMovie.trailer_url}")
+
+                        val trailerUrl = detailMovie.trailer_url
+                        val videoId = trailerUrl?.let { extractYoutubeVideoId(it) }
+
+                        if (!videoId.isNullOrEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(12.dp)
+                                    .align(Alignment.BottomEnd),
+                            ) {
+                                CustomButtonWithIcon(
+                                    onClick = {
+                                        isShowTrailer = true
+                                        Log.d("isShowTrailer", "$isShowTrailer")
+                                    },
+                                    Icons.Default.PlayArrow,
+                                    "Play Trailer"
+                                )
+                            }
+
+                            ShowTrailerMovie(
+                                isShowTrailer = isShowTrailer,
+                                videoId,
+                                context,
+                                onDismiss = {
+                                    isShowTrailer = false
+                                }
+                            )
+                        }
                     }
 
 
-                    //// Nội dung chính
                     val scrollState = rememberScrollState()
 
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f) // giữ nguyên tỉ lệ so với ảnh bên trên
-                            .verticalScroll(scrollState) // cho phép cuộn
+                            .weight(1f)
+                            .verticalScroll(scrollState)
                             .padding(16.dp)
                     ) {
                         Text(
@@ -230,7 +307,7 @@ fun DetailMovieScreen(
                             )
                         )
 
-                        Spacer(modifier = Modifier.height(2.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -241,7 +318,9 @@ fun DetailMovieScreen(
                                 style = TextStyle(
                                     fontSize = 13.sp,
                                     color = Color.White,
-                                )
+                                ),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
 
                             Spacer(modifier = Modifier.weight(1f))
@@ -264,85 +343,89 @@ fun DetailMovieScreen(
 
                         }
 
-                        Spacer(modifier = Modifier.height(12.dp))
 
-                        detailMovie.actor?.let {
-                            if (it.isNotEmpty()) {
-                                CreateTextWithIcon(it.joinToString(),painterResource( R.drawable.ic_actor))
-//                                Text(
-//                                    text = "Diễn viên: ${it.joinToString()}",
-//                                    style = TextStyle(
-//                                        fontSize = 14.sp,
-//                                        color = Color.White,
-//                                    )
-//                                )
-                            }
-                        }
 
                         Spacer(modifier = Modifier.height(8.dp))
 
                         detailMovie.content?.let {
-                            if (it.isNotBlank()) {
-                                Text(
-                                    text = it,
-                                    style = TextStyle(
-                                        fontSize = 14.sp,
-                                        color = Color.White,
-                                    )
-                                )
-                            }
+
+                            CreateTextWithIcon(
+                                it,
+                                painterResource(R.drawable.ic_content),
+                                fontSize = 14,
+                                iconSize = 20
+                            )
+
+
                         }
 
+                        Spacer(modifier = Modifier.height(8.dp))
+
+
+                        detailMovie.actor?.let {
+                            if (it.isNotEmpty()) {
+                                CreateTextWithIcon(
+                                    it.joinToString(),
+                                    painterResource(R.drawable.ic_actor),
+                                    fontSize = 14,
+                                    iconSize = 20
+                                )
+
+                            }
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
 
                         detailMovie.category?.let {
                             if (it.isNotEmpty()) {
-                                CreateTextWithIcon(it.joinToString(),painterResource( R.drawable.ic_category))
+                                CreateTextWithIcon(
+                                    it.joinToString(),
+                                    painterResource(R.drawable.ic_category),
+                                    fontSize = 14,
+                                    iconSize = 20
+                                )
 
-//                                Text(
-//                                    text = "${it.joinToString()}",
-//                                    style = TextStyle(
-//                                        fontSize = 14.sp,
-//                                        color = Color.White,
-//                                    )
-//                                )
                             }
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
 
+                        detailMovie.country?.let {
+                            if (it.isNotEmpty()) {
+                                CreateTextWithIcon(
+                                    text = it.joinToString(),
+                                    painterResource(R.drawable.ic_language),
+                                    fontSize = 14,
+                                    iconSize = 20
+                                )
 
-                        CreateTextWithIcon(text = detailMovie.episode_current+"/"+detailMovie.episode_total, painterResource(R.drawable.ic_episode), fontWeight = FontWeight.Bold  )
-                       detailMovie.country?.let {
-                           if(it.isNotEmpty()){
-                               CreateTextWithIcon(text = it.joinToString(), painterResource(R.drawable.ic_language)  )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                           }
-                       }
-//                        Row(
-//                            modifier = Modifier.fillMaxWidth(),
-//                            verticalAlignment = Alignment.CenterVertically
-//                        ) {
-//                            Icon(
-//                                painter = painterResource(R.drawable.ic_episode),
-//                                contentDescription = "",
-//                                tint = Color.White
-//                            )
-//                            Spacer(Modifier.width(4.dp))
-//                            Text(
-//                                text = "${detailMovie.episode_current+"/"+detailMovie.episode_total} Tập ",
-//                                style = TextStyle(
-//                                    fontSize = 24.sp,
-//                                    color = Color.White,
-//                                    fontWeight = FontWeight.Bold
-//                                )
-//                            )
-//                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("${detailMovie.episode_current}", color = Color.White)
+                            Divider(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(1.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
 
                         LazyRow {
                             detailMovie.listEpisodeMovie?.let {
                                 items(it) { episode ->
-                                    MovieCardVertical(episode, detailMovie)
+                                    MovieCardVertical(episode, detailMovie, context, onClick = {
+                                        val encodedUrl = URLEncoder.encode(episode.link_m3u8, "UTF-8")
+
+                                        navController.navigate("PLAY_MOVIE_ROUTE/$encodedUrl")
+
+                                    })
 
                                 }
 
@@ -354,20 +437,8 @@ fun DetailMovieScreen(
 
 
                 }
-                detailMovie.type?.let {
-                Box(
-                    modifier = Modifier.padding(12.dp).align(Alignment.TopEnd),
-                    ) {
-                    Text( it,
-                        modifier = Modifier
-                            .border(1.dp, Color.White, RoundedCornerShape(8.dp))
-                            .padding(12.dp),
-                        style = TextStyle(color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold),
-                    )
-                }
 
 
-                }
             }
 
 
@@ -378,9 +449,12 @@ fun DetailMovieScreen(
 }
 
 @Composable
-fun MovieCardVertical(episodeMovie: EpisodeMovie, detailMovie: MovieDetail) {
+fun MovieCardVertical(episodeMovie: EpisodeMovie, detailMovie: MovieDetail, context: Context, onClick : () -> Unit) {
     Card(
         modifier = Modifier
+            .clickable {
+                onClick()
+            }
             .padding(16.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1E)),
@@ -390,7 +464,6 @@ fun MovieCardVertical(episodeMovie: EpisodeMovie, detailMovie: MovieDetail) {
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val context = LocalContext.current
 
 
             AsyncImage(
@@ -427,7 +500,13 @@ fun MovieCardVertical(episodeMovie: EpisodeMovie, detailMovie: MovieDetail) {
 
 
 @Composable
-fun CreateTextWithIcon(text: String, painterResource: Painter, fontWeight: FontWeight? = null ){
+fun CreateTextWithIcon(
+    text: String,
+    painterResource: Painter,
+    fontWeight: FontWeight? = null,
+    fontSize: Int,
+    iconSize: Int
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -435,16 +514,98 @@ fun CreateTextWithIcon(text: String, painterResource: Painter, fontWeight: FontW
         Icon(
             painter = painterResource,
             contentDescription = "",
-            tint = Color.White
+            tint = Color.White,
+            modifier = Modifier.size(iconSize.dp)
         )
         Spacer(Modifier.width(4.dp))
+        Divider(
+            color = Color.White,
+            modifier = Modifier
+                .height(50.dp)
+                .width(1.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+
         Text(
-            text = "${text} Tập ",
+            text = "${text}",
             style = TextStyle(
-                fontSize = 24.sp,
+                fontSize = fontSize.sp,
                 color = Color.White,
                 fontWeight = fontWeight
-            )
+            ),
+            textAlign = TextAlign.Start
         )
     }
+}
+
+
+@Composable
+fun ShowTrailerMovie(
+    isShowTrailer: Boolean,
+    videoId: String,
+    context: Context,
+    onDismiss: () -> Unit
+) {
+    if (isShowTrailer) {
+        Dialog(onDismissRequest = { onDismiss() }) {
+            AnimatedVisibility(
+                visible = true,
+                enter = fadeIn(animationSpec = tween(500)) + scaleIn(initialScale = 0.8f),
+                exit = fadeOut(animationSpec = tween(300)) + scaleOut(targetScale = 0.8f)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .width(700.dp)
+                        .height(500.dp)
+                        .background(Color.Black, shape = RoundedCornerShape(16.dp))
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    LiveTvScreen(
+                        videoId = videoId,
+                        context = context,
+                        width = 1540,
+                        height = 1060
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = "Close",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clickable { onDismiss() }
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun LiveTvScreen(videoId: String, context: Context, width: Int, height: Int) {
+    AndroidView(
+        factory = {
+            YouTubePlayerView(it).apply {
+                layoutParams = ViewGroup.LayoutParams(width, height) // set kích thước native view
+                addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+                    override fun onReady(youTubePlayer: YouTubePlayer) {
+                        youTubePlayer.loadVideo(videoId, 0f)
+                    }
+                })
+            }
+        }
+    )
+}
+
+
+fun extractYoutubeVideoId(url: String): String? {
+    return Regex("v=([a-zA-Z0-9_-]{11})")
+        .find(url)
+        ?.groupValues
+        ?.get(1)
 }

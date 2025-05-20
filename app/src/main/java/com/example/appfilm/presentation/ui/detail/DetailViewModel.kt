@@ -9,7 +9,6 @@ import com.example.appfilm.domain.model.detail_movie.MovieDetail
 import com.example.appfilm.domain.usecase.AppUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -66,10 +65,10 @@ class DetailViewModel @Inject constructor(
     }
 
 
-    fun onEvent(action: DetailAction) {
+    fun onEvent(action: DetailEvent) {
         when (action) {
-            is DetailAction.GetDetail -> getDetailMovie(action.slug)
-            is DetailAction.ReTry -> getDetailMovie(action.slug)
+            is DetailEvent.GetDetail -> getDetailMovie(action.slug)
+            is DetailEvent.ReTry -> getDetailMovie(action.slug)
         }
     }
 }

@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import com.example.appfilm.presentation.ui.home.viewmodel.HomeViewModel
 
 @Composable
-fun FavouriteMovieScreen(homeViewModel: HomeViewModel) {
+fun FavouriteMovieScreen() {
 
     Column(
         modifier = Modifier.fillMaxSize(),

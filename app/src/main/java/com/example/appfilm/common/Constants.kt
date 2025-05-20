@@ -16,6 +16,7 @@ object Constants {
     const val RESET_PASSWORD_ROUTE = "RESET_PASSWORD_ROUTE"
     const val CATEGORY_ROUTE = "CATEGORY_ROUTE"
     const val DETAIL_ROUTE = "DETAIL_ROUTE/{MovieSlug}"
+    const val PLAY_MOVIE_ROUTE = "PLAY_MOVIE_ROUTE?MovieLink={MovieLink}"
 
 
     val FontTagessChrift = FontFamily(

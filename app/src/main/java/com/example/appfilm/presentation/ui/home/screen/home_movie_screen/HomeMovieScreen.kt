@@ -45,18 +45,28 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.commandiron.compose_loading.CubeGrid
 import com.example.appfilm.common.Constants
+import com.example.appfilm.domain.model.Movie
 import com.example.appfilm.presentation.ui.CustomTextTitle
+import com.example.appfilm.presentation.ui.home.HomeScreenShimmer
 import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.components.MovieItem
 import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.components.NewMovieItem
+import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.viewmodel.HomeMovieEvent
 import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.viewmodel.HomeMovieViewModel
+import com.example.appfilm.presentation.ui.home.viewmodel.HomeUIState
 
 
 @Composable
-fun HomeMovieScreen(navController: NavController, context: Context, homeMovieViewModel: HomeMovieViewModel = hiltViewModel()) {
+fun HomeMovieScreen(
+    navController: NavController,
+    context: Context,
+    getNewMovieState : HomeUIState,
+    movies : List<Movie>,
+    onEventClick : (HomeMovieEvent) -> Unit
+   // homeMovieViewModel: HomeMovieViewModel = hiltViewModel()
+) {
 
 
-    val getNewMovieState by homeMovieViewModel.getNewMovieState.collectAsState()
-    val movies by homeMovieViewModel.movies.collectAsState()
+
     var isShowSeeMore by rememberSaveable { mutableStateOf(false) }
 
 
@@ -76,7 +86,9 @@ fun HomeMovieScreen(navController: NavController, context: Context, homeMovieVie
             ), modifier = Modifier.padding(8.dp), textAlign = TextAlign.Center)
 
             Button(onClick = {
-                homeMovieViewModel.getMoviesOnNetwork(context, 1)
+             //   homeMovieViewModel.getMoviesOnNetwork(context, 1)
+
+                onEventClick(HomeMovieEvent.GetMoviesOnNetwork(context, 1))
 
             }) {
                 Text("Re Try")
@@ -85,105 +97,106 @@ fun HomeMovieScreen(navController: NavController, context: Context, homeMovieVie
 
 
     }else{
+       // if(getNewMovieState.isLoading){
+      //      HomeScreenShimmer()
+     //   }else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+//            if(getNewMovieState.isLoading) {
+//              item {
+//
+//                  HomeScreenShimmer()
+//              }
+//
+//            }
 
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            if(getNewMovieState.isLoading) {
-              item {
+                if (movies.isNotEmpty()) {
+                    val newMovie = movies[0]
 
-                  CubeGrid(color = Color.LightGray,
-                     size =  DpSize(100.dp, 100.dp),
+                    item {
+                        NewMovieItem(
+                            newMovie,
+                            onClickPlay = {
+                                navController.navigate("DETAIL_ROUTE/${newMovie.slug}")
+                            },
+                            onClickAddFavourite = {}
+                        )
+                    }
 
-                  )
-              }
+                    item {
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
 
-            }
-
-
-            if (movies.isNotEmpty()) {
-                val newMovie = movies[0]
-
-                item {
-                    NewMovieItem(
-                        newMovie,
-                        onClickPlay = {
-                            navController.navigate("DETAIL_ROUTE/${newMovie.slug}")
-                        },
-                        onClickAddFavourite = {}
-                    )
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-
-                item {
-                    if(isShowSeeMore){
-                        AnimatedVisibility(
-                            visible = isShowSeeMore,
-                            enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
-                            exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
-                        ) {
-                            Text(
-                                text = "Swipe to find more",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                style = TextStyle(
-                                    textAlign = TextAlign.End,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Black
+                    item {
+                        if(isShowSeeMore){
+                            AnimatedVisibility(
+                                visible = isShowSeeMore,
+                                enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
+                                exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
+                            ) {
+                                Text(
+                                    text = "Swipe to find more",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    style = TextStyle(
+                                        textAlign = TextAlign.End,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Black
+                                    )
                                 )
+                            }
+                        }
+
+                    }
+
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                            ,
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            CustomTextTitle("New Movies")
+                            Spacer(Modifier.weight(1f))
+                            CustomTextClickable(
+                                onClick = { navController.navigate(Constants.CATEGORY_ROUTE)}
                             )
                         }
                     }
 
-                }
+                    item {
 
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                        ,
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        CustomTextTitle("New Movies")
-                        Spacer(Modifier.weight(1f))
-                        CustomTextClickable(
-                            onClick = { navController.navigate(Constants.CATEGORY_ROUTE)}
-                        )
+
+
+                        LazyRow() {
+                            items(movies.drop(1)) { movie ->
+                                MovieItem(
+                                    movie,
+                                    onClick = {
+                                        navController.navigate("DETAIL_ROUTE/${movie.slug}"
+                                        )
+
+                                    }
+                                )
+                            }
+                        }
                     }
+
+
+
                 }
-
-                item {
-
-
-
-                  LazyRow() {
-                      items(movies.drop(1)) { movie ->
-                          MovieItem(
-                              movie,
-                              onClick = {
-                                  navController.navigate("DETAIL_ROUTE/${movie.slug}"
-                                  )
-
-                              }
-                              )
-                      }
-                  }
-                }
-
-
-
             }
-        }
+       // }
+
+
     }
 }
 

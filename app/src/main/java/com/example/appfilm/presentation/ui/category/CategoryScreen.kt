@@ -1,7 +1,6 @@
 package com.example.appfilm.presentation.ui.category
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.MarqueeSpacing
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
@@ -28,7 +26,6 @@ import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,41 +39,52 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
+import com.example.appfilm.domain.model.Category
 import com.example.appfilm.domain.model.MovieByCategory
 import com.example.appfilm.presentation.ui.CustomLineProgressbar
 import com.example.appfilm.presentation.ui.shimmerBrush
-@SuppressLint("AutoboxingStateCreation")
+import kotlinx.coroutines.flow.Flow
+
+@SuppressLint("AutoboxingStateCreation", "RememberReturnType")
 @Composable
-fun CategoryScreen( navController: NavController, categoryViewModel: CategoryViewModel = hiltViewModel()) {
+fun CategoryScreen(
+    navController: NavController,
+    listCategory: List<Category>,
+    onEvenClick: (CategoryEvent) -> Unit,
+    getList: (category: String) -> Flow<PagingData<MovieByCategory>>
+
+) {
 
     // Gọi lấy danh mục khi vào màn hình
     LaunchedEffect(Unit) {
-        categoryViewModel.getCategory()
+        onEvenClick(CategoryEvent.GetCategory)
     }
 
-    val listCategory by categoryViewModel.categories.collectAsState()
     var selectedTabIndex by rememberSaveable { mutableStateOf(0) }
     var selectedCategory by rememberSaveable { mutableStateOf<String?>(null) }
 
 
     var view by rememberSaveable { mutableStateOf(false) }
 
-    // Cập nhật selectedCategory mặc định sau khi load danh mục
     LaunchedEffect(listCategory) {
         if (listCategory.isNotEmpty() && selectedCategory == null) {
             selectedCategory = listCategory[0].slug
         }
     }
 
-    // Gọi lại Paging Flow mỗi khi selectedCategory thay đổi
+
     val moviesPagingItems = remember(selectedCategory) {
-        selectedCategory?.let { categoryViewModel.getMoviesByCategory2(it) }
+        selectedCategory?.let {
+
+             getList(it)
+
+        }
     }?.collectAsLazyPagingItems()
 
     val loadState = moviesPagingItems?.loadState
