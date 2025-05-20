@@ -3,10 +3,14 @@ package com.example.appfilm.domain
 import com.example.appfilm.data.source.local.model.MovieDb
 import com.example.appfilm.data.source.remote.dto.category_dto.CategoryDto
 import com.example.appfilm.data.source.remote.dto.category_dto.CategoryDtoItem
+import com.example.appfilm.data.source.remote.dto.detail_dto.MovieDetailDto
+import com.example.appfilm.data.source.remote.dto.detail_dto.ServerData
 import com.example.appfilm.data.source.remote.dto.movie_dto.Item
 import com.example.appfilm.domain.model.Category
 import com.example.appfilm.domain.model.Movie
 import com.example.appfilm.domain.model.MovieByCategory
+import com.example.appfilm.domain.model.detail_movie.EpisodeMovie
+import com.example.appfilm.domain.model.detail_movie.MovieDetail
 
 fun Item.toMovie(): Movie {
     return Movie(
@@ -81,35 +85,55 @@ fun com.example.appfilm.data.source.remote.dto.movie_catgory_dto.Item.toMovieByC
     )
 }
 
-/*
-data class Item(
-    val _id: String, // lay
-    val category: List<Category>,
-    val chieurap: Boolean,
-    val country: List<Country>,
-    val episode_current: String,
-    val lang: String,
-    val modified: Modified,
-    val name: String, // lay
-    val origin_name: String, // lay
-    val poster_url: String, // lay
-    val quality: String,
-    val slug: String,// lay
-    val sub_docquyen: Boolean,
-    val thumb_url: String,// lay
-    val time: String, // lay
-    val type: String,// lay
-    val year: Int // lay
-)
 
-/*
-    val _id: String, // lay
-    val name: String, // lay
-    val origin_name: String, // lay
-    val poster_url: String, // lay
-    val slug: String,// lay
+fun ServerData.toEpisodeMovie() : EpisodeMovie{
+    return EpisodeMovie(
+        filename = this.filename,
+        link_embed = this.link_embed,
+        link_m3u8 = this.link_m3u8,
+        name =  this.name,
+        slug = this.slug
+    )
+}
 
+fun MovieDetailDto.toMovieDetail() : MovieDetail {
 
+    val listCategory = this.movie.category.map {
+        it.name.toString()
+    }
 
- */
- */
+    val listCountry = this.movie.country.map {
+        it.name.toString()
+    }
+
+    val listEpisode = this.episodes.first().server_data.map {
+        it.toEpisodeMovie()
+    }
+
+    return MovieDetail(
+        _id = this.movie._id,
+        actor = this.movie.actor,
+        category = listCategory,
+        theater_movies = this.movie.chieurap,
+        content = this.movie.content,
+        country = listCountry,
+        director = this.movie.director,
+        episode_current = this.movie.episode_current,
+        episode_total = this.movie.episode_total,
+        is_copyright = this.movie.is_copyright,
+        lang = this.movie.lang,
+        name = this.movie.name,
+        origin_name = this.movie.origin_name,
+        poster_url = this.movie.poster_url,
+        quality = this.movie.quality,
+        showtimes = this.movie.showtimes,
+        slug = this.movie.slug,
+        status = this.movie.status,
+        thumb_url = this.movie.thumb_url,
+        trailer_url = this.movie.trailer_url,
+        type = this.movie.type,
+        year = this.movie.year,
+        vote_average = this.movie.tmdb.vote_average.toInt(),
+        listEpisodeMovie =  listEpisode,
+    )
+}

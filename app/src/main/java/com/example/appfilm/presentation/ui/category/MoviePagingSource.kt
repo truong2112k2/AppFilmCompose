@@ -3,13 +3,8 @@ package com.example.appfilm.presentation.ui.category
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.appfilm.data.source.remote.dto.MovieApiService
-import com.example.appfilm.domain.model.Movie
 import com.example.appfilm.domain.model.MovieByCategory
 import com.example.appfilm.domain.usecase.AppUseCases
-import javax.inject.Inject
-import javax.inject.Singleton
-
 
 
 class MoviePagingSource (
@@ -20,7 +15,7 @@ class MoviePagingSource (
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieByCategory> {
         return try {
             val currentPage = params.key ?: 1
-            val response = appUseCases.getMoviesByCategoryUseCase.invoke(typeList, currentPage, 16)
+            val response = appUseCases.fetchMoviesByCategoryUseCase.invoke(typeList, currentPage, 16)
 
             Log.d("MoviePagingSource", "Page = $currentPage, Size = ${params.loadSize}, Result = ${response.data?.size}")
 

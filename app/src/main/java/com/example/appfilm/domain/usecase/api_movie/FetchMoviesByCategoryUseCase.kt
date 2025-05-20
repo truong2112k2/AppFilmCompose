@@ -7,7 +7,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FetchMoviesByCategory @Inject constructor(
+class FetchMoviesByCategoryUseCase @Inject constructor(
     private val movieRepository: IApiMovie
 
 ) {

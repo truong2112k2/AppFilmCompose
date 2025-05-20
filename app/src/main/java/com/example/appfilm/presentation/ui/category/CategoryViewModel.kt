@@ -40,7 +40,7 @@ class CategoryViewModel @Inject constructor(
     fun getCategory(){
 
         viewModelScope.launch(Dispatchers.IO) {
-            val result = appUseCases.getCategoryUseCase.fetchCategory()
+            val result = appUseCases.fetchCategoryUseCase.fetchCategory()
 
             if(result.data?.isNotEmpty() == true){
 
@@ -75,7 +75,7 @@ class CategoryViewModel @Inject constructor(
     fun getMoviesByCategory(category: String, page: Int, limit: Int ){
         _getMoviesByCategoryState.value = CategoryUIState(isLoading = true)
         viewModelScope.launch(Dispatchers.IO) {
-            val result = appUseCases.getMoviesByCategoryUseCase.invoke(category, page, limit)
+            val result = appUseCases.fetchMoviesByCategoryUseCase.invoke(category, page, limit)
 
             if(result.data?.isNotEmpty() == true){
 
