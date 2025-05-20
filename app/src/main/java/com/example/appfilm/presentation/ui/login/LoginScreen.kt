@@ -31,7 +31,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -48,7 +47,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.appfilm.R
 import com.example.appfilm.common.Constants
@@ -60,15 +58,24 @@ import com.example.appfilm.presentation.ui.CustomLoadingDialog
 import com.example.appfilm.presentation.ui.CustomRandomBackground
 import com.example.appfilm.presentation.ui.CustomResultDialog
 import com.example.appfilm.presentation.ui.login.components.CustomForgotPasswordText
-import com.example.appfilm.presentation.ui.login.viewmodel.LogInViewModel
+import com.example.appfilm.presentation.ui.login.viewmodel.LoginEvent
+import com.example.appfilm.presentation.ui.login.viewmodel.LoginFields
+import com.example.appfilm.presentation.ui.login.viewmodel.LoginUIState
+import com.example.appfilm.presentation.ui.reset_password.viewmodel.RegisterEvent
 import com.google.firebase.auth.FirebaseAuth
 
 @SuppressLint("ContextCastToActivity")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = hiltViewModel()) {
-    val logInState by loginViewModel.logInUIState.collectAsState()
-    val sendEmailState by loginViewModel.sendEmailUIState.collectAsState()
+fun LogInScreen(
+    navController: NavController,
+    loginFields: LoginFields,
+    logInState: LoginUIState,
+    sendEmailState: LoginUIState,
+    evenClick : (LoginEvent) -> Unit
+) {
+    //  val logInState by loginViewModel.logInUIState.collectAsState()
+    //  val sendEmailState by loginViewModel.sendEmailUIState.collectAsState()
     var isHideUi by rememberSaveable { mutableStateOf(false) }
 
     val activity = LocalContext.current as? ComponentActivity
@@ -160,20 +167,23 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
                 Spacer(Modifier.height(8.dp))
 
                 CustomTextField(
-                    loginViewModel.logInFields.inputEmail,
+                    loginFields.inputEmail,
                     "Enter your email",
                     onValueChange = {
-                        loginViewModel.updateEmail(it)
+                        //  loginViewModel.updateEmail(it)
+                        evenClick(LoginEvent.updateEmail(it))
                     })
 
                 Spacer(Modifier.height(8.dp))
 
                 CustomTextField(
-                    loginViewModel.logInFields.inputPassword,
+                    loginFields.inputPassword,
                     "Enter your password",
                     onValueChange = {
 
-                        loginViewModel.updatePassword(it)
+                        //     loginViewModel.updatePassword(it)
+                        evenClick(LoginEvent.updatePassword(it))
+
                     },
                     true
                 )
@@ -181,7 +191,7 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
 
 
 
-                if (loginViewModel.logInFields.errorTextLogin.isNotEmpty()) {
+                if (loginFields.errorTextLogin.isNotEmpty()) {
 
                     Row(
                         modifier = Modifier
@@ -196,13 +206,13 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
                             tint = Color.Red
                         )
                         Text(
-                            text = loginViewModel.logInFields.errorTextLogin,
+                            text = loginFields.errorTextLogin,
                             color = Color.Red,
                             style = MaterialTheme.typography.headlineMedium.copy(
                                 fontSize = 15.sp
                             )
                         )
-                        if (loginViewModel.logInFields.errorTextLogin == "Email not verified") {
+                        if (loginFields.errorTextLogin == "Email not verified") {
                             var scale by remember { mutableFloatStateOf(1f) }
 
                             Spacer(Modifier.weight(1f))
@@ -221,7 +231,9 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
                                                 scale = 0.95f
                                                 tryAwaitRelease()
                                                 scale = 1f
-                                                loginViewModel.resendEmail()
+
+                                                //   loginViewModel.resendEmail()
+                                                evenClick(LoginEvent.resendEmail)
 
                                             }
                                         )
@@ -246,7 +258,8 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
                 CustomButton(
                     onClick = {
 
-                        loginViewModel.login()
+                        // loginViewModel.login()
+                        evenClick(LoginEvent.login)
 
                         Log.d(
                             Constants.STATUS_TAG,
@@ -259,22 +272,24 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
 
 
 
-                 CustomForgotPasswordText(
-                     onClickHere = {
-                         /*
-                           navController.navigate(Constants.FIRST_ROUTE){
-                            launchSingleTop
-                            popUpTo(Constants.FIRST_ROUTE){
+                CustomForgotPasswordText(
+                    onClickHere = {
+                        /*
+                          navController.navigate(Constants.FIRST_ROUTE){
+                           launchSingleTop
+                           popUpTo(Constants.FIRST_ROUTE){
 
-                                inclusive = true
-                            }
-                        }
-                          */
-                         navController.navigate(Constants.RESET_PASSWORD_ROUTE)
+                               inclusive = true
+                           }
+                       }
+                         */
+                        navController.navigate(Constants.RESET_PASSWORD_ROUTE)
 
-                     },
-                     modifier = Modifier.fillMaxWidth().padding(8.dp)
-                 )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                )
 
 
 
@@ -293,7 +308,9 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
 
                         Log.d(Constants.STATUS_TAG, "Login Success")
 
-                        loginViewModel.updateErrorTextLogin("")
+                        //  loginViewModel.updateErrorTextLogin("")
+                        evenClick(LoginEvent.updateErrorTextLogin(""))
+
                     } else if (logInState.error?.isNotBlank() == true) {
 
                         Log.d(Constants.STATUS_TAG, "Login Failed ${logInState.error}")
@@ -309,11 +326,15 @@ fun LogInScreen(navController: NavController, loginViewModel: LogInViewModel = h
 
 
                 CustomResultDialog(
-                    showDialog = loginViewModel.logInFields.isShowSendEmailDialog,
-                    message = loginViewModel.logInFields.errorTextSendEmail,
+                    showDialog = loginFields.isShowSendEmailDialog,
+                    message = loginFields.errorTextSendEmail,
                     onConfirm = {
-                        loginViewModel.updateIsShowEmailDialog(false)
-                        loginViewModel.updateErrorTextLogin("")
+                        //  loginViewModel.updateIsShowEmailDialog(false)
+                        // loginViewModel.updateErrorTextLogin("")
+
+                        evenClick(LoginEvent.updateIsShowEmailDialog(false))
+                        evenClick(LoginEvent.updateErrorTextLogin(""))
+
                     }
                 )
 

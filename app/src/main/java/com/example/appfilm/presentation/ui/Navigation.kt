@@ -21,8 +21,11 @@ import com.example.appfilm.presentation.ui.detail.DetailViewModel
 import com.example.appfilm.presentation.ui.fisrt.FirstScreen
 import com.example.appfilm.presentation.ui.home.HomeScreen
 import com.example.appfilm.presentation.ui.login.LogInScreen
+import com.example.appfilm.presentation.ui.login.viewmodel.LoginViewModel
 import com.example.appfilm.presentation.ui.register.RegisterScreen
+import com.example.appfilm.presentation.ui.register.viewmodel.RegisterViewModel
 import com.example.appfilm.presentation.ui.reset_password.ResetPasswordScreen
+import com.example.appfilm.presentation.ui.reset_password.viewmodel.ResetPassViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -35,7 +38,19 @@ fun Navigation(
 
     AnimatedNavHost(navController = navController, startDestination = Constants.FIRST_ROUTE){
         composable(Constants.LOG_IN_ROUTE) {
-            LogInScreen(navController)
+            /*
+               navController: NavController,
+    loginViewModel: LoginFields,
+    logInState: LoginUIState,
+    sendEmailState: LoginUIState,
+             */
+
+            val loginViewModel = hiltViewModel<LoginViewModel>()
+            val loginFields = loginViewModel.logInFields
+            val logInState by loginViewModel.logInUIState.collectAsState()
+            val sendEmailState by  loginViewModel.sendEmailUIState.collectAsState()
+
+            LogInScreen(navController, loginFields, logInState, sendEmailState, evenClick = {loginViewModel.handleEventLogin(it)})
         }
 
         composable(Constants.REGISTER_ROUTE) {
@@ -50,7 +65,12 @@ fun Navigation(
         }
 
         composable(Constants.RESET_PASSWORD_ROUTE) {
-            ResetPasswordScreen(navController)
+            val resetPassViewModel = hiltViewModel<ResetPassViewModel>()
+
+            val resetPassFields = resetPassViewModel.resetPassFields
+            val resetPassState = resetPassViewModel.resetPassState
+
+            ResetPasswordScreen(navController, resetPassFields, resetPassState, eventClick = {resetPassViewModel.handleEvent(it)})
         }
 
         composable(
