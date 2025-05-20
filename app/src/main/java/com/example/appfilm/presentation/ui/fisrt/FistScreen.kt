@@ -48,6 +48,8 @@ import com.example.appfilm.presentation.ui.CustomLoadingDialog
 import com.example.appfilm.presentation.ui.CustomRandomBackground
 import com.example.appfilm.presentation.ui.CustomResultDialog
 import com.example.appfilm.presentation.ui.CustomTextTitle
+import com.example.appfilm.presentation.ui.fisrt.viewmodel.FirstEvent
+import com.example.appfilm.presentation.ui.fisrt.viewmodel.FirstUiState
 import com.example.appfilm.presentation.ui.isNetworkAvailable
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

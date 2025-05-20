@@ -203,7 +203,10 @@ fun HomeScreen(
                         context,
                         getNewMovieState,
                         movies,
-                        onEventClick = { homeMovieViewModel.handleEvent(it) })
+                        onEventClick = {
+
+                            homeMovieViewModel.handleEvent(it)
+                        })
 
                     is NavigationDrawerItem.Favorite -> FavouriteMovieScreen()
                     is NavigationDrawerItem.Search -> SearchMovieScreen()

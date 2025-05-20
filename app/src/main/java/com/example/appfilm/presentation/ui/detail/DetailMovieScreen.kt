@@ -78,6 +78,8 @@ import com.example.appfilm.R
 import com.example.appfilm.common.Constants
 import com.example.appfilm.domain.model.detail_movie.EpisodeMovie
 import com.example.appfilm.domain.model.detail_movie.MovieDetail
+import com.example.appfilm.presentation.ui.detail.viewmodel.DetailEvent
+import com.example.appfilm.presentation.ui.detail.viewmodel.DetailUiState
 import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.components.CustomButtonWithIcon
 import com.example.appfilm.presentation.ui.isNetworkAvailable
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer

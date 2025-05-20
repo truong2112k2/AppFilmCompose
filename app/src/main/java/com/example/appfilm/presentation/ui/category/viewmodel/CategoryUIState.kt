@@ -1,8 +1,6 @@
-package com.example.appfilm.presentation.ui.fisrt
+package com.example.appfilm.presentation.ui.category.viewmodel
 
-
-
-data class FirstUiState(
+data class CategoryUIState(
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
     val error: String? = null

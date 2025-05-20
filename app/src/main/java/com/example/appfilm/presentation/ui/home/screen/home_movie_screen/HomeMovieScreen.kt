@@ -86,7 +86,6 @@ fun HomeMovieScreen(
             ), modifier = Modifier.padding(8.dp), textAlign = TextAlign.Center)
 
             Button(onClick = {
-             //   homeMovieViewModel.getMoviesOnNetwork(context, 1)
 
                 onEventClick(HomeMovieEvent.GetMoviesOnNetwork(context, 1))
 
@@ -97,21 +96,13 @@ fun HomeMovieScreen(
 
 
     }else{
-       // if(getNewMovieState.isLoading){
-      //      HomeScreenShimmer()
-     //   }else {
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-//            if(getNewMovieState.isLoading) {
-//              item {
-//
-//                  HomeScreenShimmer()
-//              }
-//
-//            }
+
 
 
                 if (movies.isNotEmpty()) {

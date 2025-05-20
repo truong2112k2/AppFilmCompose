@@ -1,4 +1,4 @@
-package com.example.appfilm.presentation.ui.detail
+package com.example.appfilm.presentation.ui.detail.viewmodel
 
 sealed class DetailEvent {
     data class ReTry(val slug: String) : DetailEvent()
