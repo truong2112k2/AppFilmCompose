@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.appfilm.common.Constants
 import com.example.appfilm.common.Resource
 import com.example.appfilm.domain.model.detail_movie.MovieDetail
+import com.example.appfilm.domain.toMovie
 import com.example.appfilm.domain.usecase.AppUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -97,20 +98,68 @@ class DetailViewModel @Inject constructor(
                         DetailUiState(error = getDetailMove.message)
                     }
                 }
+        }
+    }
+    private val _addFavouriteMovieState = MutableStateFlow<DetailUiState>(DetailUiState())
+    val addFavouriteMovieState: StateFlow<DetailUiState> = _addFavouriteMovieState.asStateFlow()
+    private fun addFavouriteMovie(movieDetail: MovieDetail) {
 
 
+        val movie = movieDetail.toMovie()
+        viewModelScope.launch(Dispatchers.IO) {
 
+            appUseCases.addFavouriteMovieUseCase.invoke(movie).collect { result ->
 
+                _addFavouriteMovieState.value = when (result) {
+                    is Resource.Success -> {
+                        Log.d(Constants.STATUS_TAG, "Success add detail ${movie.name} favourite")
+                        DetailUiState(isSuccess = true)
+                    }
 
+                    is Resource.Error -> {
+                        Log.d(Constants.STATUS_TAG, "Error add detail favourite ${result.message}")
+                        DetailUiState(error = result.message)
+                    }
+
+                    is Resource.Loading -> {
+                        Log.d(Constants.STATUS_TAG, "Loading detail add favourite")
+                        DetailUiState(isLoading = true)
+                    }
+                }
+
+            }
 
         }
-
     }
+    private val _checkFavourite = MutableStateFlow<Boolean>(false)
+    val checkFavourite: StateFlow<Boolean> = _checkFavourite.asStateFlow()
 
+    fun checkFavouriteMovie(movieId: String) {
+
+        Log.d("kkkk", "id Movie in checkFavouriteMovie  ${movieId.toString()}")
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = appUseCases.checkFavouriteMovieUseCase.invoke(movieId)
+            if(result.data == true){
+
+
+                _checkFavourite.value = true
+            }else{
+                _checkFavourite.value = false
+            }
+
+            Log.d("kkkk", "result in checkFavouriteMovie  ${result.data}")
+
+        }
+    }
     fun onEvent(action: DetailEvent) {
         when (action) {
             is DetailEvent.GetDetail -> getDetailMovie(action.slug)
             is DetailEvent.ReTry -> retryGetDetailMovie(action.slug)
+            is DetailEvent.AddFavouriteMovie -> addFavouriteMovie(action.movieDetail)
+            is DetailEvent.CheckFavouriteMovie -> {checkFavouriteMovie(action.movieID)}
+
+
         }
     }
 }

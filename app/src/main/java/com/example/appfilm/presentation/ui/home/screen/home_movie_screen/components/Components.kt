@@ -92,7 +92,6 @@ fun NewMovieItem(
     onClickPlay: () -> Unit,
     onClickAddFavourite: () -> Unit,
     addFavouriteMovie: HomeUIState,
-    onErrorMessage: (String) -> Unit
 
 ) {
     Box(
@@ -177,7 +176,10 @@ fun NewMovieItem(
                         "Add success"
                     } else if (addFavouriteMovie.isLoading) {
                         "Loading"
-                    } else {
+                    } else if(addFavouriteMovie.error?.isNotEmpty() == true){
+                        addFavouriteMovie.error
+                    }
+                    else {
                         "Add to favourite"
                     }
 
@@ -204,15 +206,22 @@ fun NewMovieItem(
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = "Icon",
-                                tint = Color.Black // Icon màu đen
+                                tint = Color.Black
                             )
                         } else if (addFavouriteMovie.isLoading) {
                             CircularProgressIndicator(modifier = Modifier.size(14.dp))
-                        } else {
+                        }else if(addFavouriteMovie.error?.isNotEmpty() == true){
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = "Icon",
+                                tint = Color.Black
+                            )
+                        }
+                        else {
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = "Icon",
-                                tint = Color.Black // Icon màu đen
+                                tint = Color.Black
                             )
                         }
 
@@ -225,10 +234,9 @@ fun NewMovieItem(
                     }
 
 
-                    if(addFavouriteMovie.error?.isNotEmpty() == true){
-                        onErrorMessage(addFavouriteMovie.error ?: "Error: Unknown error ")
 
-                    }
+
+
 
 
 

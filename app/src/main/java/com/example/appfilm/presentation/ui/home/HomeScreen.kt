@@ -137,32 +137,17 @@ fun HomeScreen(
 
             TopAppBar(
                 title = {
-                    //  if (!getNewMovieState.isLoading) {
-                    Text(selectedScreen.title)
-                    //         }
+                    Text(selectedScreen.title) //         }
 
                 },
                 navigationIcon = {
-                    //  if (getNewMovieState.isLoading) {
-                    //    Row(
-                    //      verticalAlignment = Alignment.CenterVertically
-                    //    ) {
-                    //     Text(
-                    //         "Loading",
-                    //        )
-                    //       Spacer(Modifier.width(6.dp))
-                    //       CircularProgressIndicator(
-                    //         color = Color.White
-                    //       )
-                    //      }
 
-                    //   } else {
                     IconButton(onClick = {
                         coroutineScope.launch { drawerState.open() }
                     }) {
                         Icon(Icons.Default.Menu, contentDescription = "Menu")
                     }
-                    //    }
+
 
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -171,7 +156,6 @@ fun HomeScreen(
                     navigationIconContentColor = Color.White
                 ),
                 actions = {
-                    /// if (!getNewMovieState.isLoading) {
                     IconButton(onClick = {
                         isShowDiaLogConfirm = true
                     }) {
@@ -181,41 +165,10 @@ fun HomeScreen(
                             tint = Color.White
                         )
                     }
-                    // }
 
                 }
             )
 
-//            if(getNewMovieState.isLoading){
-//
-//
-//                Row(
-//                    modifier = Modifier.padding(8.dp),
-//                    verticalAlignment = Alignment.CenterVertically
-//                ) {
-//                    Text(
-//                        "Updating new movies",
-//                        color = Color.White
-//                    )
-//                    Spacer(Modifier.width(6.dp))
-//                    CircularProgressIndicator(
-//                        color = Color.White,
-//                        modifier = Modifier.size(24.dp)
-//                    )
-//                }
-//            }else{
-//                Row(
-//                    modifier = Modifier.padding(8.dp),
-//                    verticalAlignment = Alignment.CenterVertically
-//                ) {
-//                    Text(
-//                        "Update success",
-//                        color = Color.White
-//                    )
-//                    Spacer(Modifier.width(6.dp))
-//                    Icon(imageVector = Icons.Default.Check, contentDescription = "", modifier = Modifier.size(24.dp), tint = Color.White)
-//                }
-//            }
 
 
             Box(
