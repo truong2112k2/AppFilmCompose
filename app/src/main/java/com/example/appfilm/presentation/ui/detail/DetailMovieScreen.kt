@@ -36,10 +36,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -57,6 +61,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -94,7 +99,10 @@ fun DetailMovieScreen(
     navController: NavController,
     movieSlug: String,
     getDetailUIState: DetailUiState,
+    addFavouriteState: DetailUiState,
+    isFavourite: Boolean,
     detailMovie: MovieDetail,
+
 
     onEvent: (DetailEvent) -> Unit
 
@@ -129,6 +137,8 @@ fun DetailMovieScreen(
     LaunchedEffect(Unit) {
 
         onEvent(DetailEvent.GetDetail(movieSlug))
+        Log.d("kkkk", "id Movie ${detailMovie._id.toString()}")
+      //  onEvent(DetailEvent.CheckFavouriteMovie(detailMovie._id.toString()  ))
         isNetworkConnected = isNetworkAvailable(context)
     }
 
@@ -161,6 +171,8 @@ fun DetailMovieScreen(
                 DetailMovieShimmer()
 
             } else {
+                Log.d("kkkk", "id Movie  2 ${detailMovie._id.toString()}")
+                onEvent(DetailEvent.CheckFavouriteMovie(detailMovie._id.toString()  ))
 
                 Column(
                     modifier = Modifier
@@ -220,6 +232,23 @@ fun DetailMovieScreen(
                                 )
                         )
 
+//                        Box(
+//                            modifier = Modifier
+//                                .align(Alignment.TopStart)
+//                                .padding(12.dp),
+//                        ) {
+//                            Icon(
+//                                imageVector = if (addFavouriteState.isSuccess) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+//                                contentDescription = "",
+//                                tint = Color.White,
+//                                modifier = Modifier.clickable {
+//                                    onEvent(DetailEvent.AddFavouriteMovie(detailMovie))
+//                                }
+//                            )
+//
+//                        }
+
+
                         detailMovie.vote_average?.let {
                             Box(
                                 modifier = Modifier
@@ -250,14 +279,40 @@ fun DetailMovieScreen(
                                 }
 
                             }
+                        }
+
+                        ///
+                        Box(
+                            modifier = Modifier
+                                .padding(12.dp)
+                                .align(Alignment.BottomStart),
+                        ) {
+                            if(isFavourite){
+                                Icon(
+                                    imageVector = Icons.Default.Favorite,
+                                    contentDescription = "",
+                                    tint = Color.White,
+                                )
+                            }else{
+                                if(addFavouriteState.isLoading){
+                                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(12.dp))
+                                }else{
+                                    Icon(
+                                        imageVector = if (addFavouriteState.isSuccess) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                        contentDescription = "",
+                                        tint = Color.White,
+                                        modifier = Modifier.clickable {
+                                            onEvent(DetailEvent.AddFavouriteMovie(detailMovie))
+                                        }
+                                    )
+                                }
+                            }
 
 
                         }
 
-
                         var isShowTrailer by rememberSaveable { mutableStateOf(false) }
 
-                        Log.d("23213", "Film : ${detailMovie.name} ${detailMovie.trailer_url}")
 
                         val trailerUrl = detailMovie.trailer_url
                         val videoId = trailerUrl?.let { extractYoutubeVideoId(it) }
@@ -299,6 +354,7 @@ fun DetailMovieScreen(
                             .verticalScroll(scrollState)
                             .padding(16.dp)
                     ) {
+
                         Text(
                             detailMovie.name.toString(),
                             style = TextStyle(
@@ -307,6 +363,16 @@ fun DetailMovieScreen(
                                 color = Color.White
                             )
                         )
+//                            Spacer(modifier = Modifier.weight(1f))
+//                            Icon(
+//                                imageVector = if(addFavouriteState.isSuccess) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+//                                contentDescription = "",
+//                                tint = Color.White,
+//                                modifier = Modifier.clickable {
+//                                    onEvent(DetailEvent.AddFavouriteMovie(detailMovie))
+//                                }
+//                            )
+
 
                         Spacer(modifier = Modifier.height(8.dp))
 

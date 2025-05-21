@@ -128,7 +128,10 @@ fun Navigation(
             val vm = hiltViewModel<DetailViewModel>()
             val getDetailUIState by vm.getDetailMovieState.collectAsState()
             val detailMovie by vm.detailMovie.collectAsState()
-            DetailMovieScreen(navController, movieSlug, getDetailUIState, detailMovie, onEvent = {
+            val favouriteMovie by vm.addFavouriteMovieState.collectAsState()
+            val isFavourite by vm.checkFavourite.collectAsState()
+
+            DetailMovieScreen(navController, movieSlug, getDetailUIState,favouriteMovie, isFavourite, detailMovie, onEvent = {
                 vm.onEvent(it)
             })
 

@@ -9,7 +9,6 @@ import com.example.appfilm.data.source.remote.dto.category_dto.CategoryDto
 import com.example.appfilm.data.source.remote.dto.detail_dto.MovieDetailDto
 import com.example.appfilm.data.source.remote.dto.movie_catgory_dto.MovieByCategoryDto
 import com.example.appfilm.data.source.remote.dto.movie_dto.MovieDto
-import com.google.firebase.database.FirebaseDatabase
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject

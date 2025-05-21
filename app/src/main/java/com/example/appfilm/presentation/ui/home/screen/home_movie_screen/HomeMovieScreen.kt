@@ -23,8 +23,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.appfilm.common.Constants
 import com.example.appfilm.domain.model.Movie
+import com.example.appfilm.presentation.ui.CustomConfirmDialog
 import com.example.appfilm.presentation.ui.CustomRetryBox
 import com.example.appfilm.presentation.ui.CustomTextTitle
 import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.components.MovieItem
@@ -120,13 +123,10 @@ fun HomeMovieScreen(
                         },
                         onClickAddFavourite = {
                             onEventClick(HomeMovieEvent.AddFavouriteMovie(newMovie))
+
                         },
                          addFavouriteMovieState,
-                        onErrorMessage = { error ->
 
-                            errorAddFavourite = error
-                          //  Log.d("eeee", error)
-                        }
                     )
                 }
 
@@ -134,29 +134,7 @@ fun HomeMovieScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                item {
-                    if (isShowSeeMore) {
-                        AnimatedVisibility(
-                            visible = isShowSeeMore,
-                            enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
-                            exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
-                        ) {
-                            Text(
-                                text = "Swipe to find more",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                style = TextStyle(
-                                    textAlign = TextAlign.End,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Black
-                                )
-                            )
-                        }
-                    }
 
-                }
 
                 item {
                     Row(
@@ -195,10 +173,25 @@ fun HomeMovieScreen(
 
             }
         }
-        // }
-        LaunchedEffect(errorAddFavourite != null ) {
-            Log.d("eeee", "LaunchedEffect"+ errorAddFavourite.toString())
-            Toast.makeText(context,errorAddFavourite, Toast.LENGTH_SHORT).show()
+
+
+        var isShowDialogConfirm by rememberSaveable { mutableStateOf(false) }
+
+
+
+        if (isShowDialogConfirm) {
+            AlertDialog(
+                onDismissRequest = {isShowDialogConfirm = false},
+                title = {
+                    Text(text = errorAddFavourite.toString())
+                },
+                confirmButton = {
+                    TextButton(onClick = {isShowDialogConfirm = false }) {
+                        Text("Ok")
+                    }
+                },
+
+            )
         }
 
 

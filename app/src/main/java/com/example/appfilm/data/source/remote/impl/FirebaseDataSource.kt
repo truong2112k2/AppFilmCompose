@@ -169,7 +169,7 @@ class FirebaseDataSource @Inject constructor(
         try {
             val snapshot = movieRef.get().await()
             if (snapshot.exists()) {
-                emit(Resource.Error("Movie is already in favorites"))
+                emit(Resource.Error("Movie is already"))
             } else {
                 movieRef.setValue(movie).await()
                 emit(Resource.Success(Unit))
@@ -208,7 +208,7 @@ class FirebaseDataSource @Inject constructor(
                     .get()
                     .await()
 
-            Resource.Success(snapshot.exists())
+            Resource.Success( snapshot.exists())
 
         } catch (e: Exception) {
             Resource.Error("Check favourite movies failed: ${e.message}")
