@@ -135,7 +135,7 @@ fun Navigation(
         }
 
         composable(
-            route = "PLAY_MOVIE_ROUTE/{MovieLink}",  // KHÔNG dùng ? ở đây
+            route = "PLAY_MOVIE_ROUTE/{MovieLink}",
             arguments = listOf(
                 navArgument("MovieLink") { type = NavType.StringType }
             ),

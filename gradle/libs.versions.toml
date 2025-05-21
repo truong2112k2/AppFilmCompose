@@ -42,6 +42,7 @@ shimmer = "0.5.0"
 simpleloading = "0.0.6"
 roomRuntimeAndroid = "2.7.1"
 composeMaterial = "1.4.1"
+firebaseDatabase = "21.0.0"
 
 [libraries]
 accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanistPlaceholderMaterial" }
@@ -98,6 +99,7 @@ shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
 simpleloading = { module = "com.github.younhwan97:SimpleLoading", version.ref = "simpleloading" }
 androidx-room-runtime-android = { group = "androidx.room", name = "room-runtime-android", version.ref = "roomRuntimeAndroid" }
 androidx-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "composeMaterial" }
+firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

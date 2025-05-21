@@ -30,7 +30,7 @@ class HomeViewModel @Inject constructor(
 
     private val _logoutState = MutableStateFlow(HomeUIState())
     val logoutState : StateFlow<HomeUIState> = _logoutState
-    fun logout(googleSignInClient: GoogleSignInClient){
+    private fun logout(googleSignInClient: GoogleSignInClient){
 
         viewModelScope.launch(Dispatchers.IO) {
             appUseCases.logoutUseCase.invoke(googleSignInClient).collect{ result ->
@@ -58,6 +58,7 @@ class HomeViewModel @Inject constructor(
     fun handleEvent(homeEvent: HomeEvent){
         when(homeEvent){
             is HomeEvent.Logout ->{ logout(homeEvent.googleSignInClient)}
+
         }
     }
 

@@ -4,9 +4,12 @@ import android.util.Log
 import com.example.appfilm.common.Constants
 import com.example.appfilm.common.Resource
 import com.example.appfilm.data.source.remote.IFirebaseDataSource
+import com.example.appfilm.data.source.remote.dto.movie_dto.MovieDto
+import com.example.appfilm.domain.model.Movie
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -16,7 +19,8 @@ import javax.inject.Singleton
 
 @Singleton
 class FirebaseDataSource @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val firebaseDatabase: FirebaseDatabase
 ) : IFirebaseDataSource {
 
     override suspend fun login(email: String, password: String): Flow<Resource<Boolean>> = flow {
@@ -138,17 +142,76 @@ class FirebaseDataSource @Inject constructor(
         try {
             val user = FirebaseAuth.getInstance().currentUser
             if (user != null && user.isEmailVerified) {
-              emit( Resource.Success(Unit))
+                emit(Resource.Success(Unit))
             } else {
-                emit(    Resource.Error("Email not login"))
+                emit(Resource.Error("Email not login"))
 
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             emit(Resource.Error("Check log-in failed: ${e.message}")) // lỗi đăng nhập
 
         }
     }
 
+    override suspend fun addFavoriteMovie(movie: Movie): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading())
 
+        val userId = firebaseAuth.currentUser?.uid
+        if (userId == null) {
+            emit(Resource.Error("User is not logged in"))
+            return@flow
+        }
 
+        val movieRef = firebaseDatabase.getReference("FAVORITE_MOVIES")
+            .child(userId)
+            .child(movie._id.toString())
+
+        try {
+            val snapshot = movieRef.get().await()
+            if (snapshot.exists()) {
+                emit(Resource.Error("Movie is already in favorites"))
+            } else {
+                movieRef.setValue(movie).await()
+                emit(Resource.Success(Unit))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error("Add favorite movie failed: ${e.message}"))
+        }
+    }
+
+    override suspend fun getFavoriteMovies(): Flow<Resource<List<MovieDto>>> = flow {
+        emit(Resource.Loading())
+        val userId = firebaseAuth.currentUser?.uid
+        try {
+            val snapshot = firebaseDatabase.getReference("FAVORITE_MOVIES")
+                    .child(userId.toString())
+                    .get()
+                    .await()
+
+            val movies = snapshot.children.mapNotNull {
+                it.getValue(MovieDto::class.java)
+            }
+            emit(Resource.Success(movies))
+        } catch (e: Exception) {
+            emit(Resource.Error(message = "Get favourite movies failed: ${e.message}"))
+        }
+
+    }
+
+    override suspend fun isFavorite(movieId: String): Resource<Boolean> {
+        val userId = firebaseAuth.currentUser?.uid
+        return try {
+            val snapshot =
+                firebaseDatabase.getReference("FAVORITE_MOVIES")
+                    .child(userId.toString())
+                    .child(movieId)
+                    .get()
+                    .await()
+
+            Resource.Success(snapshot.exists())
+
+        } catch (e: Exception) {
+            Resource.Error("Check favourite movies failed: ${e.message}")
+        }
+    }
 }

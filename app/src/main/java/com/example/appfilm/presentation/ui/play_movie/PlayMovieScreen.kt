@@ -9,8 +9,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -61,7 +64,7 @@ fun PlayMovieScreen(videoUrl: String, context: Context, navController: NavContro
         }
     }
 
-    // Xử lý nút back vật lý
+
     androidx.activity.compose.BackHandler(enabled = showVideo) {
         showVideo = false
     }
@@ -80,48 +83,6 @@ fun PlayMovieScreen(videoUrl: String, context: Context, navController: NavContro
     }
 }
 
-//
-//@Composable
-//fun PlayMovieScreen(videoUrl: String, context: Context, navController: NavController) {
-//    var showVideo by rememberSaveable { mutableStateOf(false) }
-//
-//    val activity = context as? Activity
-//
-//    LaunchedEffect(showVideo) {
-//
-//        if (showVideo) {
-//            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-//            WindowCompat.setDecorFitsSystemWindows(activity?.window ?: return@LaunchedEffect, false)
-//            activity?.window?.decorView?.systemUiVisibility = (
-//                    View.SYSTEM_UI_FLAG_FULLSCREEN
-//                            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-//                            or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-//                    )
-//        } else {
-//            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-//            WindowCompat.setDecorFitsSystemWindows(activity?.window ?: return@LaunchedEffect, true)
-//            activity?.window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
-//        }
-//    }
-//
-//    if (showVideo) {
-//        FullScreenVideoPlayer(
-//            url = videoUrl,
-//            context = context,
-//            onExit = { showVideo = false }
-//        )
-//    } else {
-//        Column(
-//            modifier = Modifier.fillMaxSize(),
-//            verticalArrangement = Arrangement.Center,
-//            horizontalAlignment = Alignment.CenterHorizontally
-//        ) {
-//            Button(onClick = { showVideo = true }) {
-//                Text("Xem video full screen")
-//            }
-//        }
-//    }
-//}
 
 
 @OptIn(UnstableApi::class)
@@ -154,7 +115,7 @@ fun FullScreenVideoPlayer(url: String, context: Context, onExit: () -> Unit) {
             },
             modifier = Modifier.fillMaxSize()
         )
-        // Nút thoát (ví dụ góc trên bên trái)
+
         IconButton(
             onClick = onExit,
             modifier = Modifier

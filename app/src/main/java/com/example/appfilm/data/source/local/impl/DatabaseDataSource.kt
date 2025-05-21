@@ -29,6 +29,7 @@ class DatabaseDataSource @Inject constructor(
     override suspend fun insertAll(movies: List<MovieDb>): Resource<Boolean> {
        return try{
             val result = movieDao.insertAll(movies)
+
             if(result.isNotEmpty()){
                 Resource.Success(true )
             }else{
