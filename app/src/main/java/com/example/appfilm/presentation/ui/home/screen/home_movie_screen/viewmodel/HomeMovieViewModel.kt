@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appfilm.common.Constants
+import com.example.appfilm.common.Resource
 import com.example.appfilm.domain.model.Movie
 import com.example.appfilm.domain.usecase.AppUseCases
 import com.example.appfilm.presentation.ui.home.viewmodel.HomeUIState
@@ -12,6 +13,7 @@ import com.example.appfilm.presentation.ui.isNetworkAvailable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -24,13 +26,13 @@ import javax.inject.Inject
 class HomeMovieViewModel @Inject constructor(
     private val appUseCases: AppUseCases,
     @ApplicationContext val context: Context
-): ViewModel() {
+) : ViewModel() {
     private val _getNewMovieState = MutableStateFlow(HomeUIState())
-    val getNewMovieState : StateFlow<HomeUIState> = _getNewMovieState
+    val getNewMovieState: StateFlow<HomeUIState> = _getNewMovieState
 
 
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
-    val movies : StateFlow<List<Movie>> = _movies
+    val movies: StateFlow<List<Movie>> = _movies
 
 
     init {
@@ -38,22 +40,30 @@ class HomeMovieViewModel @Inject constructor(
     }
 
     private fun fetchMoviesIfNeeded() {
-        if (_movies.value.isEmpty()) {
-            if (isNetworkAvailable(context)) {
-                getMoviesOnNetwork(context, 1)
-            } else {
-                getMoviesNoNetwork()
+        viewModelScope.launch(Dispatchers.IO) {
+            if (_movies.value.isEmpty()) {
+
+                getMoviesNoNetwork() // lay du lieu tu local truoc
+
+                delay(2000)
+
+                if (isNetworkAvailable(context)) {
+                    getMoviesOnNetwork(context, 1) // sau do moi tai du lieu moi ve, neu co mang
+                }
+
+
             }
         }
+
     }
 
     private fun getMoviesNoNetwork() {
 
         viewModelScope.launch(Dispatchers.IO) {
-            appUseCases.getMoviesUseCase.getMovie().collect{movies ->
+            appUseCases.getMoviesUseCase.getMovie().collect { movies ->
                 if (movies.isEmpty()) {
 
-                    Log.d(Constants.ERROR_TAG,"Error: CAN'T GET DATA FROM DATABASE")
+                    Log.d(Constants.ERROR_TAG, "Error: CAN'T GET DATA FROM DATABASE")
 
                 } else {
 
@@ -64,21 +74,20 @@ class HomeMovieViewModel @Inject constructor(
     }
 
 
-
-
-    fun getMoviesOnNetwork(context: Context, page: Int ){
+    private fun getMoviesOnNetwork(context: Context, page: Int) {
         _getNewMovieState.value = HomeUIState(isLoading = true)
         viewModelScope.launch(Dispatchers.IO) {
-            val result =  appUseCases.fetchDataAndSaveFromDbUseCase.fetchDataMovieAndSaveFromDb(context, page)
+            val result =
+                appUseCases.fetchDataAndSaveFromDbUseCase.fetchDataMovieAndSaveFromDb(context, page)
 
-            if(result.data?.isNotEmpty() == true){
+            if (result.data?.isNotEmpty() == true) {
 
                 _movies.value = result.data
                 _getNewMovieState.value = HomeUIState(isSuccess = true)
-                Log.d(Constants.STATUS_TAG,"fetchDataAndSaveFromDb UseCase success")
+                Log.d(Constants.STATUS_TAG, "fetchDataAndSaveFromDb UseCase success")
 
 
-            }else{
+            } else {
 
                 _getNewMovieState.value = HomeUIState(error = result.exception?.let {
                     convertGetMoviesException(it)
@@ -89,11 +98,54 @@ class HomeMovieViewModel @Inject constructor(
         }
     }
 
+    private val _addFavouriteMovie = MutableStateFlow(HomeUIState())
+    val addFavouriteMovie: StateFlow<HomeUIState> = _addFavouriteMovie
+
+    private fun addFavouriteMovie(movie: Movie) {
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            appUseCases.addFavouriteMovieUseCase.invoke(movie).collect { result ->
+
+                _addFavouriteMovie.value = when (result) {
+                    is Resource.Success -> {
+                        Log.d(Constants.STATUS_TAG, "Success add ${movie.name} favourite")
+                        HomeUIState(isSuccess = true)
+                    }
+
+                    is Resource.Error -> {
+                        Log.d(Constants.STATUS_TAG, "Error add favourite ${result.message}")
+                        HomeUIState(error = result.message)
+                    }
+
+                    is Resource.Loading -> {
+                        Log.d(Constants.STATUS_TAG, "Loading add favourite")
+                        HomeUIState(isLoading = true)
+                    }
+                }
+
+            }
+
+        }
+    }
+
+
+    fun handleEvent(homeMovieEvent: HomeMovieEvent) {
+        when (homeMovieEvent) {
+            is HomeMovieEvent.GetMoviesOnNetwork -> {
+                getMoviesOnNetwork(homeMovieEvent.context, homeMovieEvent.page)
+            }
+
+            is HomeMovieEvent.AddFavouriteMovie -> { addFavouriteMovie(homeMovieEvent.movie)}
+        }
+    }
+
     private fun convertGetMoviesException(exception: Exception): String {
         return when (exception) {
             is IOException -> {
                 "Cannot connect to the internet. Please check your network connection."
             }
+
             is HttpException -> {
                 when (exception.code()) {
                     400 -> "Bad request. Please try again."
@@ -104,16 +156,10 @@ class HomeMovieViewModel @Inject constructor(
                     else -> "Server error: ${exception.code()} - ${exception.message()}"
                 }
             }
+
             else -> {
                 "An unexpected error occurred. Please try again."
             }
         }
     }
-
-    fun handleEvent(homeMovieEvent: HomeMovieEvent){
-        when(homeMovieEvent){
-            is HomeMovieEvent.GetMoviesOnNetwork -> {getMoviesOnNetwork(homeMovieEvent.context, homeMovieEvent.page)}
-        }
-    }
-
 }

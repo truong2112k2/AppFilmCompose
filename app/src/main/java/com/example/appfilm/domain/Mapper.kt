@@ -137,3 +137,22 @@ fun MovieDetailDto.toMovieDetail() : MovieDetail {
         listEpisodeMovie =  listEpisode,
     )
 }
+
+fun MovieDetail.toMovie(): Movie {
+    return Movie(
+        _id = this._id,
+        name = this.name,
+        origin_name = this.origin_name,
+        poster_url = this.poster_url,
+        slug = this.slug,
+        thumb_url = this.thumb_url,
+        year = this.year,
+        type = this.type,
+        season = null, // Không có trong MovieDetail, để null
+        vote_average = this.vote_average?.toString(), // Chuyển Int? -> String?
+        vote_count = null, // Không có trong MovieDetail, để null
+        time = null, // Không có trong MovieDetail, để null
+        localPosterPath = null // Dữ liệu local, không có trong MovieDetail
+    )
+}
+

@@ -1,4 +1,4 @@
-package com.example.appfilm.domain.usecase.firebase
+package com.example.appfilm.domain.usecase.firebase.authentication
 
 import com.example.appfilm.common.Resource
 import com.example.appfilm.domain.repository.IFirebase

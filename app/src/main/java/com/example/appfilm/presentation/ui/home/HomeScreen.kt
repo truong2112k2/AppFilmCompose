@@ -7,14 +7,10 @@ import androidx.activity.OnBackPressedCallback
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,12 +29,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.appfilm.common.Constants
@@ -108,6 +102,7 @@ fun HomeScreen(
 
     val homeMovieViewModel = hiltViewModel<HomeMovieViewModel>()
     val getNewMovieState by homeMovieViewModel.getNewMovieState.collectAsState()
+    val addFavouriteMovieState by homeMovieViewModel.addFavouriteMovie.collectAsState()
     val movies by homeMovieViewModel.movies.collectAsState()
 
 
@@ -142,32 +137,32 @@ fun HomeScreen(
 
             TopAppBar(
                 title = {
-                    if (!getNewMovieState.isLoading) {
-                        Text(selectedScreen.title)
-                    }
+                    //  if (!getNewMovieState.isLoading) {
+                    Text(selectedScreen.title)
+                    //         }
 
                 },
                 navigationIcon = {
-                    if (getNewMovieState.isLoading) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                "Loading",
-                            )
-                            Spacer(Modifier.width(6.dp))
-                            CircularProgressIndicator(
-                                color = Color.White
-                            )
-                        }
+                    //  if (getNewMovieState.isLoading) {
+                    //    Row(
+                    //      verticalAlignment = Alignment.CenterVertically
+                    //    ) {
+                    //     Text(
+                    //         "Loading",
+                    //        )
+                    //       Spacer(Modifier.width(6.dp))
+                    //       CircularProgressIndicator(
+                    //         color = Color.White
+                    //       )
+                    //      }
 
-                    } else {
-                        IconButton(onClick = {
-                            coroutineScope.launch { drawerState.open() }
-                        }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menu")
-                        }
+                    //   } else {
+                    IconButton(onClick = {
+                        coroutineScope.launch { drawerState.open() }
+                    }) {
+                        Icon(Icons.Default.Menu, contentDescription = "Menu")
                     }
+                    //    }
 
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -176,22 +171,51 @@ fun HomeScreen(
                     navigationIconContentColor = Color.White
                 ),
                 actions = {
-                    if (!getNewMovieState.isLoading) {
-                        IconButton(onClick = {
-                            isShowDiaLogConfirm = true
-                        }) {
-                            Icon(
-                                Icons.Default.ExitToApp,
-                                contentDescription = "Menu",
-                                tint = Color.White
-                            )
-                        }
+                    /// if (!getNewMovieState.isLoading) {
+                    IconButton(onClick = {
+                        isShowDiaLogConfirm = true
+                    }) {
+                        Icon(
+                            Icons.Default.ExitToApp,
+                            contentDescription = "Menu",
+                            tint = Color.White
+                        )
                     }
+                    // }
 
                 }
             )
 
-
+//            if(getNewMovieState.isLoading){
+//
+//
+//                Row(
+//                    modifier = Modifier.padding(8.dp),
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    Text(
+//                        "Updating new movies",
+//                        color = Color.White
+//                    )
+//                    Spacer(Modifier.width(6.dp))
+//                    CircularProgressIndicator(
+//                        color = Color.White,
+//                        modifier = Modifier.size(24.dp)
+//                    )
+//                }
+//            }else{
+//                Row(
+//                    modifier = Modifier.padding(8.dp),
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    Text(
+//                        "Update success",
+//                        color = Color.White
+//                    )
+//                    Spacer(Modifier.width(6.dp))
+//                    Icon(imageVector = Icons.Default.Check, contentDescription = "", modifier = Modifier.size(24.dp), tint = Color.White)
+//                }
+//            }
 
 
             Box(
@@ -199,10 +223,11 @@ fun HomeScreen(
             ) {
                 when (selectedScreen) {
                     is NavigationDrawerItem.Home -> HomeMovieScreen(
-                        navController,
-                        context,
-                        getNewMovieState,
-                        movies,
+                        navController = navController,
+                        context = context,
+                        getNewMovieState = getNewMovieState,
+                        addFavouriteMovieState = addFavouriteMovieState,
+                        movies = movies,
                         onEventClick = {
 
                             homeMovieViewModel.handleEvent(it)

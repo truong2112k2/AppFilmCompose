@@ -6,6 +6,7 @@ import com.example.appfilm.data.source.local.database.MovieDao
 import com.example.appfilm.data.source.local.database.MovieDatabase
 import com.example.appfilm.data.source.remote.dto.MovieApiService
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,11 +37,18 @@ object AppModule {
         return retrofit.create(MovieApiService :: class.java)
     }
 
-    //firebase
+    //firebase authentication
     @Singleton
     @Provides
     fun provideFirebaseAuth(): FirebaseAuth {
         return FirebaseAuth.getInstance()
+    }
+
+    // firebase realtime
+    @Singleton
+    @Provides
+    fun provideFirebaseRealtime () : FirebaseDatabase{
+        return FirebaseDatabase.getInstance()
     }
     ///database
     @Provides

@@ -5,13 +5,14 @@ import com.example.appfilm.domain.usecase.api_movie.FetchDetailMovieUseCase
 import com.example.appfilm.domain.usecase.api_movie.FetchMovieAndSaveUseCase
 import com.example.appfilm.domain.usecase.api_movie.FetchMoviesByCategoryUseCase
 import com.example.appfilm.domain.usecase.database.GetMoviesUseCase
-import com.example.appfilm.domain.usecase.firebase.CheckLoginUseCase
-import com.example.appfilm.domain.usecase.firebase.LogInUseCase
-import com.example.appfilm.domain.usecase.firebase.LogInWithoutPassUseCase
-import com.example.appfilm.domain.usecase.firebase.LogoutUseCase
-import com.example.appfilm.domain.usecase.firebase.RegisterUseCase
-import com.example.appfilm.domain.usecase.firebase.ResetPassUseCase
-import com.example.appfilm.domain.usecase.firebase.VerifyUseCase
+import com.example.appfilm.domain.usecase.firebase.authentication.CheckLoginUseCase
+import com.example.appfilm.domain.usecase.firebase.authentication.LogInUseCase
+import com.example.appfilm.domain.usecase.firebase.authentication.LogInWithoutPassUseCase
+import com.example.appfilm.domain.usecase.firebase.authentication.LogoutUseCase
+import com.example.appfilm.domain.usecase.firebase.authentication.RegisterUseCase
+import com.example.appfilm.domain.usecase.firebase.authentication.ResetPassUseCase
+import com.example.appfilm.domain.usecase.firebase.authentication.VerifyUseCase
+import com.example.appfilm.domain.usecase.firebase.realtime.AddFavouriteMovieUseCase
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -31,7 +32,9 @@ data class AppUseCases @Inject constructor (
     val fetchCategoryUseCase: FetchCategoryUseCase,
     val fetchMoviesByCategoryUseCase: FetchMoviesByCategoryUseCase,
 
-    val fetchDetailMovie : FetchDetailMovieUseCase
+    val fetchDetailMovie : FetchDetailMovieUseCase,
+
+    val addFavouriteMovieUseCase: AddFavouriteMovieUseCase
 ) {
 
 

@@ -16,19 +16,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +51,7 @@ import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import com.example.appfilm.common.Constants
 import com.example.appfilm.domain.model.Movie
+import com.example.appfilm.presentation.ui.home.viewmodel.HomeUIState
 import com.example.appfilm.presentation.ui.shimmerBrush
 
 @Composable
@@ -81,10 +87,13 @@ fun CustomButtonWithIcon(
 }
 
 @Composable
- fun NewMovieItem(
+fun NewMovieItem(
     newMovie: Movie,
     onClickPlay: () -> Unit,
-    onClickAddFavourite: () -> Unit
+    onClickAddFavourite: () -> Unit,
+    addFavouriteMovie: HomeUIState,
+    onErrorMessage: (String) -> Unit
+
 ) {
     Box(
         modifier = Modifier
@@ -162,14 +171,69 @@ fun CustomButtonWithIcon(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+
+
+                    val text = if (addFavouriteMovie.isSuccess) {
+                        "Add success"
+                    } else if (addFavouriteMovie.isLoading) {
+                        "Loading"
+                    } else {
+                        "Add to favourite"
+                    }
+
+
+
                     CustomButtonWithIcon(onClick = {
                         onClickPlay()
                     }, Icons.Default.PlayArrow, "Play")
-                    Spacer(Modifier.width(8.dp))
-                    CustomButtonWithIcon(onClick = {
-                        onClickAddFavourite()
 
-                    }, Icons.Default.Favorite, "Save to favourite")
+                    Spacer(Modifier.width(8.dp))
+
+                    Button(
+                        onClick = {
+                            onClickAddFavourite()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        modifier = Modifier.width(200.dp)
+                    ) {
+                        if (addFavouriteMovie.isSuccess) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "Icon",
+                                tint = Color.Black // Icon màu đen
+                            )
+                        } else if (addFavouriteMovie.isLoading) {
+                            CircularProgressIndicator(modifier = Modifier.size(14.dp))
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Icon",
+                                tint = Color.Black // Icon màu đen
+                            )
+                        }
+
+
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = text,
+                            color = Color.Black // Text màu đen
+                        )
+                    }
+
+
+                    if(addFavouriteMovie.error?.isNotEmpty() == true){
+                        onErrorMessage(addFavouriteMovie.error ?: "Error: Unknown error ")
+
+                    }
+
+
+
+
+
                 }
                 Spacer(Modifier.height(30.dp))
             }
@@ -178,7 +242,7 @@ fun CustomButtonWithIcon(
 }
 
 @Composable
- fun MovieItem(
+fun MovieItem(
     movie: Movie,
     onClick: () -> Unit
 

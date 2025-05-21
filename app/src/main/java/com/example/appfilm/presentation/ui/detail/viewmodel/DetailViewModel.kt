@@ -30,10 +30,6 @@ class DetailViewModel @Inject constructor(
     private fun getDetailMovie(slug: String) {
         viewModelScope.launch(Dispatchers.IO) {
 
-
-
-
-
             if(detailMovie.value.listEpisodeMovie?.isEmpty() == true){
 
                 _getDetailMovieState.value = DetailUiState(isLoading = true)
@@ -72,12 +68,49 @@ class DetailViewModel @Inject constructor(
         }
 
     }
+    private fun retryGetDetailMovie(slug: String) {
+        viewModelScope.launch(Dispatchers.IO) {
 
+
+                _getDetailMovieState.value = DetailUiState(isLoading = true)
+
+                val getDetailMove = appUseCases.fetchDetailMovie.invoke(slug)
+                _getDetailMovieState.value = when (getDetailMove) {
+                    is Resource.Loading -> {
+                        DetailUiState(isLoading = true)
+                    }
+
+                    is Resource.Success -> {
+                        Log.d("312321", "Get Data from retry is success ")
+
+                        _detailMovie.value = getDetailMove.data!!
+
+
+
+                        DetailUiState(isSuccess = true)
+                    }
+
+                    is Resource.Error -> {
+                        Log.d("312321", "Error Get Data from retry is success ")
+                        _detailMovie.value = MovieDetail()
+
+                        DetailUiState(error = getDetailMove.message)
+                    }
+                }
+
+
+
+
+
+
+        }
+
+    }
 
     fun onEvent(action: DetailEvent) {
         when (action) {
             is DetailEvent.GetDetail -> getDetailMovie(action.slug)
-            is DetailEvent.ReTry -> getDetailMovie(action.slug)
+            is DetailEvent.ReTry -> retryGetDetailMovie(action.slug)
         }
     }
 }

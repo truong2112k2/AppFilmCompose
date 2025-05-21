@@ -18,30 +18,30 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -78,6 +78,7 @@ import com.example.appfilm.R
 import com.example.appfilm.common.Constants
 import com.example.appfilm.domain.model.detail_movie.EpisodeMovie
 import com.example.appfilm.domain.model.detail_movie.MovieDetail
+import com.example.appfilm.presentation.ui.CustomRetryBox
 import com.example.appfilm.presentation.ui.detail.viewmodel.DetailEvent
 import com.example.appfilm.presentation.ui.detail.viewmodel.DetailUiState
 import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.components.CustomButtonWithIcon
@@ -128,7 +129,6 @@ fun DetailMovieScreen(
     LaunchedEffect(Unit) {
 
         onEvent(DetailEvent.GetDetail(movieSlug))
-        //  onEvent(DetailEvent.GetDetail("ngoi-truong-xac-song"))
         isNetworkConnected = isNetworkAvailable(context)
     }
 
@@ -142,39 +142,26 @@ fun DetailMovieScreen(
                     colors = listOf(Color.Black, Color.White)
                 )
             )
-            .statusBarsPadding()
+
     ) {
 
 
         if (!isNetworkConnected) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    "No internet, Please check your network",
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontSize = 18.sp, color = Color.White.copy(alpha = 0.8f),
-                        lineHeight = 20.sp
-                    ),
-                    modifier = Modifier.padding(8.dp),
-                    textAlign = TextAlign.Center
-                )
 
-                Button(onClick = {
-                    onEvent(DetailEvent.GetDetail(movieSlug))
-                    //  onEvent(DetailEvent.GetDetail("ngoi-truong-xac-song"))
+            CustomRetryBox(onClick = {
+                onEvent(DetailEvent.ReTry(movieSlug))
+                isNetworkConnected = isNetworkAvailable(context)
 
-                }) {
-                    Text("Re Try")
-                }
-            }
+            })
+
+
         } else {
             if (getDetailUIState.isLoading) {
 
                 DetailMovieShimmer()
 
             } else {
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -233,23 +220,35 @@ fun DetailMovieScreen(
                                 )
                         )
 
-                        detailMovie.type?.let {
+                        detailMovie.vote_average?.let {
                             Box(
                                 modifier = Modifier
-                                    .padding(12.dp)
-                                    .align(Alignment.TopEnd),
+                                    .align(Alignment.TopEnd)
+                                    .padding(12.dp),
                             ) {
-                                Text(
-                                    it,
+                                Row(
                                     modifier = Modifier
                                         .border(1.dp, Color.White, RoundedCornerShape(8.dp))
                                         .padding(12.dp),
-                                    style = TextStyle(
-                                        color = Color.White,
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold
-                                    ),
-                                )
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_star),
+                                        contentDescription = "",
+                                        tint = Color.Yellow,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(2.dp))
+
+                                    Text(
+                                        text = "${detailMovie.vote_average}/10",
+                                        style = TextStyle(
+                                            fontSize = 13.sp,
+                                            color = Color.White,
+                                        )
+                                    )
+                                }
+
                             }
 
 
@@ -325,23 +324,6 @@ fun DetailMovieScreen(
                                 overflow = TextOverflow.Ellipsis
                             )
 
-                            Spacer(modifier = Modifier.weight(1f))
-                            Icon(
-                                painter = painterResource(R.drawable.ic_star),
-                                contentDescription = "",
-                                tint = Color.Yellow,
-                                modifier = Modifier.size(12.dp)
-                            )
-                            Spacer(modifier = Modifier.width(2.dp))
-
-                            Text(
-                                text = "${detailMovie.vote_average}/10",
-                                style = TextStyle(
-                                    fontSize = 13.sp,
-                                    color = Color.White,
-                                )
-                            )
-
 
                         }
 
@@ -404,33 +386,40 @@ fun DetailMovieScreen(
                         }
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("${detailMovie.episode_current}", color = Color.White)
-                            Divider(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(1.dp)
-                            )
-                        }
+                        detailMovie.listEpisodeMovie?.let { episodes ->
+                            if (episodes.isNotEmpty()) {
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                                CreateTextWithIcon(
+                                    text = "Danh sách tập phim",
+                                    painterResource(R.drawable.ic_episode),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 22,
+                                    iconSize = 22
+                                )
 
 
-                        LazyRow {
-                            detailMovie.listEpisodeMovie?.let {
-                                items(it) { episode ->
-                                    MovieCardVertical(episode, detailMovie, context, onClick = {
-                                        val encodedUrl = URLEncoder.encode(episode.link_m3u8, "UTF-8")
+                                Spacer(modifier = Modifier.height(8.dp))
 
-                                        navController.navigate("PLAY_MOVIE_ROUTE/$encodedUrl")
+                                LazyVerticalGrid(
+                                    columns = GridCells.Fixed(2),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .heightIn(max = 500.dp), // Giới hạn chiều cao
+                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    contentPadding = PaddingValues(4.dp)
+                                ) {
+                                    items(episodes.size) { index ->
+                                        val episode = episodes[index]
+                                        MovieCardVertical(episode, detailMovie, context, onClick = {
+                                            val encodedUrl =
+                                                URLEncoder.encode(episode.link_m3u8, "UTF-8")
 
-                                    })
+                                            navController.navigate("PLAY_MOVIE_ROUTE/$encodedUrl")
 
+                                        })
+                                    }
                                 }
-
                             }
                         }
 
@@ -450,41 +439,47 @@ fun DetailMovieScreen(
     }
 }
 
+
 @Composable
-fun MovieCardVertical(episodeMovie: EpisodeMovie, detailMovie: MovieDetail, context: Context, onClick : () -> Unit) {
-    Card(
+fun MovieCardVertical(
+    episodeMovie: EpisodeMovie,
+    detailMovie: MovieDetail,
+    context: Context,
+    onClick: () -> Unit
+) {
+
+    Row(
         modifier = Modifier
+            .border(width = 1.dp, color = Color.White, shape = CircleShape)
             .clickable {
                 onClick()
-            }
-            .padding(16.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1E)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            },
+        verticalAlignment = Alignment.CenterVertically
+
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+
+
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(detailMovie.poster_url)
+                .crossfade(true)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .build(),
+            contentDescription = detailMovie.name,
+            modifier = Modifier
+                .size(45.dp)
+                .clip(CircleShape),
+            contentScale = ContentScale.Crop
+        )
+
+
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+
         ) {
-
-
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(detailMovie.poster_url)
-                    .crossfade(true)
-                    .diskCachePolicy(CachePolicy.ENABLED)
-                    .memoryCachePolicy(CachePolicy.ENABLED)
-                    .build(),
-                contentDescription = detailMovie.name,
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(150.dp) // hoặc weight nếu cần
-                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
-                contentScale = ContentScale.Crop
-            )
-
-
-
             Text(
                 text = episodeMovie.name,
                 color = Color.White,
@@ -493,11 +488,11 @@ fun MovieCardVertical(episodeMovie: EpisodeMovie, detailMovie: MovieDetail, cont
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
         }
+
+
     }
+
 }
 
 
@@ -519,7 +514,7 @@ fun CreateTextWithIcon(
             tint = Color.White,
             modifier = Modifier.size(iconSize.dp)
         )
-        Spacer(Modifier.width(4.dp))
+        Spacer(Modifier.width(8.dp))
         Divider(
             color = Color.White,
             modifier = Modifier

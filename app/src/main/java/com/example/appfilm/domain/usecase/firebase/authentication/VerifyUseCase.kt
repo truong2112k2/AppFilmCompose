@@ -1,4 +1,4 @@
-package com.example.appfilm.domain.usecase.firebase
+package com.example.appfilm.domain.usecase.firebase.authentication
 
 import com.example.appfilm.common.Resource
 import com.example.appfilm.domain.repository.IFirebase
@@ -8,11 +8,12 @@ import javax.inject.Singleton
 
 
 @Singleton
-class LogInWithoutPassUseCase @Inject constructor(
+class VerifyUseCase @Inject constructor(
     private val firebaseRepository: IFirebase
-
 ) {
-    suspend operator fun invoke(idToken: String): Flow<Resource<Boolean>>{
-        return firebaseRepository.firebaseSignInWithGoogle(idToken)
+
+    suspend operator fun invoke() : Flow<Resource<Unit>> {
+        return firebaseRepository.firebaseSendVerification()
     }
+
 }

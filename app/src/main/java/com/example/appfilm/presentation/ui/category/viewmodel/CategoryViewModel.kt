@@ -36,7 +36,7 @@ class CategoryViewModel @Inject constructor(
     val getMoviesByCategoryState : StateFlow<CategoryUIState> = _getMoviesByCategoryState
 
     private val _moviesByCategory = MutableStateFlow(emptyList<MovieByCategory>())
-    val moviesByCategory : StateFlow<List<MovieByCategory>> = _moviesByCategory
+    private val moviesByCategory : StateFlow<List<MovieByCategory>> = _moviesByCategory
 
     private fun getCategory(){
 
@@ -78,13 +78,9 @@ class CategoryViewModel @Inject constructor(
         when(categoryEvent){
             is CategoryEvent.GetCategory -> {getCategory()}
             is CategoryEvent.GetMoviesByCategory ->{
-                if( moviesByCategory.value.isEmpty()){
-                    getMoviesByCategory(categoryEvent.typeList)
-                    Log.d("2222"," moviesByCategory is empty")
 
-                }else{
-                    Log.d("2222"," moviesByCategory is not empty")
-                }
+                    getMoviesByCategory(categoryEvent.typeList)
+
 
             }
         }
