@@ -32,7 +32,7 @@ class FirstViewModel @Inject constructor(
 
 
 
-    fun signInWithGoogle(idToken: String) {
+    private fun signInWithGoogle(idToken: String) {
 
         viewModelScope.launch {
 
@@ -62,7 +62,7 @@ class FirstViewModel @Inject constructor(
         }
     }
 
-    fun checkLogin(){
+    private fun checkLogin(){
         viewModelScope.launch(Dispatchers.IO) {
             appUseCases.checkLoginUseCase.invoke().collect{ result ->
 

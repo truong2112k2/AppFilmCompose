@@ -71,6 +71,9 @@ fun FirstScreen(
 ) {
 
 
+
+    CustomLoadingDialog(logInWithoutPassState.isLoading)
+
     var showDialogError by rememberSaveable { mutableStateOf(false) }
     var errorText by rememberSaveable { mutableStateOf("") }
 
@@ -84,8 +87,6 @@ fun FirstScreen(
     ) {
 
         LaunchedEffect(Unit) {
-            //     firstViewModel.checkLogin()
-
             onEventClick(FirstEvent.CheckLogin)
         }
 
@@ -105,7 +106,7 @@ fun FirstScreen(
             try {
                 val account = task.getResult(ApiException::class.java)
                 account.idToken?.let {
-                    //   firstViewModel.signInWithGoogle(it)
+
                     onEventClick(FirstEvent.SignInWithGoogle(it))
 
                 }

@@ -14,6 +14,8 @@ import com.example.appfilm.domain.usecase.firebase.authentication.ResetPassUseCa
 import com.example.appfilm.domain.usecase.firebase.authentication.VerifyUseCase
 import com.example.appfilm.domain.usecase.firebase.realtime.AddFavouriteMovieUseCase
 import com.example.appfilm.domain.usecase.firebase.realtime.CheckFavouriteMovieUseCase
+import com.example.appfilm.domain.usecase.firebase.realtime.GetFavouriteMoviesUseCase
+import com.example.appfilm.domain.usecase.firebase.realtime.RemoveFavouriteMovieUseCase
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,12 +34,12 @@ data class AppUseCases @Inject constructor (
     val fetchDataAndSaveFromDbUseCase: FetchMovieAndSaveUseCase,
     val fetchCategoryUseCase: FetchCategoryUseCase,
     val fetchMoviesByCategoryUseCase: FetchMoviesByCategoryUseCase,
-
     val fetchDetailMovie : FetchDetailMovieUseCase,
 
     val addFavouriteMovieUseCase: AddFavouriteMovieUseCase,
-
     val checkFavouriteMovieUseCase: CheckFavouriteMovieUseCase,
+    val getFavouriteMoviesUseCase: GetFavouriteMoviesUseCase,
+    val removeFavouriteMovieUseCase: RemoveFavouriteMovieUseCase
 ) {
 
 

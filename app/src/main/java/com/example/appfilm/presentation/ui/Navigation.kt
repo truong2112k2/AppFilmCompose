@@ -125,15 +125,24 @@ fun Navigation(
 
             val movieSlug = backStackEntry.arguments?.getString("MovieSlug") ?: "null"
 
-            val vm = hiltViewModel<DetailViewModel>()
-            val getDetailUIState by vm.getDetailMovieState.collectAsState()
-            val detailMovie by vm.detailMovie.collectAsState()
-            val favouriteMovie by vm.addFavouriteMovieState.collectAsState()
-            val isFavourite by vm.checkFavourite.collectAsState()
+            val detailViewModel = hiltViewModel<DetailViewModel>()
+            val getDetailUIState by detailViewModel.getDetailMovieState.collectAsState()
+            val detailMovie by detailViewModel.detailMovie.collectAsState()
+            val favouriteMovie by detailViewModel.addFavouriteMovieState.collectAsState()
+            val deleteFavouriteState by detailViewModel.deleteFavouriteMovieState.collectAsState()
+            val isFavourite by detailViewModel.checkFavourite.collectAsState()
 
-            DetailMovieScreen(navController, movieSlug, getDetailUIState,favouriteMovie, isFavourite, detailMovie, onEvent = {
-                vm.onEvent(it)
-            })
+            DetailMovieScreen(
+                navController,
+                movieSlug,
+                getDetailUIState,
+                favouriteMovie,
+                deleteFavouriteState,
+                isFavourite,
+                detailMovie,
+                onEvent = {
+                    detailViewModel.onEvent(it)
+                })
 
         }
 

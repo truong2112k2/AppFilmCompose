@@ -1,11 +1,13 @@
 package com.example.appfilm.domain
 
 import com.example.appfilm.data.source.local.model.MovieDb
-import com.example.appfilm.data.source.remote.dto.category_dto.CategoryDto
 import com.example.appfilm.data.source.remote.dto.category_dto.CategoryDtoItem
 import com.example.appfilm.data.source.remote.dto.detail_dto.MovieDetailDto
 import com.example.appfilm.data.source.remote.dto.detail_dto.ServerData
+import com.example.appfilm.data.source.remote.dto.movie_dto.Imdb
 import com.example.appfilm.data.source.remote.dto.movie_dto.Item
+import com.example.appfilm.data.source.remote.dto.movie_dto.Modified
+import com.example.appfilm.data.source.remote.dto.movie_dto.Tmdb
 import com.example.appfilm.domain.model.Category
 import com.example.appfilm.domain.model.Movie
 import com.example.appfilm.domain.model.MovieByCategory
@@ -21,32 +23,32 @@ fun Item.toMovie(): Movie {
         slug = this.slug,
         thumb_url = this.thumb_url,
         year = this.year,
-        type = this.tmdb.type,
-        season = this.tmdb.season.toString(),
-        vote_average = this.tmdb.vote_average.toString(),
-        vote_count = this.tmdb.vote_count.toString(),
-        time = this.modified.time
+        type = this.tmdb?.type,
+        season = this.tmdb?.season.toString(),
+        vote_average = this.tmdb?.vote_average.toString(),
+        vote_count = this.tmdb?.vote_count.toString(),
+        time = this.modified?.time
     )
 }
 
 fun Item.toMovieDb(): MovieDb {
     return MovieDb(
-        _id = this._id,
+        _id = this._id.toString(),
         name = this.name,
         origin_name = this.origin_name,
         poster_url = this.poster_url,
         slug = this.slug,
         thumb_url = this.thumb_url,
         year = this.year,
-        type = this.tmdb.type,
-        season = this.tmdb.season.toString(),
-        vote_average = this.tmdb.vote_average.toString(),
-        vote_count = this.tmdb.vote_count.toString(),
-        time = this.modified.time
+        type = this.tmdb?.type,
+        season = this.tmdb?.season.toString(),
+        vote_average = this.tmdb?.vote_average.toString(),
+        vote_count = this.tmdb?.vote_count.toString(),
+        time = this.modified?.time
     )
 }
 
-fun MovieDb.toMovie(): Movie{
+fun MovieDb.toMovie(): Movie {
     return Movie(
         _id = this._id,
         name = this.name,
@@ -64,15 +66,28 @@ fun MovieDb.toMovie(): Movie{
     )
 }
 
+fun Movie.toItem(): Item {
+    return Item(
+        _id = this._id.toString(),
+        name =this.name.toString(),
+        origin_name =this.origin_name.toString(),
+        poster_url = this.poster_url.toString(),
+        slug = this.slug.toString(),
+        thumb_url = this.thumb_url.toString(),
+        year = this.year?.toInt() ?: 0,
 
-fun CategoryDtoItem.toCategory(): Category{
-    return Category(
-        _id = this._id,
-        name =  this.name,
-        slug = this.slug
     )
 }
 
+
+
+fun CategoryDtoItem.toCategory(): Category {
+    return Category(
+        _id = this._id,
+        name = this.name,
+        slug = this.slug
+    )
+}
 
 
 fun com.example.appfilm.data.source.remote.dto.movie_catgory_dto.Item.toMovieByCategory(): MovieByCategory {
@@ -86,17 +101,17 @@ fun com.example.appfilm.data.source.remote.dto.movie_catgory_dto.Item.toMovieByC
 }
 
 
-fun ServerData.toEpisodeMovie() : EpisodeMovie{
+fun ServerData.toEpisodeMovie(): EpisodeMovie {
     return EpisodeMovie(
         filename = this.filename,
         link_embed = this.link_embed,
         link_m3u8 = this.link_m3u8,
-        name =  this.name,
+        name = this.name,
         slug = this.slug
     )
 }
 
-fun MovieDetailDto.toMovieDetail() : MovieDetail {
+fun MovieDetailDto.toMovieDetail(): MovieDetail {
 
     val listCategory = this.movie.category.map {
         it.name.toString()
@@ -134,7 +149,7 @@ fun MovieDetailDto.toMovieDetail() : MovieDetail {
         type = this.movie.type,
         year = this.movie.year,
         vote_average = this.movie.tmdb.vote_average.toInt(),
-        listEpisodeMovie =  listEpisode,
+        listEpisodeMovie = listEpisode,
     )
 }
 

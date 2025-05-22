@@ -3,6 +3,7 @@ package com.example.appfilm.presentation.ui.detail.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.appfilm.common.Constants
 import com.example.appfilm.common.Resource
 import com.example.appfilm.domain.model.detail_movie.MovieDetail
@@ -107,6 +108,7 @@ class DetailViewModel @Inject constructor(
 
         val movie = movieDetail.toMovie()
         viewModelScope.launch(Dispatchers.IO) {
+            _deleteFavouriteMovieState.value = DetailUiState()
 
             appUseCases.addFavouriteMovieUseCase.invoke(movie).collect { result ->
 
@@ -134,7 +136,7 @@ class DetailViewModel @Inject constructor(
     private val _checkFavourite = MutableStateFlow<Boolean>(false)
     val checkFavourite: StateFlow<Boolean> = _checkFavourite.asStateFlow()
 
-    fun checkFavouriteMovie(movieId: String) {
+    private fun checkFavouriteMovie(movieId: String) {
 
         Log.d("kkkk", "id Movie in checkFavouriteMovie  ${movieId.toString()}")
 
@@ -152,14 +154,34 @@ class DetailViewModel @Inject constructor(
 
         }
     }
+    private val _deleteFavouriteMovieState = MutableStateFlow<DetailUiState>(DetailUiState())
+    val deleteFavouriteMovieState: StateFlow<DetailUiState> = _deleteFavouriteMovieState.asStateFlow()
+
+    private fun deleteFavouriteMovie(movieId: String){
+        _addFavouriteMovieState.value = DetailUiState()
+
+        viewModelScope.launch {
+            appUseCases.removeFavouriteMovieUseCase.invoke(movieId).collect{
+
+                _deleteFavouriteMovieState.value = when(it){
+                    is Resource.Loading -> {DetailUiState(isLoading = true)}
+
+                    is Resource.Error ->  {DetailUiState(error = it.message)}
+
+                    is Resource.Success ->  {DetailUiState(isSuccess = true)}
+                }
+            }
+        }
+
+    }
+
     fun onEvent(action: DetailEvent) {
         when (action) {
             is DetailEvent.GetDetail -> getDetailMovie(action.slug)
             is DetailEvent.ReTry -> retryGetDetailMovie(action.slug)
             is DetailEvent.AddFavouriteMovie -> addFavouriteMovie(action.movieDetail)
             is DetailEvent.CheckFavouriteMovie -> {checkFavouriteMovie(action.movieID)}
-
-
+            is DetailEvent.DeleteFavouriteMovie -> {deleteFavouriteMovie(action.movieId)}
         }
     }
 }

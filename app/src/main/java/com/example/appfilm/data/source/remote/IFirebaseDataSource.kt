@@ -1,8 +1,7 @@
 package com.example.appfilm.data.source.remote
 
 import com.example.appfilm.common.Resource
-import com.example.appfilm.data.source.remote.dto.movie_dto.MovieDto
-import com.example.appfilm.domain.model.Movie
+import com.example.appfilm.data.source.remote.dto.movie_dto.Item
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import kotlinx.coroutines.flow.Flow
 
@@ -15,7 +14,9 @@ interface IFirebaseDataSource {
     suspend fun firebaseLogOutAccount(  googleSignInClient: GoogleSignInClient): Flow<Resource<Boolean>>
     suspend fun checkUseLoginAndVerify(): Flow<Resource<Unit>>
 
-    suspend fun addFavoriteMovie(movie: Movie):Flow<Resource<Unit>>
-    suspend fun getFavoriteMovies(): Flow<Resource<List<MovieDto>>>
+    suspend fun addFavoriteMovie(movie: Item):Flow<Resource<Unit>>
+    suspend fun removeFavoriteMovie(movieId: String): Flow<Resource<Unit>>
     suspend fun isFavorite(movieId: String): Resource<Boolean>
+
+    suspend fun getFavouriteMovies(): Flow<Resource<List<Item>>>
 }

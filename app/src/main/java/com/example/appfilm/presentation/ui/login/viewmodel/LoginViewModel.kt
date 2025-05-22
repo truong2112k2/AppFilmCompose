@@ -35,30 +35,30 @@ class LoginViewModel @Inject constructor(
     var logInFields by mutableStateOf(LoginFields())
 
 
-    fun updateIsShowEmailDialog(newValue: Boolean) {
+    private  fun updateIsShowEmailDialog(newValue: Boolean) {
         logInFields = logInFields.copy(
             isShowSendEmailDialog = newValue
         )
     }
 
-    fun updateErrorTextLogin(newError: String) {
+    private fun updateErrorTextLogin(newError: String) {
         logInFields = logInFields.copy(
             errorTextLogin = newError
         )
     }
 
-    fun updateErrorTextSendEmail(newError: String) {
+    private fun updateErrorTextSendEmail(newError: String) {
         logInFields = logInFields.copy(
             errorTextSendEmail = newError
         )
     }
 
 
-    fun updateEmail(newEmail: String) {
+    private fun updateEmail(newEmail: String) {
         logInFields = logInFields.copy(inputEmail = newEmail)
     }
 
-    fun updatePassword(newPassword: String) {
+    private  fun updatePassword(newPassword: String) {
         logInFields = logInFields.copy(inputPassword = newPassword)
     }
 
@@ -117,7 +117,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun resendEmail() {
+    private fun resendEmail() {
 
         viewModelScope.launch {
             Log.d(Constants.STATUS_TAG, "Resend email verification started")
