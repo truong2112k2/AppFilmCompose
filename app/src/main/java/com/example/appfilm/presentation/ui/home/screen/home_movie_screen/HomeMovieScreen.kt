@@ -67,11 +67,10 @@ fun HomeMovieScreen(
 ) {
 
 
-    var isShowSeeMore by rememberSaveable { mutableStateOf(false) }
 
 
 
-    var errorAddFavourite by rememberSaveable {  mutableStateOf<String?>(null)  }
+ //   var errorAddFavourite by rememberSaveable {  mutableStateOf<String?>(null)  }
 
 
 
@@ -175,24 +174,7 @@ fun HomeMovieScreen(
         }
 
 
-        var isShowDialogConfirm by rememberSaveable { mutableStateOf(false) }
-
-
-
-        if (isShowDialogConfirm) {
-            AlertDialog(
-                onDismissRequest = {isShowDialogConfirm = false},
-                title = {
-                    Text(text = errorAddFavourite.toString())
-                },
-                confirmButton = {
-                    TextButton(onClick = {isShowDialogConfirm = false }) {
-                        Text("Ok")
-                    }
-                },
-
-            )
-        }
+//
 
 
 

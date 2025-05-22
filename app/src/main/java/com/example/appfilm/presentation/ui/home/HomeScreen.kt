@@ -40,6 +40,7 @@ import com.example.appfilm.presentation.ui.CustomConfirmDialog
 import com.example.appfilm.presentation.ui.home.NavigationDrawerItem.Favorite.drawerScreenSaver
 import com.example.appfilm.presentation.ui.home.components.CustomDrawerContent
 import com.example.appfilm.presentation.ui.home.screen.favourite_movie_screen.FavouriteMovieScreen
+import com.example.appfilm.presentation.ui.home.screen.favourite_movie_screen.viewmodel.FavouriteViewModel
 import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.HomeMovieScreen
 import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.viewmodel.HomeMovieViewModel
 import com.example.appfilm.presentation.ui.home.screen.search_movie_screen.SearchMovieScreen
@@ -106,6 +107,11 @@ fun HomeScreen(
     val movies by homeMovieViewModel.movies.collectAsState()
 
 
+    val favouriteViewModel = hiltViewModel<FavouriteViewModel>()
+    val getFavouriteMovieUiState by favouriteViewModel.getMoviesFavouriteState.collectAsState()
+    val listFavouriteMovies by favouriteViewModel.listMovies.collectAsState()
+
+
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -137,7 +143,7 @@ fun HomeScreen(
 
             TopAppBar(
                 title = {
-                    Text(selectedScreen.title) //         }
+                    Text(selectedScreen.title)
 
                 },
                 navigationIcon = {
@@ -186,7 +192,16 @@ fun HomeScreen(
                             homeMovieViewModel.handleEvent(it)
                         })
 
-                    is NavigationDrawerItem.Favorite -> FavouriteMovieScreen()
+                    is NavigationDrawerItem.Favorite -> FavouriteMovieScreen(
+                        navController,
+                        getFavouriteMovieUiState,
+                        listFavouriteMovies,
+                        onEvent = {
+                            favouriteViewModel.handleEvent(it)},
+                        onClickPickMovie = {
+                            selectedScreen = NavigationDrawerItem.Home
+
+                        })
                     is NavigationDrawerItem.Search -> SearchMovieScreen()
                 }
             }

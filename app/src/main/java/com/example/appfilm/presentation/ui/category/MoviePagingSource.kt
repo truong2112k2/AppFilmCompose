@@ -15,7 +15,7 @@ class MoviePagingSource (
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieByCategory> {
         return try {
             val currentPage = params.key ?: 1
-            val response = appUseCases.fetchMoviesByCategoryUseCase.invoke(typeList, currentPage, 16)
+            val response = appUseCases.fetchMoviesByCategoryUseCase.invoke(typeList, currentPage, 10)
 
             Log.d("MoviePagingSource", "Page = $currentPage, Size = ${params.loadSize}, Result = ${response.data?.size}")
 

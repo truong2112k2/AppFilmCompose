@@ -1,7 +1,6 @@
 package com.example.appfilm.domain.repository
 
 import com.example.appfilm.common.Resource
-import com.example.appfilm.data.source.remote.dto.movie_dto.MovieDto
 import com.example.appfilm.domain.model.Movie
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import kotlinx.coroutines.flow.Flow
@@ -17,6 +16,8 @@ interface IFirebase {
 
 
     suspend fun addFavoriteMovie(movie: Movie):Flow<Resource<Unit>>
-    suspend fun getFavoriteMovies(): Flow<Resource<List<Movie>>>
     suspend fun isFavorite(movieId: String): Resource<Boolean>
+    suspend fun getFavouriteMovies(): Flow<Resource<List<Movie>>>
+    suspend fun removeFavoriteMovie(movieId: String): Flow<Resource<Unit>>
+
 }

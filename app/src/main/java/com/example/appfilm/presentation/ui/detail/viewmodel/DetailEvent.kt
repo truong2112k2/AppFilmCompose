@@ -9,5 +9,5 @@ sealed class DetailEvent {
     data class GetDetail(val slug: String) : DetailEvent()
     data class AddFavouriteMovie(val movieDetail: MovieDetail): DetailEvent()
     data class CheckFavouriteMovie(val movieID: String): DetailEvent()
-
+    data class DeleteFavouriteMovie(val movieId: String): DetailEvent()
 }

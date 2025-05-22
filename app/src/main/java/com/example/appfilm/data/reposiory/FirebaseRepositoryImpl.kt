@@ -4,10 +4,11 @@ import com.example.appfilm.common.Resource
 import com.example.appfilm.data.source.remote.IFirebaseDataSource
 import com.example.appfilm.domain.model.Movie
 import com.example.appfilm.domain.repository.IFirebase
+import com.example.appfilm.domain.toItem
 import com.example.appfilm.domain.toMovie
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -44,40 +45,30 @@ class FirebaseRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addFavoriteMovie(movie: Movie): Flow<Resource<Unit>> {
-        return firebaseDataSource.addFavoriteMovie(movie)
+
+        return firebaseDataSource.addFavoriteMovie(movie.toItem())
     }
 
-
-    override suspend fun getFavoriteMovies(): Flow<Resource<List<Movie>>> = flow {
-
-        firebaseDataSource.getFavoriteMovies().collect { result ->
-            when (result) {
-                is Resource.Success -> {
-                    result.data?.map { movieDto ->
-                        val list = movieDto.items.map { item ->
-                            item.toMovie()
-                        }
-
-                        emit(Resource.Success(list))
-                    }
-
-                }
-
-                is Resource.Error -> {
-                    emit(Resource.Error(result.message.toString()))
-                }
-
-                is Resource.Loading -> {
-                    emit(Resource.Loading())
-                }
-            }
-
-        }
-
-
-    }
 
     override suspend fun isFavorite(movieId: String): Resource<Boolean> {
         return firebaseDataSource.isFavorite(movieId)
+    }
+
+    override suspend fun getFavouriteMovies(): Flow<Resource<List<Movie>>> {
+        return firebaseDataSource.getFavouriteMovies()
+            .map { result ->
+                when (result) {
+                    is Resource.Loading -> Resource.Loading()
+                    is Resource.Error -> Resource.Error(result.message ?: "Unknown error")
+                    is Resource.Success -> {
+                        val data = result.data?.map { it.toMovie() } ?: emptyList()
+                        Resource.Success(data)
+                    }
+                }
+            }
+    }
+
+    override suspend fun removeFavoriteMovie(movieId: String): Flow<Resource<Unit>> {
+        return firebaseDataSource.removeFavoriteMovie(movieId)
     }
 }
