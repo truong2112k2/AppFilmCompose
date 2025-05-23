@@ -1,0 +1,25 @@
+package com.example.appfilm.data.source.remote.dto.search_dto
+
+data class Item(
+    val _id: String,
+    val category: List<Category>,
+    val chieurap: Boolean,
+    val country: List<Country>,
+    val created: Created,
+    val episode_current: String,
+    val imdb: Imdb,
+    val lang: String,
+    val modified: Modified,
+    val name: String,
+    val origin_name: String,
+    val poster_url: String,
+    val quality: String,
+    val slug: String,
+    val sub_docquyen: Boolean,
+    val thumb_url: String,
+    val time: String,
+    val tmdb: Tmdb,
+    val type: String,
+    val year: Int
+)
+

@@ -8,9 +8,9 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class NavigationDrawerItem(val title: String, val icon: ImageVector) {
-    object Home : NavigationDrawerItem(title ="Home", icon = Icons.Default.Home)
-    object Favorite : NavigationDrawerItem(title ="Favorite",icon =  Icons.Default.Favorite)
-    object Search : NavigationDrawerItem(title = "Search", icon = Icons.Default.Search)
+    data object Home : NavigationDrawerItem(title ="Home", icon = Icons.Default.Home)
+    data object Favorite : NavigationDrawerItem(title ="Favorite",icon =  Icons.Default.Favorite)
+    data object Search : NavigationDrawerItem(title = "Search", icon = Icons.Default.Search)
 
     companion object {
         fun fromTitle(title: String): NavigationDrawerItem {

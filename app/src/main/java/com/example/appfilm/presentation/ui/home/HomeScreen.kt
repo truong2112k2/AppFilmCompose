@@ -44,6 +44,7 @@ import com.example.appfilm.presentation.ui.home.screen.favourite_movie_screen.vi
 import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.HomeMovieScreen
 import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.viewmodel.HomeMovieViewModel
 import com.example.appfilm.presentation.ui.home.screen.search_movie_screen.SearchMovieScreen
+import com.example.appfilm.presentation.ui.home.screen.search_movie_screen.viewmodel.SearchMovieViewModel
 import com.example.appfilm.presentation.ui.home.viewmodel.HomeEvent
 import com.example.appfilm.presentation.ui.home.viewmodel.HomeUIState
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -111,6 +112,11 @@ fun HomeScreen(
     val getFavouriteMovieUiState by favouriteViewModel.getMoviesFavouriteState.collectAsState()
     val listFavouriteMovies by favouriteViewModel.listMovies.collectAsState()
 
+
+    val searchMovieViewModel = hiltViewModel<SearchMovieViewModel>()
+    val searchMovieState by searchMovieViewModel.searchMoviesState.collectAsState()
+    val listMovieSearch by searchMovieViewModel.listMovieSearch.collectAsState()
+    val listMovie by searchMovieViewModel.listMovie.collectAsState()
 
 
     ModalNavigationDrawer(
@@ -197,12 +203,23 @@ fun HomeScreen(
                         getFavouriteMovieUiState,
                         listFavouriteMovies,
                         onEvent = {
-                            favouriteViewModel.handleEvent(it)},
+                            favouriteViewModel.handleEvent(it)
+                        },
                         onClickPickMovie = {
                             selectedScreen = NavigationDrawerItem.Home
 
                         })
-                    is NavigationDrawerItem.Search -> SearchMovieScreen()
+
+                    is NavigationDrawerItem.Search -> SearchMovieScreen(
+                        navController,
+                        searchMovieState,
+                        listMovie,
+                        listMovieSearch,
+                        onEventClick = {
+                            searchMovieViewModel.handleEvent(it )
+                        }
+
+                    )
                 }
             }
 

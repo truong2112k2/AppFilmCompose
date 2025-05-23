@@ -4,13 +4,11 @@ import com.example.appfilm.data.source.local.model.MovieDb
 import com.example.appfilm.data.source.remote.dto.category_dto.CategoryDtoItem
 import com.example.appfilm.data.source.remote.dto.detail_dto.MovieDetailDto
 import com.example.appfilm.data.source.remote.dto.detail_dto.ServerData
-import com.example.appfilm.data.source.remote.dto.movie_dto.Imdb
 import com.example.appfilm.data.source.remote.dto.movie_dto.Item
-import com.example.appfilm.data.source.remote.dto.movie_dto.Modified
-import com.example.appfilm.data.source.remote.dto.movie_dto.Tmdb
 import com.example.appfilm.domain.model.Category
 import com.example.appfilm.domain.model.Movie
 import com.example.appfilm.domain.model.MovieByCategory
+import com.example.appfilm.domain.model.MovieBySearch
 import com.example.appfilm.domain.model.detail_movie.EpisodeMovie
 import com.example.appfilm.domain.model.detail_movie.MovieDetail
 
@@ -69,16 +67,15 @@ fun MovieDb.toMovie(): Movie {
 fun Movie.toItem(): Item {
     return Item(
         _id = this._id.toString(),
-        name =this.name.toString(),
-        origin_name =this.origin_name.toString(),
+        name = this.name.toString(),
+        origin_name = this.origin_name.toString(),
         poster_url = this.poster_url.toString(),
         slug = this.slug.toString(),
         thumb_url = this.thumb_url.toString(),
         year = this.year?.toInt() ?: 0,
 
-    )
+        )
 }
-
 
 
 fun CategoryDtoItem.toCategory(): Category {
@@ -168,6 +165,30 @@ fun MovieDetail.toMovie(): Movie {
         vote_count = null, // Không có trong MovieDetail, để null
         time = null, // Không có trong MovieDetail, để null
         localPosterPath = null // Dữ liệu local, không có trong MovieDetail
+    )
+}
+
+
+fun com.example.appfilm.data.source.remote.dto.search_dto.Item.toMovieBySearch(): MovieBySearch {
+    return MovieBySearch(
+        _id = this._id,
+        category = this.category.map { it.name.toString() },
+        chieurap = this.chieurap,
+        country = this.country.map { it.name.toString() },
+        episode_current = this.episode_current,
+        lang = this.lang,
+        name = this.name,
+        origin_name = this.origin_name,
+        poster_url = this.poster_url,
+        quality = this.quality,
+        slug = this.slug,
+        sub_docquyen = this.sub_docquyen,
+        thumb_url = this.thumb_url,
+        time = this.time,
+        vote_average = this.tmdb.vote_average,
+        vote_count = this.tmdb.vote_count,
+        type = this.type,
+        year = this.year
     )
 }
 

@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -21,15 +22,14 @@ import javax.inject.Inject
 @HiltViewModel
 class FirstViewModel @Inject constructor(
     private val appUseCases: AppUseCases
-) : ViewModel(){
+) : ViewModel() {
 
 
     private val _loginWithoutPassState = MutableStateFlow<FirstUiState>(FirstUiState())
     val loginWithoutPassState: StateFlow<FirstUiState> = _loginWithoutPassState
 
     private val _checkLoginState = MutableStateFlow<FirstUiState>(FirstUiState())
-    val checkLoginState : StateFlow<FirstUiState> = _checkLoginState
-
+    val checkLoginState: StateFlow<FirstUiState> = _checkLoginState
 
 
     private fun signInWithGoogle(idToken: String) {
@@ -37,62 +37,69 @@ class FirstViewModel @Inject constructor(
         viewModelScope.launch {
 
 
-            appUseCases.logInWithoutPassUseCase.invoke(idToken).collect{ result->
+            appUseCases.logInWithoutPassUseCase.invoke(idToken).collect { result ->
 
-                 _loginWithoutPassState.value = when(result){
+                _loginWithoutPassState.value = when (result) {
 
-                     is Resource.Loading -> {
-                         Log.d("LoginWithoutMail", "loading")
+                    is Resource.Loading -> {
+                        Log.d("FirstViewModel", "LoginWithoutMail loading")
 
-                         FirstUiState(isLoading = true)
-                     }
+                        FirstUiState(isLoading = true)
+                    }
 
-                     is Resource.Success -> {
-                         Log.d("LoginWithoutMail", "success LoginWithoutMail ")
+                    is Resource.Success -> {
+                        Log.d("FirstViewModel", "LoginWithoutMail success ")
 
-                         FirstUiState(isSuccess = true)
-                     }
+                        FirstUiState(isSuccess = true)
+                    }
 
-                     is Resource.Error -> {
-                         Log.d("LoginWithoutMail", result.message.toString())
-                         FirstUiState(error = convertLoginGoogleException(result.exception ?: Exception()))
-                     }
-                 }
-             }
+                    is Resource.Error -> {
+                        Log.d("FirstViewModel", "LoginWithoutMail ${result.message.toString()}")
+                        FirstUiState(
+                            error = convertLoginGoogleException(
+                                result.exception ?: Exception()
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 
-    private fun checkLogin(){
+    private fun checkLogin() {
         viewModelScope.launch(Dispatchers.IO) {
-            appUseCases.checkLoginUseCase.invoke().collect{ result ->
+            _checkLoginState.value = FirstUiState(isLoading = true)
 
-                _checkLoginState.value = when(result) {
+            delay(3000)
+            appUseCases.checkLoginUseCase.invoke().collect { result ->
+
+                _checkLoginState.value = when (result) {
                     is Resource.Loading -> {
-                        Log.d("CheckLogin", "Load")
+                        Log.d("FirstViewModel", "checkLogin Loading")
 
                         FirstUiState(isLoading = true)
 
                     }
+
                     is Resource.Success -> {
 
 
-                        Log.d("CheckLogin","Success")
+                        Log.d("FirstViewModel", "checkLogin Success")
 
                         FirstUiState(isSuccess = true)
                     }
+
                     is Resource.Error -> {
-                        Log.d("CheckLogin", "Not ok")
+                        Log.d("FirstViewModel", "CheckLogin failed")
 
                         FirstUiState(error = result.message)
 
                     }
 
-            }
+                }
 
 
             }
-
-
 
 
         }
@@ -111,18 +118,23 @@ class FirstViewModel @Inject constructor(
                 12501 -> "Sign-in was cancelled."
                 else -> "Google Sign-In failed with error code: ${e.statusCode}"
             }
+
             else -> e.localizedMessage ?: "An unknown error has occurred."
         }
     }
 
 
-    fun handleEvent(firstEvent: FirstEvent){
-        when(firstEvent){
-            is FirstEvent.CheckLogin ->{ checkLogin()}
-            is FirstEvent.SignInWithGoogle -> {signInWithGoogle(firstEvent.idToken)}
+    fun handleEvent(firstEvent: FirstEvent) {
+        when (firstEvent) {
+            is FirstEvent.CheckLogin -> {
+                checkLogin()
+            }
+
+            is FirstEvent.SignInWithGoogle -> {
+                signInWithGoogle(firstEvent.idToken)
+            }
         }
     }
-
 
 
 }
