@@ -9,9 +9,9 @@ import javax.inject.Singleton
 
 @Singleton
 class FetchCategoryUseCase @Inject constructor(
-    private val movieRepository : IApiMovie
+    private val movieRepository: IApiMovie
 ) {
-    suspend fun fetchCategory() : Resource<List<Category>>{
+    suspend fun fetchCategory(): Resource<List<Category>> {
         return movieRepository.fetchCategory()
     }
 

@@ -10,9 +10,14 @@ import com.example.appfilm.domain.model.detail_movie.MovieDetail
 
 interface IApiMovie {
     suspend fun fetchDataMovieAndSaveFromDb(context: Context, page: Int): Resource<List<Movie>>
-    suspend fun fetchCategory() : Resource<List<Category>>
-    suspend fun fetchMoviesByCategory(category: String, page: Int, limit: Int ) : Resource<List<MovieByCategory>>
-    suspend fun getDetailMovie(slug: String) : Resource<MovieDetail>
-    suspend fun searchMovies(keyword: String) : Resource<List<MovieBySearch>>
+    suspend fun fetchCategory(): Resource<List<Category>>
+    suspend fun fetchMoviesByCategory(
+        category: String,
+        page: Int,
+        limit: Int
+    ): Resource<List<MovieByCategory>>
+
+    suspend fun getDetailMovie(slug: String): Resource<MovieDetail>
+    suspend fun searchMovies(keyword: String): Resource<List<MovieBySearch>>
 
 }

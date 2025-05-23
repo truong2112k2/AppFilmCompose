@@ -15,10 +15,12 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
+
 private const val URL_BASE = "https://phimapi.com/"
+
 /// https://phimapi.com/the-loai
 @Module
-@InstallIn(SingletonComponent ::class)
+@InstallIn(SingletonComponent::class)
 object AppModule {
 
 
@@ -34,7 +36,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideMovieApiService(retrofit: Retrofit): MovieApiService {
-        return retrofit.create(MovieApiService :: class.java)
+        return retrofit.create(MovieApiService::class.java)
     }
 
     //firebase authentication
@@ -47,9 +49,10 @@ object AppModule {
     // firebase realtime
     @Singleton
     @Provides
-    fun provideFirebaseRealtime () : FirebaseDatabase{
+    fun provideFirebaseRealtime(): FirebaseDatabase {
         return FirebaseDatabase.getInstance()
     }
+
     ///database
     @Provides
     @Singleton

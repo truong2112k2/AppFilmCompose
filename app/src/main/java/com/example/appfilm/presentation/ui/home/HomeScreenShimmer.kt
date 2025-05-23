@@ -64,7 +64,7 @@ fun HomeScreenShimmer() {
         )
         Spacer(Modifier.height(4.dp))
 
-        LazyRow() {
+        LazyRow {
             items(20) {
                 Text(
                     "", modifier =

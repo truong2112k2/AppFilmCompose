@@ -1,13 +1,21 @@
 package com.example.appfilm.presentation.ui.detail
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.placeholder
 import com.google.accompanist.placeholder.shimmer
-import java.net.URLEncoder
 
 @Composable
 fun DetailMovieShimmer() {
@@ -48,7 +55,7 @@ fun DetailMovieShimmer() {
                 .fillMaxSize()
                 .background(Color(0xFF101018))
                 .padding(16.dp)
-        ){
+        ) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Tiêu đề
@@ -72,7 +79,7 @@ fun DetailMovieShimmer() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Nội dung mô tả
+
             repeat(4) {
                 Surface(
                     modifier = Modifier
@@ -93,24 +100,29 @@ fun DetailMovieShimmer() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Text: "Tập phim"
+
 
             Row(
-                modifier = Modifier.fillMaxWidth().placeholder(
-                    visible = true,
-                    highlight = PlaceholderHighlight.shimmer(highlightColor = Color.White),
-                    color = Color.DarkGray
-                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .placeholder(
+                        visible = true,
+                        highlight = PlaceholderHighlight.shimmer(highlightColor = Color.White),
+                        color = Color.DarkGray
+                    ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("", color = Color.White)
-                Divider(modifier = Modifier.weight(1f).height(1.dp))
+                HorizontalDivider(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(1.dp)
+                )
             }
 
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Danh sách tập phim (shimmer)
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
@@ -136,11 +148,11 @@ fun DetailMovieShimmer() {
                         tonalElevation = 3.dp,
                         shadowElevation = 6.dp,
                         color = Color.Transparent
-                    ){
+                    ) {
 
                     }
                 }
-        }
+            }
 
         }
 

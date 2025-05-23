@@ -12,14 +12,11 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
-
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -38,18 +35,18 @@ class FirebaseDataSource @Inject constructor(
         if (user != null) {
             Log.d(
                 Constants.STATUS_TAG,
-                "Email just logged in ${user.email} - Verify: ${user.isEmailVerified.toString()}"
+                "Email just logged in ${user.email} - Verify: ${user.isEmailVerified}"
             )
         }
 
-            try {
-                firebaseAuth.signInWithEmailAndPassword(email, password).await()
-                val isVerified = firebaseAuth.currentUser?.isEmailVerified == true
-                emit(Resource.Success(isVerified))
-            } catch (e: Exception) {
-                emit(Resource.Error(e.message ?: "Login Failed", e))
+        try {
+            firebaseAuth.signInWithEmailAndPassword(email, password).await()
+            val isVerified = firebaseAuth.currentUser?.isEmailVerified == true
+            emit(Resource.Success(isVerified))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "Login Failed", e))
 
-            }
+        }
 
 
     }
@@ -62,7 +59,7 @@ class FirebaseDataSource @Inject constructor(
             if (user != null) {
                 Log.d(
                     Constants.STATUS_TAG,
-                    "email just registered is ${user.email} - Verify: ${user.isEmailVerified.toString()}"
+                    "email just registered is ${user.email} - Verify: ${user.isEmailVerified}"
                 )
             }
 
@@ -117,7 +114,7 @@ class FirebaseDataSource @Inject constructor(
         if (user != null) {
             Log.d(
                 Constants.STATUS_TAG,
-                "Email just logged in ${user.email} - Verify: ${user.isEmailVerified.toString()}"
+                "Email just logged in ${user.email} - Verify: ${user.isEmailVerified}"
             )
         }
 
@@ -190,7 +187,6 @@ class FirebaseDataSource @Inject constructor(
     }
 
 
-
     override suspend fun isFavorite(movieId: String): Resource<Boolean> {
         val userId = firebaseAuth.currentUser?.uid
         return try {
@@ -216,28 +212,28 @@ class FirebaseDataSource @Inject constructor(
             return@callbackFlow
         }
 
-            trySend(Resource.Loading())
+        trySend(Resource.Loading())
 
-            val ref = firebaseDatabase.getReference("FAVORITE_MOVIES").child(userId)
+        val ref = firebaseDatabase.getReference("FAVORITE_MOVIES").child(userId)
 
-            val listener = object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val movies = snapshot.children.mapNotNull {
-                        it.getValue(Item::class.java)
-                    }
-                    trySend(Resource.Success(movies))
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val movies = snapshot.children.mapNotNull {
+                    it.getValue(Item::class.java)
                 }
-
-                override fun onCancelled(error: DatabaseError) {
-                    trySend(Resource.Error("Database error: ${error.message}"))
-                }
+                trySend(Resource.Success(movies))
             }
 
-            ref.addValueEventListener(listener)
-
-            awaitClose {
-                ref.removeEventListener(listener)
+            override fun onCancelled(error: DatabaseError) {
+                trySend(Resource.Error("Database error: ${error.message}"))
             }
+        }
+
+        ref.addValueEventListener(listener)
+
+        awaitClose {
+            ref.removeEventListener(listener)
+        }
 
     }
 
@@ -267,4 +263,21 @@ class FirebaseDataSource @Inject constructor(
         }
     }
 
+    override suspend fun isFavoriteNewMovies(movieId: String): Flow<Resource<Boolean>> = flow {
+        emit(Resource.Loading())
+        val userId = firebaseAuth.currentUser?.uid
+         try {
+            val snapshot =
+                firebaseDatabase.getReference("FAVORITE_MOVIES")
+                    .child(userId.toString())
+                    .child(movieId)
+                    .get()
+                    .await()
+
+            emit(Resource.Success(snapshot.exists()))
+
+        } catch (e: Exception) {
+             emit(Resource.Error("Check favourite movies failed: ${e.message}"))
+        }
+    }
 }

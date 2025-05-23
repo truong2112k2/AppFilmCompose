@@ -3,7 +3,7 @@ package com.example.appfilm.common
 import com.example.appfilm.R
 
 object Background {
-   private val backgrounds = listOf(
+    private val backgrounds = listOf(
         R.drawable.background_1,
         R.drawable.background_2,
         R.drawable.background_3,

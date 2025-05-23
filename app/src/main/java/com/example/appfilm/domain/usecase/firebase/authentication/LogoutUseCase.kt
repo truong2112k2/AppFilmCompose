@@ -11,10 +11,10 @@ import javax.inject.Singleton
 @Singleton
 class LogoutUseCase @Inject constructor(
     private val firebaseRepository: IFirebase
-){
+) {
 
-    suspend operator fun invoke(googleSignInClient: GoogleSignInClient): Flow<Resource<Boolean>>{
-       return firebaseRepository.firebaseLogOutAccount(googleSignInClient)
+    suspend operator fun invoke(googleSignInClient: GoogleSignInClient): Flow<Resource<Boolean>> {
+        return firebaseRepository.firebaseLogOutAccount(googleSignInClient)
     }
 
 }

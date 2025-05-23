@@ -8,4 +8,4 @@ data class LoginFields(
     val isShowSendEmailDialog: Boolean = false,
 
 
-)
+    )

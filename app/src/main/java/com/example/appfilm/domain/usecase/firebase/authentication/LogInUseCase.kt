@@ -9,9 +9,9 @@ import javax.inject.Singleton
 
 @Singleton
 class LogInUseCase @Inject constructor(
-  private val firebaseRepository: IFirebase
+    private val firebaseRepository: IFirebase
 ) {
-    suspend operator fun invoke(email: String, password: String): Flow<Resource<Boolean>>{
+    suspend operator fun invoke(email: String, password: String): Flow<Resource<Boolean>> {
         return firebaseRepository.firebaseLogin(email, password)
     }
 }

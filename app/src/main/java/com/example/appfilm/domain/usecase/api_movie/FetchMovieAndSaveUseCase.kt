@@ -10,10 +10,10 @@ import javax.inject.Singleton
 
 @Singleton
 class FetchMovieAndSaveUseCase @Inject constructor(
-    private val movieRepository : IApiMovie
+    private val movieRepository: IApiMovie
 ) {
     suspend fun fetchDataMovieAndSaveFromDb(context: Context, page: Int): Resource<List<Movie>> {
-        return movieRepository.fetchDataMovieAndSaveFromDb( context, page)
+        return movieRepository.fetchDataMovieAndSaveFromDb(context, page)
     }
 
 }

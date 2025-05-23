@@ -24,8 +24,6 @@ import javax.inject.Singleton
 
 @Singleton
 class ApiMovieRepositoryImpl @Inject constructor(
-
-
     private val apiMovieDataSource: ApiMovieDataSource,
     private val databaseDataSource: IDatabaseDataSource
 
@@ -160,7 +158,10 @@ class ApiMovieRepositoryImpl @Inject constructor(
         return when (val searchMovie = apiMovieDataSource.searchMovies(keyword)) {
             is Resource.Success -> {
                 movies = searchMovie.data?.data?.items?.map { it.toMovieBySearch() } ?: emptyList()
-                Log.d(Constants.STATUS_TAG, "search movies by ApiMovieRepositoryImpl success ${movies.size}")
+                Log.d(
+                    Constants.STATUS_TAG,
+                    "search movies by ApiMovieRepositoryImpl success ${movies.size}"
+                )
 
                 Resource.Success(movies)
             }

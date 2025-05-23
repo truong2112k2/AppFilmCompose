@@ -3,12 +3,12 @@ package com.example.appfilm.presentation.ui.detail.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.appfilm.common.Constants
 import com.example.appfilm.common.Resource
 import com.example.appfilm.domain.model.detail_movie.MovieDetail
 import com.example.appfilm.domain.toMovie
 import com.example.appfilm.domain.usecase.AppUseCases
+import com.example.appfilm.presentation.ui.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,8 +23,8 @@ class DetailViewModel @Inject constructor(
     private val appUseCases: AppUseCases
 ) : ViewModel() {
 
-    private val _getDetailMovieState = MutableStateFlow<DetailUiState>(DetailUiState())
-    val getDetailMovieState: StateFlow<DetailUiState> = _getDetailMovieState.asStateFlow()
+    private val _getDetailMovieState = MutableStateFlow<UIState>(UIState())
+    val getDetailMovieState: StateFlow<UIState> = _getDetailMovieState.asStateFlow()
 
     private val _detailMovie = MutableStateFlow<MovieDetail>(MovieDetail())
     val detailMovie: StateFlow<MovieDetail> = _detailMovie.asStateFlow()
@@ -32,14 +32,14 @@ class DetailViewModel @Inject constructor(
     private fun getDetailMovie(slug: String) {
         viewModelScope.launch(Dispatchers.IO) {
 
-            if(detailMovie.value.listEpisodeMovie?.isEmpty() == true){
+            if (detailMovie.value.listEpisodeMovie?.isEmpty() == true) {
 
-                _getDetailMovieState.value = DetailUiState(isLoading = true)
+                _getDetailMovieState.value = UIState(isLoading = true)
                 Log.d("check", _getDetailMovieState.value.isLoading.toString())
                 val getDetailMove = appUseCases.fetchDetailMovie.invoke(slug)
                 _getDetailMovieState.value = when (getDetailMove) {
                     is Resource.Loading -> {
-                        DetailUiState(isLoading = true)
+                        UIState(isLoading = true)
                     }
 
                     is Resource.Success -> {
@@ -49,83 +49,82 @@ class DetailViewModel @Inject constructor(
 
 
 
-                        DetailUiState(isSuccess = true)
+                        UIState(isSuccess = true)
                     }
 
                     is Resource.Error -> {
                         Log.d(Constants.STATUS_TAG, "Error from getDetailMovie ")
                         _detailMovie.value = MovieDetail()
 
-                        DetailUiState(error = getDetailMove.message)
+                        UIState(error = getDetailMove.message)
                     }
                 }
-            }else{
-                Log.d(Constants.STATUS_TAG,"detail movie is not null")
+            } else {
+                Log.d(Constants.STATUS_TAG, "detail movie is not null")
             }
-
-
-
 
 
         }
 
     }
+
     private fun retryGetDetailMovie(slug: String) {
         viewModelScope.launch(Dispatchers.IO) {
 
 
-                _getDetailMovieState.value = DetailUiState(isLoading = true)
+            _getDetailMovieState.value = UIState(isLoading = true)
 
-                val getDetailMove = appUseCases.fetchDetailMovie.invoke(slug)
-                _getDetailMovieState.value = when (getDetailMove) {
-                    is Resource.Loading -> {
-                        DetailUiState(isLoading = true)
-                    }
-
-                    is Resource.Success -> {
-                        Log.d("312321", "Get Data from retry is success ")
-
-                        _detailMovie.value = getDetailMove.data!!
-
-
-
-                        DetailUiState(isSuccess = true)
-                    }
-
-                    is Resource.Error -> {
-                        Log.d("312321", "Error Get Data from retry is success ")
-                        _detailMovie.value = MovieDetail()
-
-                        DetailUiState(error = getDetailMove.message)
-                    }
+            val getDetailMove = appUseCases.fetchDetailMovie.invoke(slug)
+            _getDetailMovieState.value = when (getDetailMove) {
+                is Resource.Loading -> {
+                    UIState(isLoading = true)
                 }
+
+                is Resource.Success -> {
+                    Log.d("312321", "Get Data from retry is success ")
+
+                    _detailMovie.value = getDetailMove.data!!
+
+
+
+                    UIState(isSuccess = true)
+                }
+
+                is Resource.Error -> {
+                    Log.d("312321", "Error Get Data from retry is success ")
+                    _detailMovie.value = MovieDetail()
+
+                    UIState(error = getDetailMove.message)
+                }
+            }
         }
     }
-    private val _addFavouriteMovieState = MutableStateFlow<DetailUiState>(DetailUiState())
-    val addFavouriteMovieState: StateFlow<DetailUiState> = _addFavouriteMovieState.asStateFlow()
+
+    private val _addFavouriteMovieState = MutableStateFlow<UIState>(UIState())
+    val addFavouriteMovieState: StateFlow<UIState> = _addFavouriteMovieState.asStateFlow()
     private fun addFavouriteMovie(movieDetail: MovieDetail) {
 
 
         val movie = movieDetail.toMovie()
         viewModelScope.launch(Dispatchers.IO) {
-            _deleteFavouriteMovieState.value = DetailUiState()
+            _deleteFavouriteMovieState.value = UIState()
 
             appUseCases.addFavouriteMovieUseCase.invoke(movie).collect { result ->
 
                 _addFavouriteMovieState.value = when (result) {
                     is Resource.Success -> {
                         Log.d(Constants.STATUS_TAG, "Success add detail ${movie.name} favourite")
-                        DetailUiState(isSuccess = true)
+                        UIState(isSuccess = true)
                     }
 
                     is Resource.Error -> {
                         Log.d(Constants.STATUS_TAG, "Error add detail favourite ${result.message}")
-                        DetailUiState(error = result.message)
+                        UIState(error = result.message)
                     }
 
                     is Resource.Loading -> {
                         Log.d(Constants.STATUS_TAG, "Loading detail add favourite")
-                        DetailUiState(isLoading = true)
+                        UIState(isLoading = true)
                     }
                 }
 
@@ -133,42 +132,44 @@ class DetailViewModel @Inject constructor(
 
         }
     }
+
     private val _checkFavourite = MutableStateFlow<Boolean>(false)
     val checkFavourite: StateFlow<Boolean> = _checkFavourite.asStateFlow()
 
     private fun checkFavouriteMovie(movieId: String) {
 
-        Log.d("kkkk", "id Movie in checkFavouriteMovie  ${movieId.toString()}")
+        Log.d("kkkk", "id Movie in checkFavouriteMovie  $movieId")
 
         viewModelScope.launch(Dispatchers.IO) {
             val result = appUseCases.checkFavouriteMovieUseCase.invoke(movieId)
-            if(result.data == true){
-
-
-                _checkFavourite.value = true
-            }else{
-                _checkFavourite.value = false
-            }
+            _checkFavourite.value = result.data == true
 
             Log.d("kkkk", "result in checkFavouriteMovie  ${result.data}")
 
         }
     }
-    private val _deleteFavouriteMovieState = MutableStateFlow<DetailUiState>(DetailUiState())
-    val deleteFavouriteMovieState: StateFlow<DetailUiState> = _deleteFavouriteMovieState.asStateFlow()
 
-    private fun deleteFavouriteMovie(movieId: String){
-        _addFavouriteMovieState.value = DetailUiState()
+    private val _deleteFavouriteMovieState = MutableStateFlow<UIState>(UIState())
+    val deleteFavouriteMovieState: StateFlow<UIState> = _deleteFavouriteMovieState.asStateFlow()
+
+    private fun deleteFavouriteMovie(movieId: String) {
+        _addFavouriteMovieState.value = UIState()
 
         viewModelScope.launch {
-            appUseCases.removeFavouriteMovieUseCase.invoke(movieId).collect{
+            appUseCases.removeFavouriteMovieUseCase.invoke(movieId).collect {
 
-                _deleteFavouriteMovieState.value = when(it){
-                    is Resource.Loading -> {DetailUiState(isLoading = true)}
+                _deleteFavouriteMovieState.value = when (it) {
+                    is Resource.Loading -> {
+                        UIState(isLoading = true)
+                    }
 
-                    is Resource.Error ->  {DetailUiState(error = it.message)}
+                    is Resource.Error -> {
+                        UIState(error = it.message)
+                    }
 
-                    is Resource.Success ->  {DetailUiState(isSuccess = true)}
+                    is Resource.Success -> {
+                        UIState(isSuccess = true)
+                    }
                 }
             }
         }
@@ -180,8 +181,13 @@ class DetailViewModel @Inject constructor(
             is DetailEvent.GetDetail -> getDetailMovie(action.slug)
             is DetailEvent.ReTry -> retryGetDetailMovie(action.slug)
             is DetailEvent.AddFavouriteMovie -> addFavouriteMovie(action.movieDetail)
-            is DetailEvent.CheckFavouriteMovie -> {checkFavouriteMovie(action.movieID)}
-            is DetailEvent.DeleteFavouriteMovie -> {deleteFavouriteMovie(action.movieId)}
+            is DetailEvent.CheckFavouriteMovie -> {
+                checkFavouriteMovie(action.movieID)
+            }
+
+            is DetailEvent.DeleteFavouriteMovie -> {
+                deleteFavouriteMovie(action.movieId)
+            }
         }
     }
 }

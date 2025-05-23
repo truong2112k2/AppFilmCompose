@@ -10,7 +10,7 @@ import javax.inject.Singleton
 class RemoveFavouriteMovieUseCase @Inject constructor(
     private val firebaseRepository: IFirebase
 ) {
-      suspend operator fun invoke(movieId: String): Flow<Resource<Unit>> {
-            return firebaseRepository.removeFavoriteMovie(movieId)
+    suspend operator fun invoke(movieId: String): Flow<Resource<Unit>> {
+        return firebaseRepository.removeFavoriteMovie(movieId)
     }
 }

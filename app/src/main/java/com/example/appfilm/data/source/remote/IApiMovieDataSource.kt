@@ -9,9 +9,10 @@ import com.example.appfilm.data.source.remote.dto.search_dto.MovieBySearchDto
 
 interface IApiMovieDataSource {
     suspend fun fetchDataMovieAndSaveFromDb(page: Int): Resource<MovieDto>
-    suspend fun fetchCategory() : Resource<CategoryDto>
-    suspend fun fetchMoviesByCategory(category: String, page: Int, limit: Int ): Resource<MovieByCategoryDto>
-    suspend fun getDetailMovie(slug: String) : Resource<MovieDetailDto>
-    suspend fun searchMovies(keyword: String) : Resource<MovieBySearchDto>
+    suspend fun fetchCategory(): Resource<CategoryDto>
+    suspend fun fetchMoviesByCategory(category: String, page: Int, limit: Int): Resource<MovieByCategoryDto>
+
+    suspend fun getDetailMovie(slug: String): Resource<MovieDetailDto>
+    suspend fun searchMovies(keyword: String): Resource<MovieBySearchDto>
 
 }

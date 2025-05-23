@@ -1,6 +1,5 @@
 package com.example.appfilm.domain.usecase.database
 
-import com.example.appfilm.data.source.local.model.MovieDb
 import com.example.appfilm.domain.model.Movie
 import com.example.appfilm.domain.repository.IDatabase
 import kotlinx.coroutines.flow.Flow

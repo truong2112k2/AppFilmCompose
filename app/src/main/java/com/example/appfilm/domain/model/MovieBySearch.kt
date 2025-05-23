@@ -1,9 +1,5 @@
 package com.example.appfilm.domain.model
 
-import com.example.appfilm.data.source.remote.dto.search_dto.Imdb
-import com.example.appfilm.data.source.remote.dto.search_dto.Modified
-import com.example.appfilm.data.source.remote.dto.search_dto.Tmdb
-
 data class MovieBySearch(
     val _id: String,
     val category: List<String>,
@@ -24,5 +20,4 @@ data class MovieBySearch(
     val type: String,
     val year: Int
 
-) {
-}
+)

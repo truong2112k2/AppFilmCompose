@@ -1,17 +1,9 @@
 package com.example.appfilm.presentation.ui.detail
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.util.Log
-import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,17 +23,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,45 +43,32 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 import com.example.appfilm.R
 import com.example.appfilm.common.Constants
-import com.example.appfilm.domain.model.detail_movie.EpisodeMovie
 import com.example.appfilm.domain.model.detail_movie.MovieDetail
 import com.example.appfilm.presentation.ui.CustomConfirmDialog
 import com.example.appfilm.presentation.ui.CustomRetryBox
-import com.example.appfilm.presentation.ui.detail.components.CreateTextWithIcon
-import com.example.appfilm.presentation.ui.detail.components.MovieCardVertical
+import com.example.appfilm.presentation.ui.UIState
+import com.example.appfilm.presentation.ui.detail.components.CustomTextWithIcon
+import com.example.appfilm.presentation.ui.detail.components.EpisodeMovieItem
 import com.example.appfilm.presentation.ui.detail.components.ShowTrailerMovie
 import com.example.appfilm.presentation.ui.detail.components.extractYoutubeVideoId
 import com.example.appfilm.presentation.ui.detail.viewmodel.DetailEvent
-import com.example.appfilm.presentation.ui.detail.viewmodel.DetailUiState
 import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.components.CustomButtonWithIcon
 import com.example.appfilm.presentation.ui.isNetworkAvailable
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
-import kotlinx.coroutines.delay
 import java.net.URLEncoder
 
 @SuppressLint("ContextCastToActivity")
@@ -100,9 +76,9 @@ import java.net.URLEncoder
 fun DetailMovieScreen(
     navController: NavController,
     movieSlug: String,
-    getDetailUIState: DetailUiState,
-    addFavouriteState: DetailUiState,
-    deleteFavouriteState: DetailUiState,
+    getDetailUIState: UIState,
+    addFavouriteState: UIState,
+    deleteFavouriteState: UIState,
     isFavourite: Boolean,
     detailMovie: MovieDetail,
 
@@ -143,8 +119,6 @@ fun DetailMovieScreen(
         isNetworkConnected = isNetworkAvailable(context)
 
 
-
-
     }
 
 
@@ -165,10 +139,10 @@ fun DetailMovieScreen(
 
             CustomRetryBox(
                 onClick = {
-                onEvent(DetailEvent.ReTry(movieSlug))
-                isNetworkConnected = isNetworkAvailable(context)
+                    onEvent(DetailEvent.ReTry(movieSlug))
+                    isNetworkConnected = isNetworkAvailable(context)
 
-            })
+                })
 
 
         } else {
@@ -280,10 +254,13 @@ fun DetailMovieScreen(
                                 .padding(12.dp)
                                 .align(Alignment.BottomStart),
                         ) {
-                            if(isFavourite){
-                                if(deleteFavouriteState.isLoading){
-                                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(16.dp))
-                                }else{
+                            if (isFavourite) {
+                                if (deleteFavouriteState.isLoading) {
+                                    CircularProgressIndicator(
+                                        color = Color.White,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                } else {
                                     Icon(
                                         imageVector = if (deleteFavouriteState.isSuccess) Icons.Default.FavoriteBorder else Icons.Default.Favorite,
                                         contentDescription = "",
@@ -295,10 +272,13 @@ fun DetailMovieScreen(
                                     )
                                 }
 //
-                            }else{
-                                if(addFavouriteState.isLoading){
-                                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(16.dp))
-                                }else{
+                            } else {
+                                if (addFavouriteState.isLoading) {
+                                    CircularProgressIndicator(
+                                        color = Color.White,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                } else {
                                     Icon(
                                         imageVector = if (addFavouriteState.isSuccess) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                         contentDescription = "",
@@ -306,7 +286,7 @@ fun DetailMovieScreen(
                                         modifier = Modifier.clickable {
                                             isDialogConfirmAdd = true
                                             titleDialogConfirm = "Yêu thích ${detailMovie.name}?"
-                                         }
+                                        }
                                     )
                                 }
                             }
@@ -316,24 +296,24 @@ fun DetailMovieScreen(
                                 message = "",
                                 onDismiss = {
                                     isDialogConfirmDelete = false
-                                            },
+                                },
                                 onConfirm = {
                                     onEvent(DetailEvent.DeleteFavouriteMovie(detailMovie._id.toString()))
 
                                     isDialogConfirmDelete = false
-                                            },
+                                },
                                 showDialog = isDialogConfirmDelete
                             )
 
                             CustomConfirmDialog(
                                 title = titleDialogConfirm,
                                 message = "",
-                                onDismiss = { isDialogConfirmAdd = false},
+                                onDismiss = { isDialogConfirmAdd = false },
                                 onConfirm = {
                                     onEvent(DetailEvent.AddFavouriteMovie(detailMovie))
 
                                     isDialogConfirmAdd = false
-                                            },
+                                },
                                 showDialog = isDialogConfirmAdd
                             )
                         }
@@ -353,7 +333,7 @@ fun DetailMovieScreen(
                                 CustomButtonWithIcon(
                                     onClick = {
                                         isShowTrailer = true
-                                        Log.d("isShowTrailer", "$isShowTrailer")
+                                        Log.d("isShowTrailer", isShowTrailer.toString())
                                     },
                                     Icons.Default.PlayArrow,
                                     "Play Trailer"
@@ -363,7 +343,6 @@ fun DetailMovieScreen(
                             ShowTrailerMovie(
                                 isShowTrailer = isShowTrailer,
                                 videoId,
-                                context,
                                 onDismiss = {
                                     isShowTrailer = false
                                 }
@@ -418,7 +397,7 @@ fun DetailMovieScreen(
 
                         detailMovie.content?.let {
 
-                            CreateTextWithIcon(
+                            CustomTextWithIcon(
                                 it,
                                 painterResource(R.drawable.ic_content),
                                 fontSize = 14,
@@ -433,7 +412,7 @@ fun DetailMovieScreen(
 
                         detailMovie.actor?.let {
                             if (it.isNotEmpty()) {
-                                CreateTextWithIcon(
+                                CustomTextWithIcon(
                                     it.joinToString(),
                                     painterResource(R.drawable.ic_actor),
                                     fontSize = 14,
@@ -446,7 +425,7 @@ fun DetailMovieScreen(
 
                         detailMovie.category?.let {
                             if (it.isNotEmpty()) {
-                                CreateTextWithIcon(
+                                CustomTextWithIcon(
                                     it.joinToString(),
                                     painterResource(R.drawable.ic_category),
                                     fontSize = 14,
@@ -460,7 +439,7 @@ fun DetailMovieScreen(
 
                         detailMovie.country?.let {
                             if (it.isNotEmpty()) {
-                                CreateTextWithIcon(
+                                CustomTextWithIcon(
                                     text = it.joinToString(),
                                     painterResource(R.drawable.ic_language),
                                     fontSize = 14,
@@ -474,7 +453,7 @@ fun DetailMovieScreen(
                         detailMovie.listEpisodeMovie?.let { episodes ->
                             if (episodes.isNotEmpty()) {
 
-                                CreateTextWithIcon(
+                                CustomTextWithIcon(
                                     text = "Danh sách tập phim",
                                     painterResource(R.drawable.ic_episode),
                                     fontWeight = FontWeight.Bold,
@@ -496,7 +475,7 @@ fun DetailMovieScreen(
                                 ) {
                                     items(episodes.size) { index ->
                                         val episode = episodes[index]
-                                        MovieCardVertical(episode, detailMovie, context, onClick = {
+                                        EpisodeMovieItem(episode, detailMovie, onClick = {
                                             val encodedUrl =
                                                 URLEncoder.encode(episode.link_m3u8, "UTF-8")
 
@@ -519,7 +498,6 @@ fun DetailMovieScreen(
 
 
         }
-
 
 
     }

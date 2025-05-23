@@ -14,8 +14,8 @@ import javax.inject.Singleton
 @Singleton
 class DatabaseRepositoryImpl @Inject constructor(
     private val databaseDataSource: IDatabaseDataSource
-): IDatabase {
-     override suspend fun insertAll(movies: List<MovieDb>): Resource<Boolean> {
+) : IDatabase {
+    override suspend fun insertAll(movies: List<MovieDb>): Resource<Boolean> {
         return databaseDataSource.insertAll(movies)
     }
 

@@ -9,16 +9,16 @@ import javax.inject.Singleton
 
 
 @Singleton
-class AddFavouriteMovieUseCase @Inject constructor (
+class AddFavouriteMovieUseCase @Inject constructor(
     private val firebaseRepository: IFirebase
 
-){
+) {
     /*
     override suspend fun addFavoriteMovie(movie: Movie): Flow<Resource<Unit>> {
         return firebaseDataSource.addFavoriteMovie(movie)
     }
      */
-    suspend operator fun invoke (movie: Movie): Flow<Resource<Unit>> {
+    suspend operator fun invoke(movie: Movie): Flow<Resource<Unit>> {
         return firebaseRepository.addFavoriteMovie(movie)
     }
 }

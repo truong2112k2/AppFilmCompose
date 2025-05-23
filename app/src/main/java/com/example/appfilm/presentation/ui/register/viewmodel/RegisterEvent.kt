@@ -1,14 +1,6 @@
 package com.example.appfilm.presentation.ui.register.viewmodel
 
-import android.util.Log
-import androidx.lifecycle.viewModelScope
-import com.example.appfilm.common.Constants
-import com.example.appfilm.common.Resource
-import com.example.appfilm.presentation.ui.convertSendEmailException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-
-sealed class RegisterEvent(){
+sealed class RegisterEvent {
     data class UpdateResultTextSendEmail(val newResult: String) : RegisterEvent()
 
     data object ToggleIsShowDialogSuccess : RegisterEvent()
@@ -17,7 +9,7 @@ sealed class RegisterEvent(){
 
     data class UpdateEmail(val newEmail: String) : RegisterEvent()
 
-    data class UpdatePassword(val newPassword: String): RegisterEvent()
+    data class UpdatePassword(val newPassword: String) : RegisterEvent()
 
     data class UpdateReInputPassword(val newPassword: String) : RegisterEvent()
     data class Reset(val level: Int) : RegisterEvent()

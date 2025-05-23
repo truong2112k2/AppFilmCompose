@@ -8,10 +8,10 @@ import javax.inject.Singleton
 
 @Singleton
 class FetchDetailMovieUseCase @Inject constructor(
-    private val movieRepository : IApiMovie
+    private val movieRepository: IApiMovie
 
 ) {
-    suspend operator fun invoke(slug: String) : Resource<MovieDetail> {
-      return movieRepository.getDetailMovie(slug)
+    suspend operator fun invoke(slug: String): Resource<MovieDetail> {
+        return movieRepository.getDetailMovie(slug)
     }
 }

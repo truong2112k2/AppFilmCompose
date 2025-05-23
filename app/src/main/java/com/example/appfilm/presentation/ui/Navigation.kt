@@ -19,7 +19,6 @@ import com.example.appfilm.presentation.ui.category.viewmodel.CategoryViewModel
 import com.example.appfilm.presentation.ui.detail.DetailMovieScreen
 import com.example.appfilm.presentation.ui.detail.viewmodel.DetailViewModel
 import com.example.appfilm.presentation.ui.fisrt.FirstScreen
-import com.example.appfilm.presentation.ui.fisrt.viewmodel.FirstUiState
 import com.example.appfilm.presentation.ui.fisrt.viewmodel.FirstViewModel
 import com.example.appfilm.presentation.ui.home.HomeScreen
 import com.example.appfilm.presentation.ui.home.viewmodel.HomeViewModel
@@ -41,7 +40,7 @@ fun Navigation(
 
     ) {
 
-    AnimatedNavHost(navController = navController, startDestination = Constants.FIRST_ROUTE) {
+    AnimatedNavHost(navController = navController, startDestination = Constants.SPLASH_ROUTE) {
         composable(Constants.LOG_IN_ROUTE) {
             val loginViewModel = hiltViewModel<LoginViewModel>()
             val loginFields = loginViewModel.logInFields
@@ -73,8 +72,8 @@ fun Navigation(
         composable(Constants.FIRST_ROUTE) {
 
             val firstViewModel = hiltViewModel<FirstViewModel>()
-            val checkLoginState: FirstUiState by firstViewModel.checkLoginState.collectAsState()
-            val logInWithoutPassState: FirstUiState by firstViewModel.loginWithoutPassState.collectAsState()
+            val checkLoginState: UIState by firstViewModel.checkLoginState.collectAsState()
+            val logInWithoutPassState: UIState by firstViewModel.loginWithoutPassState.collectAsState()
             FirstScreen(navController,
                 checkLoginState,
                 logInWithoutPassState,
@@ -161,22 +160,19 @@ fun Navigation(
             PlayMovieScreen(decodedLink, context, navController)
         }
 
-//        composable(route = Constants.PLAY_MOVIE_ROUTE,
-//            arguments = listOf(
-//                navArgument("MovieLink"){
-//                    type = NavType.StringType
-//                }
-//            ),
-//           // arguments = listOf(navArgument("MovieLink") { type = NavType.StringType }),
-//            enterTransition = { fadeIn(animationSpec = tween(700)) },
-//            exitTransition = { fadeOut(animationSpec = tween(700)) })
-//        { backStackEntry ->
-//
-//            val movieLink = backStackEntry.arguments?.getString("MovieLink") ?: "null"
-//
-//            PlayMovieScreen(movieLink, context, navController)
-//
-//
-//        }
+        composable(
+            route = Constants.SPLASH_ROUTE
+        )
+        {
+            SplashScreen(onNavigateToHome = {
+                navController.navigate(Constants.FIRST_ROUTE) {
+                    popUpTo(Constants.SPLASH_ROUTE) {
+                        inclusive = true
+                    }
+                }
+            })
+        }
+
+
     }
 }

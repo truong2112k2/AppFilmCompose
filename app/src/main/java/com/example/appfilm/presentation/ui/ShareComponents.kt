@@ -6,7 +6,6 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,14 +15,12 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -65,12 +62,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.appfilm.R
 import com.example.appfilm.common.Background
-import com.example.appfilm.presentation.ui.detail.viewmodel.DetailEvent
 
 @Composable
 fun CustomLoadingDialog(
     showDialog: Boolean,
-    ) {
+) {
     if (showDialog) {
         AlertDialog(
             onDismissRequest = {},
@@ -95,7 +91,7 @@ fun CustomLoadingDialog(
 
 @Composable
 fun CustomButton(
-    onClick :() -> Unit,
+    onClick: () -> Unit,
     textButton: String
 ) {
     var scale by remember { mutableFloatStateOf(1f) }
@@ -136,12 +132,12 @@ fun CustomTextTitle(text: String) {
             fontWeight = FontWeight.Bold
         ),
 
-    )
+        )
 }
 
 
 @Composable
-fun CustomLineProgressbar(color: Color){
+fun CustomLineProgressbar(color: Color) {
     LinearProgressIndicator(
         modifier = Modifier
             .fillMaxWidth()
@@ -184,7 +180,8 @@ fun CustomTextField(
         trailingIcon = {
 
             if (isPassword) {
-                val image = if (showPassword) R.drawable.ic_hide_password else R.drawable.ic_show_pass
+                val image =
+                    if (showPassword) R.drawable.ic_hide_password else R.drawable.ic_show_pass
                 val description = if (showPassword) "Hide password" else "Show password"
 
                 Box(
@@ -211,14 +208,14 @@ fun CustomTextField(
 }
 
 
-
-
-
 @Composable
-fun CustomBoxHideUI(){
+fun CustomBoxHideUI() {
     Box(
-        modifier =Modifier.fillMaxSize().background(Color.Transparent).pointerInput(Unit){}
-    ){
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Transparent)
+            .pointerInput(Unit) {}
+    ) {
 
     }
 }
@@ -237,12 +234,12 @@ fun CustomResultDialog(
             text = {
                 Column {
                     Text(message)
-                    if(warningMessage != null ){
+                    if (warningMessage != null) {
                         Text(warningMessage, color = Color.Red)
                     }
                 }
 
-                   },
+            },
             confirmButton = {
                 TextButton(onClick = onConfirm) {
                     Text("OK")
@@ -251,8 +248,9 @@ fun CustomResultDialog(
         )
     }
 }
+
 @Composable
-fun CustomRandomBackground(){
+fun CustomRandomBackground() {
     Image(
         painter = painterResource(id = Background.background),
         contentDescription = null,
@@ -295,7 +293,7 @@ fun shimmerBrush(): Brush {
 
 @Composable
 fun CustomConfirmDialog(
-    title: String ,
+    title: String,
     message: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
@@ -325,7 +323,7 @@ fun CustomConfirmDialog(
 }
 
 @Composable
-fun CustomRetryBox( onClick: () -> Unit){
+fun CustomRetryBox(onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -360,7 +358,7 @@ fun CustomRetryBox( onClick: () -> Unit){
                     .clip(RoundedCornerShape(12.dp))
                     .background(Color.White.copy(alpha = 0.1f))
                     .clickable {
-                         onClick()
+                        onClick()
                     },
                 contentAlignment = Alignment.Center
             ) {

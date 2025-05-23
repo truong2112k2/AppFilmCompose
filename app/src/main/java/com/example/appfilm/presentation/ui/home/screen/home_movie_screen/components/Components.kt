@@ -1,5 +1,8 @@
 package com.example.appfilm.presentation.ui.home.screen.home_movie_screen.components
 
+import android.util.Log
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.MarqueeSpacing
@@ -7,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,7 +37,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,7 +44,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -51,7 +56,7 @@ import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import com.example.appfilm.common.Constants
 import com.example.appfilm.domain.model.Movie
-import com.example.appfilm.presentation.ui.home.viewmodel.HomeUIState
+import com.example.appfilm.presentation.ui.UIState
 import com.example.appfilm.presentation.ui.shimmerBrush
 
 @Composable
@@ -66,20 +71,20 @@ fun CustomButtonWithIcon(
             onClick()
         },
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White // Nền trắng
+            containerColor = Color.White
         ),
-        shape = RoundedCornerShape(12.dp), // Bo góc nhẹ
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp) // Đổ bóng nhẹ (tùy chọn)
+        shape = RoundedCornerShape(12.dp),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
     ) {
-        androidx.compose.material3.Icon(
-            imageVector = icon, // Đổi icon nếu muốn
+        Icon(
+            imageVector = icon,
             contentDescription = "Icon",
-            tint = Color.Black // Icon màu đen
+            tint = Color.Black
         )
-        Spacer(modifier = Modifier.width(8.dp)) // Khoảng cách giữa icon và text
+        Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = text,
-            color = Color.Black // Text màu đen
+            color = Color.Black
         )
     }
 
@@ -89,11 +94,12 @@ fun CustomButtonWithIcon(
 @Composable
 fun NewMovieItem(
     newMovie: Movie,
+    checkFavouriteMovie: Boolean,
     onClickPlay: () -> Unit,
     onClickAddFavourite: () -> Unit,
-    addFavouriteMovie: HomeUIState,
+    addFavouriteMovie: UIState,
 
-) {
+    ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -153,6 +159,8 @@ fun NewMovieItem(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+
+               // Text( checkFavouriteMovie.toString(), color = Color.White, fontSize = 24.sp)
                 Text(
                     newMovie.name.toString(),
                     style = TextStyle(
@@ -172,22 +180,25 @@ fun NewMovieItem(
                 ) {
 
 
+
                     val text = if (addFavouriteMovie.isSuccess) {
                         "Add success"
                     } else if (addFavouriteMovie.isLoading) {
                         "Loading"
-                    } else if(addFavouriteMovie.error?.isNotEmpty() == true){
+                    } else if (addFavouriteMovie.error?.isNotEmpty() == true) {
                         addFavouriteMovie.error
-                    }
-                    else {
+                    }  else {
                         "Add to favourite"
+
                     }
 
 
 
-                    CustomButtonWithIcon(onClick = {
-                        onClickPlay()
-                    }, Icons.Default.PlayArrow, "Play")
+                        CustomButtonWithIcon(onClick = {
+                            onClickPlay()
+                        }, Icons.Default.PlayArrow, "Play")
+
+
 
                     Spacer(Modifier.width(8.dp))
 
@@ -210,14 +221,13 @@ fun NewMovieItem(
                             )
                         } else if (addFavouriteMovie.isLoading) {
                             CircularProgressIndicator(modifier = Modifier.size(14.dp))
-                        }else if(addFavouriteMovie.error?.isNotEmpty() == true){
+                        } else if (addFavouriteMovie.error?.isNotEmpty() == true) {
                             Icon(
                                 imageVector = Icons.Default.Warning,
                                 contentDescription = "Icon",
                                 tint = Color.Black
                             )
-                        }
-                        else {
+                        } else {
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = "Icon",
@@ -228,18 +238,10 @@ fun NewMovieItem(
 
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = text,
-                            color = Color.Black // Text màu đen
+                            text =  text,
+                            color = Color.Black
                         )
                     }
-
-
-
-
-
-
-
-
 
 
                 }
@@ -250,7 +252,7 @@ fun NewMovieItem(
 }
 
 @Composable
-fun MovieItem(
+fun HomeMovieItem(
     movie: Movie,
     onClick: () -> Unit
 
@@ -329,4 +331,35 @@ fun MovieItem(
             )
         }
     }
+}
+
+@Composable
+fun CustomTextClickable(onClick: () -> Unit) {
+    var isPressed by remember { mutableStateOf(false) }
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else 1f,
+        animationSpec = tween(durationMillis = 100),
+        label = "scaleAnim"
+    )
+
+    Text(
+        text = "Find More",
+        color = Color.White,
+        modifier = Modifier
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        isPressed = true
+                        tryAwaitRelease()
+                        isPressed = false
+                        onClick()
+                    }
+                )
+            }
+    )
 }

@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.appfilm.common.Constants
 import com.example.appfilm.common.Resource
 import com.example.appfilm.domain.usecase.AppUseCases
+import com.example.appfilm.presentation.ui.UIState
 import com.example.appfilm.presentation.ui.convertSendEmailException
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthException
@@ -26,16 +27,16 @@ class LoginViewModel @Inject constructor(
     private val appUseCases: AppUseCases
 ) : ViewModel() {
 
-    private val _logInUISate = MutableStateFlow<LoginUIState>(LoginUIState())
-    val logInUIState: StateFlow<LoginUIState> = _logInUISate
+    private val _logInUISate = MutableStateFlow<UIState>(UIState())
+    val logInUIState: StateFlow<UIState> = _logInUISate
 
-    private val _sendEmailUIState = MutableStateFlow<LoginUIState>(LoginUIState())
-    val sendEmailUIState: StateFlow<LoginUIState> = _sendEmailUIState
+    private val _sendEmailUIState = MutableStateFlow<UIState>(UIState())
+    val sendEmailUIState: StateFlow<UIState> = _sendEmailUIState
 
     var logInFields by mutableStateOf(LoginFields())
 
 
-    private  fun updateIsShowEmailDialog(newValue: Boolean) {
+    private fun updateIsShowEmailDialog(newValue: Boolean) {
         logInFields = logInFields.copy(
             isShowSendEmailDialog = newValue
         )
@@ -58,7 +59,7 @@ class LoginViewModel @Inject constructor(
         logInFields = logInFields.copy(inputEmail = newEmail)
     }
 
-    private  fun updatePassword(newPassword: String) {
+    private fun updatePassword(newPassword: String) {
         logInFields = logInFields.copy(inputPassword = newPassword)
     }
 
@@ -75,7 +76,7 @@ class LoginViewModel @Inject constructor(
 
             if (emailError != null) {
                 Log.e(Constants.ERROR_TAG, "Email validation error: $emailError")
-                _logInUISate.value = LoginUIState(error = emailError)
+                _logInUISate.value = UIState(error = emailError)
                 updateErrorTextLogin(emailError)
                 return@launch
             }
@@ -83,7 +84,7 @@ class LoginViewModel @Inject constructor(
             val passwordError = appUseCases.validationUseCase.validationPasswordLogin(password)
             if (passwordError != null) {
                 Log.e(Constants.ERROR_TAG, "Password validation error: $passwordError")
-                _logInUISate.value = LoginUIState(error = passwordError)
+                _logInUISate.value = UIState(error = passwordError)
                 updateErrorTextLogin(passwordError)
                 return@launch
             }
@@ -92,17 +93,17 @@ class LoginViewModel @Inject constructor(
                 _logInUISate.value = when (result) {
                     is Resource.Loading -> {
                         Log.d(Constants.STATUS_TAG, "Login Loading")
-                        LoginUIState(isLoading = true)
+                        UIState(isLoading = true)
                     }
 
                     is Resource.Success -> {
                         if (result.data == true) {
                             Log.d(Constants.STATUS_TAG, "Login Success")
-                            LoginUIState(isSuccess = true)
+                            UIState(isSuccess = true)
                         } else {
                             Log.e(Constants.ERROR_TAG, "Email not verified")
                             updateErrorTextLogin("Email not verified")
-                            LoginUIState(error = "Email not verified")
+                            UIState(error = "Email not verified")
                         }
                     }
 
@@ -110,7 +111,7 @@ class LoginViewModel @Inject constructor(
                         val error = convertLoginException(result.exception ?: Exception())
                         Log.e(Constants.ERROR_TAG, "Login Error: $error")
                         updateErrorTextLogin(error)
-                        LoginUIState(error = error)
+                        UIState(error = error)
                     }
                 }
             }
@@ -128,7 +129,7 @@ class LoginViewModel @Inject constructor(
                 _sendEmailUIState.value = when (result) {
                     is Resource.Loading -> {
                         Log.d(Constants.STATUS_TAG, "Resend email loading...")
-                        LoginUIState(isLoading = true)
+                        UIState(isLoading = true)
                     }
 
                     is Resource.Success -> {
@@ -138,7 +139,7 @@ class LoginViewModel @Inject constructor(
                         )
                         updateErrorTextSendEmail("A verification has been sent, please check your email !")
                         updateIsShowEmailDialog(true)
-                        LoginUIState(isSuccess = true)
+                        UIState(isSuccess = true)
                     }
 
                     is Resource.Error -> {
@@ -147,7 +148,7 @@ class LoginViewModel @Inject constructor(
                         Log.e(Constants.ERROR_TAG, "Resend email error: $error")
                         updateErrorTextSendEmail(error)
                         updateIsShowEmailDialog(true)
-                        LoginUIState(error = error)
+                        UIState(error = error)
                     }
                 }
             }

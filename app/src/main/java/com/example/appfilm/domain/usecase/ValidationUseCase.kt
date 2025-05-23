@@ -28,6 +28,7 @@ class ValidationUseCase @Inject constructor(
 
         return null
     }
+
     fun validationPasswordLogin(password: String): String? {
         if (password.isEmpty()) {
             return "Password is empty"
@@ -36,19 +37,18 @@ class ValidationUseCase @Inject constructor(
     }
 
     fun validationEmail(email: String): String? {
-        if(email.isEmpty()){
+        if (email.isEmpty()) {
             return "Email can not is empty"
         }
-        if( !isValidEmail(email)){
+        if (!isValidEmail(email)) {
             return "Invalid email address"
 
         }
-        if(containsUpperCase(email)){
+        if (containsUpperCase(email)) {
             return "Email must not contain uppercase letters"
         }
-       return null
+        return null
     }
-
 
 
     private fun isValidEmail(email: String): Boolean {
@@ -59,7 +59,6 @@ class ValidationUseCase @Inject constructor(
     private fun containsUpperCase(input: String): Boolean {
         return input.any { it.isUpperCase() }
     }
-
 
 
 }

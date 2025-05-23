@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,7 +25,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,13 +53,11 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.Abs
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 @Composable
-fun MovieCardVertical(
+fun EpisodeMovieItem(
     episodeMovie: EpisodeMovie,
     detailMovie: MovieDetail,
-    context: Context,
     onClick: () -> Unit
 ) {
-
     Row(
         modifier = Modifier
             .border(width = 1.dp, color = Color.White, shape = CircleShape)
@@ -67,7 +65,6 @@ fun MovieCardVertical(
                 onClick()
             },
         verticalAlignment = Alignment.CenterVertically
-
     ) {
 
 
@@ -109,7 +106,7 @@ fun MovieCardVertical(
 
 
 @Composable
-fun CreateTextWithIcon(
+fun CustomTextWithIcon(
     text: String,
     painterResource: Painter,
     fontWeight: FontWeight? = null,
@@ -127,16 +124,19 @@ fun CreateTextWithIcon(
             modifier = Modifier.size(iconSize.dp)
         )
         Spacer(Modifier.width(8.dp))
-        Divider(
-            color = Color.White,
+
+        Box(
             modifier = Modifier
-                .height(50.dp)
+                .height(24.dp)
                 .width(1.dp)
+                .background(Color.White)
+                .padding(horizontal = 4.dp)
         )
+
         Spacer(Modifier.width(8.dp))
 
         Text(
-            text = "${text}",
+            text = text,
             style = TextStyle(
                 fontSize = fontSize.sp,
                 color = Color.White,
@@ -152,7 +152,6 @@ fun CreateTextWithIcon(
 fun ShowTrailerMovie(
     isShowTrailer: Boolean,
     videoId: String,
-    context: Context,
     onDismiss: () -> Unit
 ) {
     if (isShowTrailer) {
@@ -171,9 +170,8 @@ fun ShowTrailerMovie(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    LiveTvScreen(
+                    WatchMovieVideo(
                         videoId = videoId,
-                        context = context,
                         width = 1540,
                         height = 1060
                     )
@@ -196,7 +194,7 @@ fun ShowTrailerMovie(
 
 
 @Composable
-fun LiveTvScreen(videoId: String, context: Context, width: Int, height: Int) {
+fun WatchMovieVideo(videoId: String, width: Int, height: Int) {
     AndroidView(
         factory = {
             YouTubePlayerView(it).apply {
