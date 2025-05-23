@@ -4,6 +4,7 @@ import com.example.appfilm.domain.usecase.api_movie.FetchCategoryUseCase
 import com.example.appfilm.domain.usecase.api_movie.FetchDetailMovieUseCase
 import com.example.appfilm.domain.usecase.api_movie.FetchMovieAndSaveUseCase
 import com.example.appfilm.domain.usecase.api_movie.FetchMoviesByCategoryUseCase
+import com.example.appfilm.domain.usecase.api_movie.SearchMoviesUseCase
 import com.example.appfilm.domain.usecase.database.GetMoviesUseCase
 import com.example.appfilm.domain.usecase.firebase.authentication.CheckLoginUseCase
 import com.example.appfilm.domain.usecase.firebase.authentication.LogInUseCase
@@ -39,7 +40,8 @@ data class AppUseCases @Inject constructor (
     val addFavouriteMovieUseCase: AddFavouriteMovieUseCase,
     val checkFavouriteMovieUseCase: CheckFavouriteMovieUseCase,
     val getFavouriteMoviesUseCase: GetFavouriteMoviesUseCase,
-    val removeFavouriteMovieUseCase: RemoveFavouriteMovieUseCase
+    val removeFavouriteMovieUseCase: RemoveFavouriteMovieUseCase,
+    val searchMoviesUseCase: SearchMoviesUseCase
 ) {
 
 

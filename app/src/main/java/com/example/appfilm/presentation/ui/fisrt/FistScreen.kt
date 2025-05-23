@@ -55,9 +55,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
-/*
-getString(R.string.default_web_client_id) -> get Id Token
- */
+
 
 
 @Composable
@@ -73,6 +71,8 @@ fun FirstScreen(
 
 
     CustomLoadingDialog(logInWithoutPassState.isLoading)
+
+    //CustomLoadingDialog(checkLoginState.isLoading)
 
     var showDialogError by rememberSaveable { mutableStateOf(false) }
     var errorText by rememberSaveable { mutableStateOf("") }
@@ -261,18 +261,14 @@ fun FirstScreen(
 
     }
 
+    CustomLoadingDialog(checkLoginState.isLoading)
 
-    when (checkLoginState) {
-        FirstUiState(isLoading = true) -> {
-            CustomLoadingDialog(checkLoginState.isLoading)
-        }
-
-        FirstUiState(isSuccess = true) -> {
-            navController.navigate(Constants.HOME_ROUTE) {
-                popUpTo(0) { inclusive = true }
-                launchSingleTop = true
-            }
+    if(checkLoginState.isSuccess){
+        navController.navigate(Constants.HOME_ROUTE) {
+            popUpTo(0) { inclusive = true }
+            launchSingleTop = true
         }
     }
+
 }
 

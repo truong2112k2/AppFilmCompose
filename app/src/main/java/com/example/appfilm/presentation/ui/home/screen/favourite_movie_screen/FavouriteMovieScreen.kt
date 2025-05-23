@@ -119,7 +119,7 @@ fun FavouriteMovieScreen(
 
                         ) {
                             items(listMovies) {
-                                MovieItem(it, onClick = {
+                                MovieItemFavourite(it, onClick = {
                                     navController.navigate(
                                         "DETAIL_ROUTE/${it.slug}"
                                     )
@@ -143,11 +143,9 @@ fun FavouriteMovieScreen(
 
 }
 
-//      navController.navigate(
-//                                        "DETAIL_ROUTE/${movie.slug}"
-//                                    )
+
 @Composable
-fun MovieItem(
+fun MovieItemFavourite(
     movie: Movie,
     onClick: () -> Unit
 ) {

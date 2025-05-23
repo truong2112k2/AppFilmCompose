@@ -49,6 +49,8 @@ class ValidationUseCase @Inject constructor(
        return null
     }
 
+
+
     private fun isValidEmail(email: String): Boolean {
         val emailPattern = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.(com|vn|org|net)$")
         return email.matches(emailPattern)
@@ -57,5 +59,7 @@ class ValidationUseCase @Inject constructor(
     private fun containsUpperCase(input: String): Boolean {
         return input.any { it.isUpperCase() }
     }
+
+
 
 }
