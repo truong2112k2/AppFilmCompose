@@ -39,12 +39,12 @@ fun CustomSuccessDialog(
         AlertDialog(
             onDismissRequest = {},
             confirmButton = {
-                TextButton(onClick = {onConfirm()}) {
+                TextButton(onClick = { onConfirm() }) {
                     Text("Ok")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { onDismiss()}
+                TextButton(onClick = { onDismiss() }
 
                 ) {
                     Text("Send New Email")
@@ -65,11 +65,11 @@ fun CustomSuccessDialog(
                     )
                     Text(text = message)
                     Spacer(modifier = Modifier.height(8.dp))
-                    if(isSendingEmail){
+                    if (isSendingEmail) {
                         CircularProgressIndicator()
                         return@AlertDialog
                     }
-                    if(messageSendEmail.isNotEmpty()){
+                    if (messageSendEmail.isNotEmpty()) {
                         Text(text = messageSendEmail, color = Color.Red)
 
                     }
@@ -78,6 +78,7 @@ fun CustomSuccessDialog(
         )
     }
 }
+
 @Composable
 fun CustomTextError(text: String) {
     Row(
@@ -96,7 +97,7 @@ fun CustomTextError(text: String) {
             text = text,
             color = Color.Red,
             style = MaterialTheme.typography.headlineMedium.copy(
-                fontSize = 15.sp, lineHeight = 17.sp 
+                fontSize = 15.sp, lineHeight = 17.sp
             )
         )
 

@@ -1,6 +1,5 @@
 package com.example.appfilm.presentation.ui.theme
 
-import android.graphics.Color
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -48,8 +47,6 @@ fun AppFilmTheme(
         content = content
     )
 }
-
-
 
 
 private val lightScheme = lightColorScheme(
@@ -127,7 +124,6 @@ private val darkScheme = darkColorScheme(
     surfaceContainerHigh = surfaceContainerHighDark,
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
-
 
 
 @Composable

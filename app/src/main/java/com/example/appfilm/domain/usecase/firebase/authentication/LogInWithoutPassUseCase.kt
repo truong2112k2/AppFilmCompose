@@ -12,7 +12,7 @@ class LogInWithoutPassUseCase @Inject constructor(
     private val firebaseRepository: IFirebase
 
 ) {
-    suspend operator fun invoke(idToken: String): Flow<Resource<Boolean>>{
+    suspend operator fun invoke(idToken: String): Flow<Resource<Boolean>> {
         return firebaseRepository.firebaseSignInWithGoogle(idToken)
     }
 }

@@ -11,12 +11,13 @@ interface IFirebaseDataSource {
     suspend fun resendVerificationEmail(): Flow<Resource<Unit>>
     suspend fun resetPassword(email: String): Flow<Resource<Unit>>
     suspend fun firebaseSignInWithGoogle(idToken: String): Flow<Resource<Boolean>>
-    suspend fun firebaseLogOutAccount(  googleSignInClient: GoogleSignInClient): Flow<Resource<Boolean>>
+    suspend fun firebaseLogOutAccount(googleSignInClient: GoogleSignInClient): Flow<Resource<Boolean>>
     suspend fun checkUseLoginAndVerify(): Flow<Resource<Unit>>
 
-    suspend fun addFavoriteMovie(movie: Item):Flow<Resource<Unit>>
+    suspend fun addFavoriteMovie(movie: Item): Flow<Resource<Unit>>
     suspend fun removeFavoriteMovie(movieId: String): Flow<Resource<Unit>>
-    suspend fun isFavorite(movieId: String): Resource<Boolean>
 
+    suspend fun isFavorite(movieId: String): Resource<Boolean>
+    suspend fun isFavoriteNewMovies(movieId: String): Flow<Resource<Boolean>>
     suspend fun getFavouriteMovies(): Flow<Resource<List<Item>>>
 }

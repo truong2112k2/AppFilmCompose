@@ -19,12 +19,12 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent ::class)
+@InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
 
     @Singleton
     @Binds
-    abstract fun provideIMovieApiDataSource(apiMovieDataSource: ApiMovieDataSource) : IApiMovieDataSource
+    abstract fun provideIMovieApiDataSource(apiMovieDataSource: ApiMovieDataSource): IApiMovieDataSource
 
     @Singleton
     @Binds
@@ -33,12 +33,11 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindIAuthDataSource( authDataSource: FirebaseDataSource): IFirebaseDataSource
+    abstract fun bindIAuthDataSource(authDataSource: FirebaseDataSource): IFirebaseDataSource
 
     @Binds
     @Singleton
     abstract fun bindIFirebase(authRepositoryImpl: FirebaseRepositoryImpl): IFirebase
-
 
 
     @Singleton

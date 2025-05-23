@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appfilm.common.Resource
 import com.example.appfilm.domain.usecase.AppUseCases
+import com.example.appfilm.presentation.ui.UIState
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthException
@@ -25,11 +26,11 @@ class FirstViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    private val _loginWithoutPassState = MutableStateFlow<FirstUiState>(FirstUiState())
-    val loginWithoutPassState: StateFlow<FirstUiState> = _loginWithoutPassState
+    private val _loginWithoutPassState = MutableStateFlow<UIState>(UIState())
+    val loginWithoutPassState: StateFlow<UIState> = _loginWithoutPassState
 
-    private val _checkLoginState = MutableStateFlow<FirstUiState>(FirstUiState())
-    val checkLoginState: StateFlow<FirstUiState> = _checkLoginState
+    private val _checkLoginState = MutableStateFlow<UIState>(UIState())
+    val checkLoginState: StateFlow<UIState> = _checkLoginState
 
 
     private fun signInWithGoogle(idToken: String) {
@@ -44,18 +45,18 @@ class FirstViewModel @Inject constructor(
                     is Resource.Loading -> {
                         Log.d("FirstViewModel", "LoginWithoutMail loading")
 
-                        FirstUiState(isLoading = true)
+                        UIState(isLoading = true)
                     }
 
                     is Resource.Success -> {
                         Log.d("FirstViewModel", "LoginWithoutMail success ")
 
-                        FirstUiState(isSuccess = true)
+                        UIState(isSuccess = true)
                     }
 
                     is Resource.Error -> {
                         Log.d("FirstViewModel", "LoginWithoutMail ${result.message.toString()}")
-                        FirstUiState(
+                        UIState(
                             error = convertLoginGoogleException(
                                 result.exception ?: Exception()
                             )
@@ -68,7 +69,7 @@ class FirstViewModel @Inject constructor(
 
     private fun checkLogin() {
         viewModelScope.launch(Dispatchers.IO) {
-            _checkLoginState.value = FirstUiState(isLoading = true)
+            _checkLoginState.value = UIState(isLoading = true)
 
             delay(3000)
             appUseCases.checkLoginUseCase.invoke().collect { result ->
@@ -77,7 +78,7 @@ class FirstViewModel @Inject constructor(
                     is Resource.Loading -> {
                         Log.d("FirstViewModel", "checkLogin Loading")
 
-                        FirstUiState(isLoading = true)
+                        UIState(isLoading = true)
 
                     }
 
@@ -86,13 +87,13 @@ class FirstViewModel @Inject constructor(
 
                         Log.d("FirstViewModel", "checkLogin Success")
 
-                        FirstUiState(isSuccess = true)
+                        UIState(isSuccess = true)
                     }
 
                     is Resource.Error -> {
                         Log.d("FirstViewModel", "CheckLogin failed")
 
-                        FirstUiState(error = result.message)
+                        UIState(error = result.message)
 
                     }
 

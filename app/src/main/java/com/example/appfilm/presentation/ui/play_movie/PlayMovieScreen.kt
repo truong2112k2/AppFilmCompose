@@ -6,21 +6,14 @@ import android.content.pm.ActivityInfo
 import android.view.View
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -42,6 +35,7 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
+
 @Composable
 fun PlayMovieScreen(videoUrl: String, context: Context, navController: NavController) {
     var showVideo by rememberSaveable { mutableStateOf(true) }
@@ -52,7 +46,7 @@ fun PlayMovieScreen(videoUrl: String, context: Context, navController: NavContro
         if (showVideo) {
             activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
             WindowCompat.setDecorFitsSystemWindows(activity?.window ?: return@LaunchedEffect, false)
-            activity?.window?.decorView?.systemUiVisibility = (
+            activity.window?.decorView?.systemUiVisibility = (
                     View.SYSTEM_UI_FLAG_FULLSCREEN
                             or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -60,7 +54,7 @@ fun PlayMovieScreen(videoUrl: String, context: Context, navController: NavContro
         } else {
             activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             WindowCompat.setDecorFitsSystemWindows(activity?.window ?: return@LaunchedEffect, true)
-            activity?.window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+            activity.window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
         }
     }
 
@@ -84,7 +78,6 @@ fun PlayMovieScreen(videoUrl: String, context: Context, navController: NavContro
 }
 
 
-
 @OptIn(UnstableApi::class)
 @Composable
 fun FullScreenVideoPlayer(url: String, context: Context, onExit: () -> Unit) {
@@ -104,7 +97,9 @@ fun FullScreenVideoPlayer(url: String, context: Context, onExit: () -> Unit) {
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.Black)) {
         AndroidView(
             factory = {
                 PlayerView(context).apply {

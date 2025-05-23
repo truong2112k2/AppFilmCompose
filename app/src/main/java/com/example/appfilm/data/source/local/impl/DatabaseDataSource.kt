@@ -23,21 +23,21 @@ import javax.inject.Singleton
 @Singleton
 
 class DatabaseDataSource @Inject constructor(
-    private val movieDao : MovieDao
-): IDatabaseDataSource{
+    private val movieDao: MovieDao
+) : IDatabaseDataSource {
 
     override suspend fun insertAll(movies: List<MovieDb>): Resource<Boolean> {
-       return try{
+        return try {
             val result = movieDao.insertAll(movies)
 
-            if(result.isNotEmpty()){
-                Resource.Success(true )
-            }else{
-                Resource.Success(false )
+            if (result.isNotEmpty()) {
+                Resource.Success(true)
+            } else {
+                Resource.Success(false)
 
             }
-        }catch (e: Exception){
-           Resource.Error(e.message.toString())
+        } catch (e: Exception) {
+            Resource.Error(e.message.toString())
 
         }
     }
@@ -46,10 +46,14 @@ class DatabaseDataSource @Inject constructor(
         return movieDao.getAllMovies()
     }
 
-    override suspend fun cacheMovies(  context: Context, movies: List<MovieDb>): List<MovieDb> {
+    override suspend fun cacheMovies(context: Context, movies: List<MovieDb>): List<MovieDb> {
         return movies.map { movie ->
             val localPath = movie.poster_url?.let {
-                saveImageToInternalStorage(context, it, movie._id ?: movie.name ?: UUID.randomUUID().toString())
+                saveImageToInternalStorage(
+                    context,
+                    it,
+                    movie._id ?: UUID.randomUUID().toString()
+                )
             }
             Log.d("Check", localPath.toString())
 
@@ -57,7 +61,11 @@ class DatabaseDataSource @Inject constructor(
         }
     }
 
-    override suspend fun saveImageToInternalStorage(context: Context, imageUrl: String, fileName: String): String? {
+    override suspend fun saveImageToInternalStorage(
+        context: Context,
+        imageUrl: String,
+        fileName: String
+    ): String? {
         return try {
             val url = URL(imageUrl)
             val connection: HttpURLConnection =

@@ -12,7 +12,7 @@ class VerifyUseCase @Inject constructor(
     private val firebaseRepository: IFirebase
 ) {
 
-    suspend operator fun invoke() : Flow<Resource<Unit>> {
+    suspend operator fun invoke(): Flow<Resource<Unit>> {
         return firebaseRepository.firebaseSendVerification()
     }
 

@@ -1,21 +1,18 @@
 package com.example.appfilm.presentation.ui.home.viewmodel
 
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appfilm.common.Constants
 import com.example.appfilm.common.Resource
-import com.example.appfilm.domain.model.Movie
 import com.example.appfilm.domain.usecase.AppUseCases
+import com.example.appfilm.presentation.ui.UIState
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 
@@ -23,30 +20,30 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
 
     private val appUseCases: AppUseCases
-): ViewModel() {
+) : ViewModel() {
 
 
-
-
-    private val _logoutState = MutableStateFlow(HomeUIState())
-    val logoutState : StateFlow<HomeUIState> = _logoutState
-    private fun logout(googleSignInClient: GoogleSignInClient){
+    private val _logoutState = MutableStateFlow(UIState())
+    val logoutState: StateFlow<UIState> = _logoutState
+    private fun logout(googleSignInClient: GoogleSignInClient) {
 
         viewModelScope.launch(Dispatchers.IO) {
-            appUseCases.logoutUseCase.invoke(googleSignInClient).collect{ result ->
+            appUseCases.logoutUseCase.invoke(googleSignInClient).collect { result ->
 
-                _logoutState.value = when(result){
+                _logoutState.value = when (result) {
                     is Resource.Loading -> {
-                        Log.d(Constants.STATUS_TAG,"Loading logout")
-                        HomeUIState(isLoading = true)
+                        Log.d(Constants.STATUS_TAG, "Loading logout")
+                        UIState(isLoading = true)
                     }
+
                     is Resource.Success -> {
-                        Log.d(Constants.STATUS_TAG,"Logout Success")
-                        HomeUIState(isSuccess =  true )
+                        Log.d(Constants.STATUS_TAG, "Logout Success")
+                        UIState(isSuccess = true)
                     }
+
                     is Resource.Error -> {
-                        Log.d(Constants.STATUS_TAG,"Logout Error")
-                        HomeUIState(error =  result.message)
+                        Log.d(Constants.STATUS_TAG, "Logout Error")
+                        UIState(error = result.message)
 
                     }
                 }
@@ -55,15 +52,14 @@ class HomeViewModel @Inject constructor(
 
     }
 
-    fun handleEvent(homeEvent: HomeEvent){
-        when(homeEvent){
-            is HomeEvent.Logout ->{ logout(homeEvent.googleSignInClient)}
+    fun handleEvent(homeEvent: HomeEvent) {
+        when (homeEvent) {
+            is HomeEvent.Logout -> {
+                logout(homeEvent.googleSignInClient)
+            }
 
         }
     }
-
-
-
 
 
 }

@@ -8,7 +8,7 @@ import com.example.appfilm.common.Constants
 import com.example.appfilm.common.Resource
 import com.example.appfilm.domain.model.Movie
 import com.example.appfilm.domain.usecase.AppUseCases
-import com.example.appfilm.presentation.ui.home.viewmodel.HomeUIState
+import com.example.appfilm.presentation.ui.UIState
 import com.example.appfilm.presentation.ui.isNetworkAvailable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -27,8 +28,8 @@ class HomeMovieViewModel @Inject constructor(
     private val appUseCases: AppUseCases,
     @ApplicationContext val context: Context
 ) : ViewModel() {
-    private val _getNewMovieState = MutableStateFlow(HomeUIState())
-    val getNewMovieState: StateFlow<HomeUIState> = _getNewMovieState
+    private val _getNewMovieState = MutableStateFlow(UIState())
+    val getNewMovieState: StateFlow<UIState> = _getNewMovieState
 
 
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
@@ -75,7 +76,7 @@ class HomeMovieViewModel @Inject constructor(
 
 
     private fun getMoviesOnNetwork(context: Context, page: Int) {
-        _getNewMovieState.value = HomeUIState(isLoading = true)
+        _getNewMovieState.value = UIState(isLoading = true)
         viewModelScope.launch(Dispatchers.IO) {
             val result =
                 appUseCases.fetchDataAndSaveFromDbUseCase.fetchDataMovieAndSaveFromDb(context, page)
@@ -83,13 +84,13 @@ class HomeMovieViewModel @Inject constructor(
             if (result.data?.isNotEmpty() == true) {
 
                 _movies.value = result.data
-                _getNewMovieState.value = HomeUIState(isSuccess = true)
+                _getNewMovieState.value = UIState(isSuccess = true)
                 Log.d(Constants.STATUS_TAG, "fetchDataAndSaveFromDb UseCase success")
 
 
             } else {
 
-                _getNewMovieState.value = HomeUIState(error = result.exception?.let {
+                _getNewMovieState.value = UIState(error = result.exception?.let {
                     convertGetMoviesException(it)
                 })
 
@@ -98,8 +99,8 @@ class HomeMovieViewModel @Inject constructor(
         }
     }
 
-    private val _addFavouriteMovie = MutableStateFlow(HomeUIState())
-    val addFavouriteMovie: StateFlow<HomeUIState> = _addFavouriteMovie
+    private val _addFavouriteMovie = MutableStateFlow(UIState())
+    val addFavouriteMovie: StateFlow<UIState> = _addFavouriteMovie
 
     private fun addFavouriteMovie(movie: Movie) {
 
@@ -110,17 +111,17 @@ class HomeMovieViewModel @Inject constructor(
                 _addFavouriteMovie.value = when (result) {
                     is Resource.Success -> {
                         Log.d(Constants.STATUS_TAG, "Success add ${movie.name} favourite")
-                        HomeUIState(isSuccess = true)
+                        UIState(isSuccess = true)
                     }
 
                     is Resource.Error -> {
                         Log.d(Constants.STATUS_TAG, "Error add favourite ${result.message}")
-                        HomeUIState(error = result.message)
+                        UIState(error = result.message)
                     }
 
                     is Resource.Loading -> {
                         Log.d(Constants.STATUS_TAG, "Loading add favourite")
-                        HomeUIState(isLoading = true)
+                        UIState(isLoading = true)
                     }
                 }
 
@@ -128,7 +129,21 @@ class HomeMovieViewModel @Inject constructor(
 
         }
     }
+    private val _checkFavourite = MutableStateFlow<Boolean>(false)
+    val checkFavourite: StateFlow<Boolean> = _checkFavourite.asStateFlow()
 
+    private fun checkFavouriteMovie(movieId: String) {
+
+        Log.d("3334", "id Movie by HomeMovieViewModel  $movieId")
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = appUseCases.checkFavouriteMovieUseCase.invoke(movieId)
+            _checkFavourite.value = result.data == true
+
+            Log.d("3334", "result by HomeMovieViewModel  ${result.data}")
+
+        }
+    }
 
     fun handleEvent(homeMovieEvent: HomeMovieEvent) {
         when (homeMovieEvent) {
@@ -136,7 +151,11 @@ class HomeMovieViewModel @Inject constructor(
                 getMoviesOnNetwork(homeMovieEvent.context, homeMovieEvent.page)
             }
 
-            is HomeMovieEvent.AddFavouriteMovie -> { addFavouriteMovie(homeMovieEvent.movie)}
+            is HomeMovieEvent.AddFavouriteMovie -> {
+                addFavouriteMovie(homeMovieEvent.movie)
+            }
+
+            is HomeMovieEvent.CheckFavouriteMovie -> {checkFavouriteMovie(homeMovieEvent.movieId)}
         }
     }
 

@@ -48,31 +48,26 @@ import com.example.appfilm.presentation.ui.CustomLoadingDialog
 import com.example.appfilm.presentation.ui.CustomRandomBackground
 import com.example.appfilm.presentation.ui.CustomResultDialog
 import com.example.appfilm.presentation.ui.CustomTextTitle
+import com.example.appfilm.presentation.ui.UIState
 import com.example.appfilm.presentation.ui.fisrt.viewmodel.FirstEvent
-import com.example.appfilm.presentation.ui.fisrt.viewmodel.FirstUiState
 import com.example.appfilm.presentation.ui.isNetworkAvailable
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
 
-
-
 @Composable
 fun FirstScreen(
     navController: NavController,
-    checkLoginState: FirstUiState,
-    logInWithoutPassState: FirstUiState,
+    checkLoginState: UIState,
+    logInWithoutPassState: UIState,
     onEventClick: (FirstEvent) -> Unit
 
 
 ) {
 
 
-
     CustomLoadingDialog(logInWithoutPassState.isLoading)
-
-    //CustomLoadingDialog(checkLoginState.isLoading)
 
     var showDialogError by rememberSaveable { mutableStateOf(false) }
     var errorText by rememberSaveable { mutableStateOf("") }
@@ -263,7 +258,7 @@ fun FirstScreen(
 
     CustomLoadingDialog(checkLoginState.isLoading)
 
-    if(checkLoginState.isSuccess){
+    if (checkLoginState.isSuccess) {
         navController.navigate(Constants.HOME_ROUTE) {
             popUpTo(0) { inclusive = true }
             launchSingleTop = true

@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.appfilm.common.Constants
 import com.example.appfilm.common.Resource
 import com.example.appfilm.domain.usecase.AppUseCases
+import com.example.appfilm.presentation.ui.UIState
 import com.example.appfilm.presentation.ui.convertSendEmailException
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthException
@@ -25,17 +26,18 @@ class RegisterViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    var registerState by mutableStateOf(RegisterUIState())
-    var sendEmailUIState by mutableStateOf(RegisterUIState())
+    var registerState by mutableStateOf(UIState())
+    var sendEmailUIState by mutableStateOf(UIState())
 
     var registerFields by mutableStateOf(RegisterFields())
 
 
-    private fun updateResultTextSendEmail(newResult: String){
+    private fun updateResultTextSendEmail(newResult: String) {
         registerFields = registerFields.copy(
             resultTextSendEmail = newResult
         )
     }
+
     fun toggleIsShowDialogSuccess() {
         registerFields = registerFields.copy(
             isShowDialogSuccess = !registerFields.isShowDialogSuccess
@@ -69,10 +71,10 @@ class RegisterViewModel @Inject constructor(
     fun reset(level: Int) {
         when (level) {
             1 -> registerFields = RegisterFields()
-            2 -> registerState = RegisterUIState()
+            2 -> registerState = UIState()
             3 -> {
                 registerFields = RegisterFields()
-                registerState = RegisterUIState()
+                registerState = UIState()
             }
         }
     }
@@ -90,15 +92,16 @@ class RegisterViewModel @Inject constructor(
             val emailError = appUseCases.validationUseCase.validationEmail(email)
             if (emailError != null) {
                 Log.e(Constants.ERROR_TAG, "Email validation error: $emailError")
-                registerState = RegisterUIState(error = emailError)
+                registerState = UIState(error = emailError)
                 updateErrorTextRegister(error = emailError)
                 return@launch
             }
 
-            val passwordError = appUseCases.validationUseCase.validationPasswordRegister(password, rePassword)
+            val passwordError =
+                appUseCases.validationUseCase.validationPasswordRegister(password, rePassword)
             if (passwordError != null) {
                 Log.e(Constants.ERROR_TAG, "Password validation error: $passwordError")
-                registerState = RegisterUIState(error = passwordError)
+                registerState = UIState(error = passwordError)
                 updateErrorTextRegister(error = passwordError)
                 return@launch
             }
@@ -109,17 +112,19 @@ class RegisterViewModel @Inject constructor(
                 registerState = when (result) {
                     is Resource.Loading -> {
                         Log.d(Constants.STATUS_TAG, "Register Loading...")
-                        RegisterUIState(isLoading = true)
+                        UIState(isLoading = true)
                     }
+
                     is Resource.Success -> {
                         Log.d(Constants.STATUS_TAG, "Register Success")
-                        RegisterUIState(isSuccess = true)
+                        UIState(isSuccess = true)
                     }
+
                     is Resource.Error -> {
                         val message = convertRegisterException(result.exception)
                         Log.e(Constants.ERROR_TAG, "Register Error: $message")
                         updateErrorTextRegister(error = message)
-                        RegisterUIState(error = message)
+                        UIState(error = message)
                     }
                 }
             }
@@ -136,18 +141,24 @@ class RegisterViewModel @Inject constructor(
                 sendEmailUIState = when (result) {
                     is Resource.Loading -> {
                         Log.d(Constants.STATUS_TAG, "Resend email loading...")
-                        RegisterUIState(isLoading = true)
+                        UIState(isLoading = true)
                     }
+
                     is Resource.Success -> {
-                        Log.d(Constants.STATUS_TAG, "Resend email success: A verification has been sent.")
+                        Log.d(
+                            Constants.STATUS_TAG,
+                            "Resend email success: A verification has been sent."
+                        )
                         updateResultTextSendEmail("A verification has been sent, please check your email !")
-                        RegisterUIState(isSuccess = true)
+                        UIState(isSuccess = true)
                     }
+
                     is Resource.Error -> {
-                        val error = convertSendEmailException(result.exception, fallback = result.message)
+                        val error =
+                            convertSendEmailException(result.exception, fallback = result.message)
                         Log.e(Constants.ERROR_TAG, "Resend email error: $error")
                         updateResultTextSendEmail(error)
-                        RegisterUIState(error = error)
+                        UIState(error = error)
                     }
                 }
             }
@@ -165,42 +176,43 @@ class RegisterViewModel @Inject constructor(
     }
 
 
-    fun handleEvent(registerEvent: RegisterEvent){
-        when(registerEvent){
-            is RegisterEvent.Register ->{
+    fun handleEvent(registerEvent: RegisterEvent) {
+        when (registerEvent) {
+            is RegisterEvent.Register -> {
                 register()
             }
-            is RegisterEvent.UpdateResultTextSendEmail ->{
+
+            is RegisterEvent.UpdateResultTextSendEmail -> {
                 updateResultTextSendEmail(registerEvent.newResult)
             }
 
-            is RegisterEvent.ToggleIsShowDialogSuccess ->{
+            is RegisterEvent.ToggleIsShowDialogSuccess -> {
 
                 toggleIsShowDialogSuccess()
 
             }
 
-            is RegisterEvent.UpdateErrorTextRegister->{
+            is RegisterEvent.UpdateErrorTextRegister -> {
                 updateErrorTextRegister(registerEvent.error)
             }
 
-            is RegisterEvent.UpdateEmail->{
+            is RegisterEvent.UpdateEmail -> {
                 updateEmail(registerEvent.newEmail)
             }
 
-            is RegisterEvent. UpdatePassword->{
+            is RegisterEvent.UpdatePassword -> {
                 updatePassword(registerEvent.newPassword)
             }
 
-            is RegisterEvent.UpdateReInputPassword->{
+            is RegisterEvent.UpdateReInputPassword -> {
                 updateReInputPassword(registerEvent.newPassword)
             }
 
-            is RegisterEvent.Reset->{
+            is RegisterEvent.Reset -> {
                 reset(registerEvent.level)
             }
 
-            is RegisterEvent.ResendEmail ->{
+            is RegisterEvent.ResendEmail -> {
                 resendEmail()
             }
         }

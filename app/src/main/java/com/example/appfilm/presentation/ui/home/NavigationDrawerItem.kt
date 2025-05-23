@@ -8,8 +8,8 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class NavigationDrawerItem(val title: String, val icon: ImageVector) {
-    data object Home : NavigationDrawerItem(title ="Home", icon = Icons.Default.Home)
-    data object Favorite : NavigationDrawerItem(title ="Favorite",icon =  Icons.Default.Favorite)
+    data object Home : NavigationDrawerItem(title = "Home", icon = Icons.Default.Home)
+    data object Favorite : NavigationDrawerItem(title = "Favorite", icon = Icons.Default.Favorite)
     data object Search : NavigationDrawerItem(title = "Search", icon = Icons.Default.Search)
 
     companion object {
@@ -22,9 +22,11 @@ sealed class NavigationDrawerItem(val title: String, val icon: ImageVector) {
             }
         }
     }
-    val drawerScreenSaver: Saver<NavigationDrawerItem, String> = Saver( // giúp saveable có thể lưu 1 object
-        save = { it.title },
-        restore = { NavigationDrawerItem.fromTitle(it) }
-    )
+
+    val drawerScreenSaver: Saver<NavigationDrawerItem, String> =
+        Saver( // giúp saveable có thể lưu 1 object
+            save = { it.title },
+            restore = { fromTitle(it) }
+        )
 
 }

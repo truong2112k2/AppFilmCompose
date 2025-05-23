@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.appfilm.common.Constants
 import com.example.appfilm.presentation.ui.CustomConfirmDialog
+import com.example.appfilm.presentation.ui.UIState
 import com.example.appfilm.presentation.ui.home.NavigationDrawerItem.Favorite.drawerScreenSaver
 import com.example.appfilm.presentation.ui.home.components.CustomDrawerContent
 import com.example.appfilm.presentation.ui.home.screen.favourite_movie_screen.FavouriteMovieScreen
@@ -46,7 +47,6 @@ import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.viewmod
 import com.example.appfilm.presentation.ui.home.screen.search_movie_screen.SearchMovieScreen
 import com.example.appfilm.presentation.ui.home.screen.search_movie_screen.viewmodel.SearchMovieViewModel
 import com.example.appfilm.presentation.ui.home.viewmodel.HomeEvent
-import com.example.appfilm.presentation.ui.home.viewmodel.HomeUIState
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import kotlinx.coroutines.launch
@@ -58,7 +58,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     navController: NavController,
-    logoutState: HomeUIState,
+    logoutState: UIState,
     onEvenClick: (HomeEvent) -> Unit
 
 ) {
@@ -106,6 +106,7 @@ fun HomeScreen(
     val getNewMovieState by homeMovieViewModel.getNewMovieState.collectAsState()
     val addFavouriteMovieState by homeMovieViewModel.addFavouriteMovie.collectAsState()
     val movies by homeMovieViewModel.movies.collectAsState()
+    val isFavouriteMovie by homeMovieViewModel.checkFavourite.collectAsState()
 
 
     val favouriteViewModel = hiltViewModel<FavouriteViewModel>()
@@ -172,7 +173,7 @@ fun HomeScreen(
                         isShowDiaLogConfirm = true
                     }) {
                         Icon(
-                            Icons.Default.ExitToApp,
+                            Icons.AutoMirrored.Filled.ExitToApp,
                             contentDescription = "Menu",
                             tint = Color.White
                         )
@@ -183,9 +184,7 @@ fun HomeScreen(
 
 
 
-            Box(
-
-            ) {
+            Box {
                 when (selectedScreen) {
                     is NavigationDrawerItem.Home -> HomeMovieScreen(
                         navController = navController,
@@ -193,10 +192,14 @@ fun HomeScreen(
                         getNewMovieState = getNewMovieState,
                         addFavouriteMovieState = addFavouriteMovieState,
                         movies = movies,
+                        checkFavouriteMovie = isFavouriteMovie,
                         onEventClick = {
 
                             homeMovieViewModel.handleEvent(it)
-                        })
+                        },
+
+                    )
+
 
                     is NavigationDrawerItem.Favorite -> FavouriteMovieScreen(
                         navController,
@@ -216,7 +219,7 @@ fun HomeScreen(
                         listMovie,
                         listMovieSearch,
                         onEventClick = {
-                            searchMovieViewModel.handleEvent(it )
+                            searchMovieViewModel.handleEvent(it)
                         }
 
                     )

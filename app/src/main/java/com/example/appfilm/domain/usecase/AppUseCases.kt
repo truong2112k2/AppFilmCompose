@@ -21,7 +21,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-data class AppUseCases @Inject constructor (
+data class AppUseCases @Inject constructor(
     val logInUseCase: LogInUseCase,
     val registerUseCase: RegisterUseCase,
     val validationUseCase: ValidationUseCase,
@@ -35,14 +35,11 @@ data class AppUseCases @Inject constructor (
     val fetchDataAndSaveFromDbUseCase: FetchMovieAndSaveUseCase,
     val fetchCategoryUseCase: FetchCategoryUseCase,
     val fetchMoviesByCategoryUseCase: FetchMoviesByCategoryUseCase,
-    val fetchDetailMovie : FetchDetailMovieUseCase,
+    val fetchDetailMovie: FetchDetailMovieUseCase,
 
     val addFavouriteMovieUseCase: AddFavouriteMovieUseCase,
     val checkFavouriteMovieUseCase: CheckFavouriteMovieUseCase,
     val getFavouriteMoviesUseCase: GetFavouriteMoviesUseCase,
     val removeFavouriteMovieUseCase: RemoveFavouriteMovieUseCase,
     val searchMoviesUseCase: SearchMoviesUseCase
-) {
-
-
-}
+)

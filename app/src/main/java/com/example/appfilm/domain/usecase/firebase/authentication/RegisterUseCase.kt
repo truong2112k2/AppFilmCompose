@@ -12,6 +12,6 @@ class RegisterUseCase @Inject constructor(
     private val firebaseRepository: IFirebase
 ) {
     suspend operator fun invoke(email: String, password: String): Flow<Resource<Unit>> {
-           return firebaseRepository.firebaseRegister(email, password)
+        return firebaseRepository.firebaseRegister(email, password)
     }
 }

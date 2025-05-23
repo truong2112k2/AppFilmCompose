@@ -20,7 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,15 +52,15 @@ import com.example.appfilm.R
 import com.example.appfilm.common.Constants
 import com.example.appfilm.presentation.ui.CustomBoxHideUI
 import com.example.appfilm.presentation.ui.CustomButton
-import com.example.appfilm.presentation.ui.CustomTextField
-import com.example.appfilm.presentation.ui.CustomTextTitle
 import com.example.appfilm.presentation.ui.CustomLoadingDialog
 import com.example.appfilm.presentation.ui.CustomRandomBackground
 import com.example.appfilm.presentation.ui.CustomResultDialog
+import com.example.appfilm.presentation.ui.CustomTextField
+import com.example.appfilm.presentation.ui.CustomTextTitle
+import com.example.appfilm.presentation.ui.UIState
 import com.example.appfilm.presentation.ui.login.components.CustomForgotPasswordText
 import com.example.appfilm.presentation.ui.login.viewmodel.LoginEvent
 import com.example.appfilm.presentation.ui.login.viewmodel.LoginFields
-import com.example.appfilm.presentation.ui.login.viewmodel.LoginUIState
 import com.google.firebase.auth.FirebaseAuth
 
 @SuppressLint("ContextCastToActivity")
@@ -69,9 +69,9 @@ import com.google.firebase.auth.FirebaseAuth
 fun LogInScreen(
     navController: NavController,
     loginFields: LoginFields,
-    logInState: LoginUIState,
-    sendEmailState: LoginUIState,
-    evenClick : (LoginEvent) -> Unit
+    logInState: UIState,
+    sendEmailState: UIState,
+    evenClick: (LoginEvent) -> Unit
 ) {
     //  val logInState by loginViewModel.logInUIState.collectAsState()
     //  val sendEmailState by loginViewModel.sendEmailUIState.collectAsState()
@@ -123,7 +123,7 @@ fun LogInScreen(
                 title = {},
                 navigationIcon = {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier.clickable {

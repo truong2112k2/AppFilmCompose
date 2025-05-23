@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -41,31 +41,30 @@ import androidx.navigation.NavController
 import com.example.appfilm.R
 import com.example.appfilm.common.Constants
 import com.example.appfilm.presentation.ui.CustomButton
-import com.example.appfilm.presentation.ui.CustomTextField
-import com.example.appfilm.presentation.ui.CustomTextTitle
 import com.example.appfilm.presentation.ui.CustomLoadingDialog
 import com.example.appfilm.presentation.ui.CustomRandomBackground
 import com.example.appfilm.presentation.ui.CustomResultDialog
+import com.example.appfilm.presentation.ui.CustomTextField
+import com.example.appfilm.presentation.ui.CustomTextTitle
+import com.example.appfilm.presentation.ui.UIState
 import com.example.appfilm.presentation.ui.register.componets.CustomTextError
 import com.example.appfilm.presentation.ui.reset_password.viewmodel.RegisterEvent
 import com.example.appfilm.presentation.ui.reset_password.viewmodel.ResetPassFields
-import com.example.appfilm.presentation.ui.reset_password.viewmodel.ResetPassUIState
 
 @SuppressLint("ContextCastToActivity")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResetPasswordScreen(
     navController: NavController,
-    resetPassFields : ResetPassFields,
-    resetPassUIState: ResetPassUIState,
-    eventClick : (RegisterEvent) -> Unit
-                      //  resetPassViewModel: ResetPassViewModel = hiltViewModel()
+    resetPassFields: ResetPassFields,
+    resetPassUIState: UIState,
+    eventClick: (RegisterEvent) -> Unit
+    //  resetPassViewModel: ResetPassViewModel = hiltViewModel()
 ) {
 
 
     var isHideUi by rememberSaveable { mutableStateOf(false) }
-   // val resetPassFields = resetPassViewModel.resetPassFields
-   // val resetPassUIState = resetPassViewModel.resetPassState
+
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -117,7 +116,7 @@ fun ResetPasswordScreen(
                     title = {},
                     navigationIcon = {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier.clickable {
@@ -164,13 +163,13 @@ fun ResetPasswordScreen(
                         resetPassFields.email,
                         "Enter your email",
                         onValueChange = {
-                        //    resetPassViewModel.updateEmail(it) // funtion
+                            //    resetPassViewModel.updateEmail(it) // funtion
                             eventClick(RegisterEvent.UpdateEmail(it))
                         })
 
                     Spacer(Modifier.height(8.dp))
 
-                    if(resetPassUIState.error?.isNotEmpty() == true){
+                    if (resetPassUIState.error?.isNotEmpty() == true) {
                         CustomTextError(resetPassUIState.error)
                     }
 
@@ -182,7 +181,7 @@ fun ResetPasswordScreen(
                         onClick = {
 
                             eventClick(RegisterEvent.ResetPassword)
-                          //  resetPassViewModel.resetPassword() // funtion
+                            //  resetPassViewModel.resetPassword() // funtion
 
                         },
                         "Reset password"
@@ -192,7 +191,7 @@ fun ResetPasswordScreen(
                     CustomLoadingDialog(resetPassUIState.isLoading)
 
                     CustomResultDialog(
-                      resetPassFields.isShowDialogResult,
+                        resetPassFields.isShowDialogResult,
                         message = resetPassFields.resultString,
                         warningMessage = stringResource(R.string.warning_reset_pass),
                         onConfirm = {

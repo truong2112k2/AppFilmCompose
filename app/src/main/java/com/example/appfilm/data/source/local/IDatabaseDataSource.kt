@@ -9,5 +9,9 @@ interface IDatabaseDataSource {
     suspend fun insertAll(movies: List<MovieDb>): Resource<Boolean>
     fun getAllMovies(): Flow<List<MovieDb>>
     suspend fun cacheMovies(context: Context, movies: List<MovieDb>): List<MovieDb>
-    suspend fun saveImageToInternalStorage(context: Context, imageUrl: String, fileName: String): String?
+    suspend fun saveImageToInternalStorage(
+        context: Context,
+        imageUrl: String,
+        fileName: String
+    ): String?
 }

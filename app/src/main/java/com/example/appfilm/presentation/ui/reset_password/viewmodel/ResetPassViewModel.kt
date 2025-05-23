@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appfilm.common.Resource
 import com.example.appfilm.domain.usecase.AppUseCases
+import com.example.appfilm.presentation.ui.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,7 +20,7 @@ class ResetPassViewModel @Inject constructor(
 ) : ViewModel() {
 
     var resetPassFields by mutableStateOf(ResetPassFields())
-    var resetPassState by mutableStateOf(ResetPassUIState())
+    var resetPassState by mutableStateOf(UIState())
 
 
     fun updateEmail(newEmail: String) {
@@ -28,13 +29,13 @@ class ResetPassViewModel @Inject constructor(
         )
     }
 
-    fun updateResultString(newString: String){
+    fun updateResultString(newString: String) {
         resetPassFields = resetPassFields.copy(
             resultString = newString
         )
     }
 
-    fun updateIsShowDialogResult(newValue: Boolean){
+    fun updateIsShowDialogResult(newValue: Boolean) {
         resetPassFields = resetPassFields.copy(
             isShowDialogResult = newValue
         )
@@ -48,7 +49,7 @@ class ResetPassViewModel @Inject constructor(
 
             val errorEmail = appUseCases.validationUseCase.validationEmail(resetPassFields.email)
             if (errorEmail?.isNotEmpty() == true) {
-                resetPassState = ResetPassUIState(error = errorEmail)
+                resetPassState = UIState(error = errorEmail)
                 updateResultString(errorEmail)
 
                 return@launch
@@ -57,7 +58,7 @@ class ResetPassViewModel @Inject constructor(
             appUseCases.resetPassWordUseCase.invoke(resetPassFields.email).collect { result ->
                 resetPassState = when (result) {
                     is Resource.Loading -> {
-                        ResetPassUIState(isLoading = true)
+                        UIState(isLoading = true)
                     }
 
                     is Resource.Success -> {
@@ -65,7 +66,7 @@ class ResetPassViewModel @Inject constructor(
 
                         updateIsShowDialogResult(true)
 
-                        ResetPassUIState(isSuccess = true)
+                        UIState(isSuccess = true)
 
                     }
 
@@ -75,7 +76,7 @@ class ResetPassViewModel @Inject constructor(
                             updateResultString(it)
                         }
                         updateIsShowDialogResult(true)
-                        ResetPassUIState(
+                        UIState(
                             error = result.message
                         )
                     }
@@ -88,15 +89,21 @@ class ResetPassViewModel @Inject constructor(
 
     }
 
-    fun handleEvent(registerEvent: RegisterEvent){
-        when(registerEvent){
-            is RegisterEvent.UpdateEmail -> { updateEmail(registerEvent.email)}
-            is RegisterEvent.ResetPassword -> { resetPassword() }
-            is RegisterEvent.UpdateIsShowDialogResult -> { updateIsShowDialogResult(registerEvent.value)}
+    fun handleEvent(registerEvent: RegisterEvent) {
+        when (registerEvent) {
+            is RegisterEvent.UpdateEmail -> {
+                updateEmail(registerEvent.email)
+            }
+
+            is RegisterEvent.ResetPassword -> {
+                resetPassword()
+            }
+
+            is RegisterEvent.UpdateIsShowDialogResult -> {
+                updateIsShowDialogResult(registerEvent.value)
+            }
         }
     }
-
-
 
 
 }

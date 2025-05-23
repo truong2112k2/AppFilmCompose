@@ -7,17 +7,21 @@ import com.example.appfilm.domain.model.MovieByCategory
 import com.example.appfilm.domain.usecase.AppUseCases
 
 
-class MoviePagingSource (
-    private val appUseCases: AppUseCases ,
+class MoviePagingSource(
+    private val appUseCases: AppUseCases,
     private val typeList: String
 ) : PagingSource<Int, MovieByCategory>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieByCategory> {
         return try {
             val currentPage = params.key ?: 1
-            val response = appUseCases.fetchMoviesByCategoryUseCase.invoke(typeList, currentPage, 10)
+            val response =
+                appUseCases.fetchMoviesByCategoryUseCase.invoke(typeList, currentPage, 10)
 
-            Log.d("MoviePagingSource", "Page = $currentPage, Size = ${params.loadSize}, Result = ${response.data?.size}")
+            Log.d(
+                "MoviePagingSource",
+                "Page = $currentPage, Size = ${params.loadSize}, Result = ${response.data?.size}"
+            )
 
             val movies = response.data ?: emptyList()
 

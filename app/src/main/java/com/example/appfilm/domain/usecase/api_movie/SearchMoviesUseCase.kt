@@ -7,11 +7,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SearchMoviesUseCase  @Inject constructor(
-    private val movieRepository : IApiMovie
+class SearchMoviesUseCase @Inject constructor(
+    private val movieRepository: IApiMovie
 ) {
 
-    suspend operator fun invoke(keyword: String): Resource<List<MovieBySearch>>{
+    suspend operator fun invoke(keyword: String): Resource<List<MovieBySearch>> {
         return movieRepository.searchMovies(keyword)
     }
 
