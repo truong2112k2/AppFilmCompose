@@ -1,6 +1,7 @@
 package com.example.appfilm.presentation.ui.home.screen.home_movie_screen
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +17,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.appfilm.common.Constants
 import com.example.appfilm.domain.model.Movie
-import com.example.appfilm.presentation.ui.CustomRetryBox
 import com.example.appfilm.presentation.ui.CustomTextTitle
 import com.example.appfilm.presentation.ui.UIState
 import com.example.appfilm.presentation.ui.home.screen.home_movie_screen.components.CustomTextClickable
@@ -38,38 +37,38 @@ fun HomeMovieScreen(
     navController: NavController,
     context: Context,
     getNewMovieState: UIState,
-    addFavouriteMovieState: UIState,
+
     movies: List<Movie>,
-    checkFavouriteMovie: Boolean,
+
     onEventClick: (HomeMovieEvent) -> Unit
 ) {
 
-    LaunchedEffect(Unit) {
-        if(movies.isNotEmpty()){
-            onEventClick(HomeMovieEvent.CheckFavouriteMovie(movies[0]._id.toString()))
 
-        }
-    }
-    if (getNewMovieState.error?.isNotEmpty() == true) {
-        CustomRetryBox(onClick = {
-            onEventClick(HomeMovieEvent.GetMoviesOnNetwork(context, 1))
-        })
+//    if (getNewMovieState.error?.isNotEmpty() == true) {
+//        CustomRetryBox(onClick = {
+//            onEventClick(HomeMovieEvent.GetMoviesOnNetwork(context, 1))
+//        })
+//
+//    } else {
 
-    } else {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        if (movies.isNotEmpty()) {
+            val newMovie = movies[0]
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
             item {
-                if (getNewMovieState.isLoading) {
 
+                if (getNewMovieState.isLoading) {
 
                     Row(
                         modifier = Modifier.padding(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+
+                        Log.d("312312", "Vao Day r")
                         Text(
                             "Updating new movies",
                             color = Color.White
@@ -81,78 +80,66 @@ fun HomeMovieScreen(
                         )
                     }
                 }
+                NewMovieItem(
+                    newMovie,
+                    onClickPlay = {
+                        navController.navigate("DETAIL_ROUTE/${newMovie.slug}")
+                    },
 
+
+                    )
             }
 
 
-            if (movies.isNotEmpty()) {
-                val newMovie = movies[0]
-
-                item {
-                    NewMovieItem(
-                        newMovie,
-                        checkFavouriteMovie,
-                        onClickPlay = {
-                            navController.navigate("DETAIL_ROUTE/${newMovie.slug}")
-                        },
-                        onClickAddFavourite = {
-                            onEventClick(HomeMovieEvent.AddFavouriteMovie(newMovie))
-
-                        },
-                        addFavouriteMovieState,
-
-                        )
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-
-
-
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        CustomTextTitle("New Movies")
-                        Spacer(Modifier.weight(1f))
-                        CustomTextClickable(
-                            onClick = { navController.navigate(Constants.CATEGORY_ROUTE) }
-                        )
-                    }
-                }
-
-                item {
-
-
-                    LazyRow {
-                        items(movies.drop(1)) { movie ->
-                            HomeMovieItem(
-                                movie,
-                                onClick = {
-                                    navController.navigate(
-                                        "DETAIL_ROUTE/${movie.slug}"
-                                    )
-
-                                }
-                            )
-                        }
-                    }
-                }
-
-
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
             }
+
+
+
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    CustomTextTitle("New Movies")
+                    Spacer(Modifier.weight(1f))
+                    CustomTextClickable(
+                        onClick = { navController.navigate(Constants.CATEGORY_ROUTE) }
+                    )
+                }
+            }
+
+            item {
+
+
+                LazyRow {
+                    items(movies.drop(1)) { movie ->
+                        HomeMovieItem(
+                            movie,
+                            onClick = {
+                                navController.navigate(
+                                    "DETAIL_ROUTE/${movie.slug}"
+                                )
+
+                            }
+                        )
+                    }
+                }
+            }
+
+
         }
+    }
 
 
 //
 
 
-    }
+    //}
 }
 
 

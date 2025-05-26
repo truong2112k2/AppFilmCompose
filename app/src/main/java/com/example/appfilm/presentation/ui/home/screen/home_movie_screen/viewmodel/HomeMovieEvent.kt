@@ -6,6 +6,6 @@ import com.example.appfilm.domain.model.Movie
 sealed class HomeMovieEvent {
     data class GetMoviesOnNetwork(val context: Context, val page: Int) : HomeMovieEvent()
     data class AddFavouriteMovie(val movie: Movie) : HomeMovieEvent()
-    data class CheckFavouriteMovie(val movieId: String) : HomeMovieEvent()
+
 
 }

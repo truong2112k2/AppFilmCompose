@@ -94,11 +94,7 @@ fun CustomButtonWithIcon(
 @Composable
 fun NewMovieItem(
     newMovie: Movie,
-    checkFavouriteMovie: Boolean,
     onClickPlay: () -> Unit,
-    onClickAddFavourite: () -> Unit,
-    addFavouriteMovie: UIState,
-
     ) {
     Box(
         modifier = Modifier
@@ -160,7 +156,8 @@ fun NewMovieItem(
                 verticalArrangement = Arrangement.Center
             ) {
 
-               // Text( checkFavouriteMovie.toString(), color = Color.White, fontSize = 24.sp)
+
+
                 Text(
                     newMovie.name.toString(),
                     style = TextStyle(
@@ -179,68 +176,8 @@ fun NewMovieItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-
-
-                    val text = if (addFavouriteMovie.isSuccess) {
-                        "Add success"
-                    } else if (addFavouriteMovie.isLoading) {
-                        "Loading"
-                    } else if (addFavouriteMovie.error?.isNotEmpty() == true) {
-                        addFavouriteMovie.error
-                    }  else {
-                        "Add to favourite"
-
-                    }
-
-
-
-                        CustomButtonWithIcon(onClick = {
-                            onClickPlay()
-                        }, Icons.Default.PlayArrow, "Play")
-
-
-
-                    Spacer(Modifier.width(8.dp))
-
-                    Button(
-                        onClick = {
-                            onClickAddFavourite()
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                        modifier = Modifier.width(200.dp)
-                    ) {
-                        if (addFavouriteMovie.isSuccess) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = "Icon",
-                                tint = Color.Black
-                            )
-                        } else if (addFavouriteMovie.isLoading) {
-                            CircularProgressIndicator(modifier = Modifier.size(14.dp))
-                        } else if (addFavouriteMovie.error?.isNotEmpty() == true) {
-                            Icon(
-                                imageVector = Icons.Default.Warning,
-                                contentDescription = "Icon",
-                                tint = Color.Black
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Icon",
-                                tint = Color.Black
-                            )
-                        }
-
-
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text =  text,
-                            color = Color.Black
-                        )
+                    PlaySquareButton {
+                        onClickPlay()
                     }
 
 
@@ -248,6 +185,25 @@ fun NewMovieItem(
                 Spacer(Modifier.height(30.dp))
             }
         }
+    }
+}
+@Composable
+fun PlaySquareButton(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(62.dp) // Kích thước hình vuông
+            .clip(RoundedCornerShape(14.dp)) // Bo góc 14.dp
+            .border(1.dp, Color.Black, RoundedCornerShape(14.dp)) // Viền đen nếu bạn muốn
+            .background(Color.White) // Nền trong suốt
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.PlayArrow,
+            contentDescription = "Play",
+            tint = Color.Black,
+            modifier = Modifier.size(24.dp)
+        )
     }
 }
 

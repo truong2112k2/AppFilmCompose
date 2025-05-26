@@ -138,16 +138,17 @@ class DetailViewModel @Inject constructor(
 
     private fun checkFavouriteMovie(movieId: String) {
 
-        Log.d("kkkk", "id Movie in checkFavouriteMovie  $movieId")
+     //   Log.d("kkkk", "id Movie in checkFavouriteMovie  $movieId")
 
         viewModelScope.launch(Dispatchers.IO) {
             val result = appUseCases.checkFavouriteMovieUseCase.invoke(movieId)
             _checkFavourite.value = result.data == true
 
-            Log.d("kkkk", "result in checkFavouriteMovie  ${result.data}")
+//Log.d("kkkk", "result in checkFavouriteMovie  ${result.data}")
 
         }
     }
+
 
     private val _deleteFavouriteMovieState = MutableStateFlow<UIState>(UIState())
     val deleteFavouriteMovieState: StateFlow<UIState> = _deleteFavouriteMovieState.asStateFlow()

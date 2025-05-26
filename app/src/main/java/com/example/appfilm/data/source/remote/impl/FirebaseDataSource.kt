@@ -263,21 +263,4 @@ class FirebaseDataSource @Inject constructor(
         }
     }
 
-    override suspend fun isFavoriteNewMovies(movieId: String): Flow<Resource<Boolean>> = flow {
-        emit(Resource.Loading())
-        val userId = firebaseAuth.currentUser?.uid
-         try {
-            val snapshot =
-                firebaseDatabase.getReference("FAVORITE_MOVIES")
-                    .child(userId.toString())
-                    .child(movieId)
-                    .get()
-                    .await()
-
-            emit(Resource.Success(snapshot.exists()))
-
-        } catch (e: Exception) {
-             emit(Resource.Error("Check favourite movies failed: ${e.message}"))
-        }
-    }
 }
