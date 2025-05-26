@@ -18,6 +18,5 @@ interface IFirebaseDataSource {
     suspend fun removeFavoriteMovie(movieId: String): Flow<Resource<Unit>>
 
     suspend fun isFavorite(movieId: String): Resource<Boolean>
-    suspend fun isFavoriteNewMovies(movieId: String): Flow<Resource<Boolean>>
     suspend fun getFavouriteMovies(): Flow<Resource<List<Item>>>
 }

@@ -104,9 +104,7 @@ fun HomeScreen(
 
     val homeMovieViewModel = hiltViewModel<HomeMovieViewModel>()
     val getNewMovieState by homeMovieViewModel.getNewMovieState.collectAsState()
-    val addFavouriteMovieState by homeMovieViewModel.addFavouriteMovie.collectAsState()
     val movies by homeMovieViewModel.movies.collectAsState()
-    val isFavouriteMovie by homeMovieViewModel.checkFavourite.collectAsState()
 
 
     val favouriteViewModel = hiltViewModel<FavouriteViewModel>()
@@ -150,6 +148,7 @@ fun HomeScreen(
 
             TopAppBar(
                 title = {
+
                     Text(selectedScreen.title)
 
                 },
@@ -190,9 +189,7 @@ fun HomeScreen(
                         navController = navController,
                         context = context,
                         getNewMovieState = getNewMovieState,
-                        addFavouriteMovieState = addFavouriteMovieState,
                         movies = movies,
-                        checkFavouriteMovie = isFavouriteMovie,
                         onEventClick = {
 
                             homeMovieViewModel.handleEvent(it)

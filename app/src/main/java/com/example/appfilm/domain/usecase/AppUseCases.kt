@@ -41,5 +41,5 @@ data class AppUseCases @Inject constructor(
     val checkFavouriteMovieUseCase: CheckFavouriteMovieUseCase,
     val getFavouriteMoviesUseCase: GetFavouriteMoviesUseCase,
     val removeFavouriteMovieUseCase: RemoveFavouriteMovieUseCase,
-    val searchMoviesUseCase: SearchMoviesUseCase
+    val searchMoviesUseCase: SearchMoviesUseCase,
 )

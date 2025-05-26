@@ -77,6 +77,8 @@ class HomeMovieViewModel @Inject constructor(
 
     private fun getMoviesOnNetwork(context: Context, page: Int) {
         _getNewMovieState.value = UIState(isLoading = true)
+        Log.d("312312","getMoviesOnNetwork is loading ${_getNewMovieState.value.isLoading} ")
+
         viewModelScope.launch(Dispatchers.IO) {
             val result =
                 appUseCases.fetchDataAndSaveFromDbUseCase.fetchDataMovieAndSaveFromDb(context, page)
@@ -85,12 +87,16 @@ class HomeMovieViewModel @Inject constructor(
 
                 _movies.value = result.data
                 _getNewMovieState.value = UIState(isSuccess = true)
+                Log.d("312312","getMoviesOnNetwork is success ${_getNewMovieState.value.isSuccess} ")
+
                 Log.d(Constants.STATUS_TAG, "fetchDataAndSaveFromDb UseCase success")
 
 
             } else {
 
+
                 _getNewMovieState.value = UIState(error = result.exception?.let {
+                    Log.d("312312","getMoviesOnNetwork is error ${_getNewMovieState.value.error} ")
                     convertGetMoviesException(it)
                 })
 
@@ -129,21 +135,23 @@ class HomeMovieViewModel @Inject constructor(
 
         }
     }
-    private val _checkFavourite = MutableStateFlow<Boolean>(false)
-    val checkFavourite: StateFlow<Boolean> = _checkFavourite.asStateFlow()
+//    private val _checkFavourite = MutableStateFlow<Boolean>(false)
+//    val checkFavourite: StateFlow<Boolean> = _checkFavourite.asStateFlow()
 
-    private fun checkFavouriteMovie(movieId: String) {
+//    private fun checkFavouriteMovie(movieId: String) {
+//
+//        Log.d("3334", "id Movie by HomeMovieViewModel  $movieId")
+//
+//        viewModelScope.launch(Dispatchers.IO) {
+//            val result = appUseCases.checkFavouriteMovieUseCase.invoke(movieId)
+//            _checkFavourite.value = result.data == true
+//
+//            Log.d("3334", "result by HomeMovieViewModel  ${result.data}")
+//
+//        }
+//    }
 
-        Log.d("3334", "id Movie by HomeMovieViewModel  $movieId")
 
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = appUseCases.checkFavouriteMovieUseCase.invoke(movieId)
-            _checkFavourite.value = result.data == true
-
-            Log.d("3334", "result by HomeMovieViewModel  ${result.data}")
-
-        }
-    }
 
     fun handleEvent(homeMovieEvent: HomeMovieEvent) {
         when (homeMovieEvent) {
@@ -155,7 +163,7 @@ class HomeMovieViewModel @Inject constructor(
                 addFavouriteMovie(homeMovieEvent.movie)
             }
 
-            is HomeMovieEvent.CheckFavouriteMovie -> {checkFavouriteMovie(homeMovieEvent.movieId)}
+
         }
     }
 

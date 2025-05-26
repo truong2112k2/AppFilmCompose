@@ -72,7 +72,5 @@ class FirebaseRepositoryImpl @Inject constructor(
         return firebaseDataSource.removeFavoriteMovie(movieId)
     }
 
-    override suspend fun isFavoriteNewMovies(movieId: String): Flow<Resource<Boolean>> {
-        return firebaseDataSource.isFavoriteNewMovies(movieId)
-    }
+
 }
